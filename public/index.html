@@ -237,11 +237,12 @@ async function search(server) {
     const list = data.list || [];
     let exact = list.filter(r => norm(r.name) === norm(name));
     if (server && exact.length > 1) exact = exact.filter(r => norm(r.serverName) === norm(server));
-    const pick = exact.length === 1 ? exact : list;
+    // Several exact matches: show all of them, highest level first. Otherwise the closest names.
+    const pick = exact.length ? [...exact].sort((a, b) => (b.level || 0) - (a.level || 0)) : list.slice(0, 20);
     if (!pick.length) return say(`No character called “${esc(name)}” in ${esc(region.toUpperCase())}. Check the spelling, or try the other faction.`, true);
     if (pick.length > 1) {
       say("Several characters match — pick yours:");
-      $("#candidates").innerHTML = pick.slice(0, 12).map((r, i) =>
+      $("#candidates").innerHTML = pick.map((r, i) =>
         `<li><button data-i="${i}"><span>${esc(r.name)} <small>${esc(r.className || "")}</small></span><span>${esc(r.serverName)} · Lv ${r.level}</span></button></li>`).join("");
       $("#candidates").querySelectorAll("button").forEach(b => b.onclick = () => load(pick[+b.dataset.i], region));
       return;
