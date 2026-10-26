@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { diagnoseItem } from "../public/js/doctor.js";
-import { expectedAttempts, rollUntil, expectedRoll, atLeastOnce, upgrades, rank, plan, odyleBudget } from "../public/js/calc.js";
+import { expectedAttempts, rollUntil, expectedRoll, atLeastOnce, upgrades, rank, plan } from "../public/js/calc.js";
 
 const load = p => JSON.parse(readFileSync(new URL(p, import.meta.url), "utf8"));
 const model = load("../public/guide/ilvl-model.json");
@@ -38,7 +38,8 @@ test("plan: unlimited resources take everything known; Kinah limits stone work",
   const all = plan(model, upgrades(model, ctx({})), { odyle: 100000 });
   assert.ok(all.total.exp > 100);
   assert.ok(all.taken.some(t => t.id.startsWith("dae:azphel")), "Azphel tiers after an already bought tier");
-  const poor = plan(model, upgrades(model, ctx({})), { kinah: 0, odyle: 0, ap: 0, trainingExp: 0 });
+  const now = new Date("2026-10-26T12:00");
+  const poor = plan(model, upgrades(model, ctx({})), { kinah: 0, odyle: 0, ap: 0, trainingExp: 0, targetDate: "2026-10-26T12:00" }, undefined, now);
   assert.equal(poor.byLever.stones.exp, 0);
   assert.equal(poor.byLever.gear.exp, 0, "no cubes, no gear");
   assert.ok(poor.byLever.daevanion.exp >= 32, "shop crystals are not priced in tracked resources");
@@ -47,11 +48,3 @@ test("plan: unlimited resources take everything known; Kinah limits stone work",
   assert.equal(ids.length, new Set(ids).size);
 });
 
-test("Odyle budget: regen 15 per 3 h, event doubles it", () => {
-  const now = new Date("2026-10-28T00:00:00");
-  const a = odyleBudget(model, { odyle: 100, targetDate: "2026-11-04" }, now);
-  assert.equal(a.regen, 7 * 8 * 15);
-  assert.equal(a.cubes, Math.floor((100 + 840) / 40));
-  const b = odyleBudget(model, { odyle: 100, targetDate: "2026-11-04", event: true }, now);
-  assert.equal(b.total, 100 + 2 * 840);
-});

@@ -13,7 +13,8 @@ const diag = name => { const e = bySlot(name); return diagnoseItem(model, e, nkl
 test("keep / replace rules", () => {
   assert.equal(diag("Torso").status, "keeper", "86 base");
   assert.equal(diag("Shoulder").status, "replace", "70 base");
-  assert.equal(diag("Ring1").status, "keeper", "crafted Splendent Star Dragon Lord Ring stays until the 86 crafted ring");
+  assert.equal(diag("Ring1").status, "keeper", "crafted Splendent Star Dragon Lord Ring is upgraded by transfer-craft");
+  assert.equal(diag("Ring1").label, "CRAFT-UPGRADE");
   assert.equal(diag("Belt").status, "keeper");
   assert.equal(diag("Bracelet2").status, "keeper", "bracelets wait for Ludra");
   assert.equal(diag("Arcana2").status, "replace", "Legend card");

@@ -6,15 +6,34 @@ const slotIs = (e, names) => names.some(n => norm(e.slotPosName).replace(/ \d+$/
 const round1 = x => Math.round(x * 10) / 10;
 const sourceFor = (model, e) => model.gear.sources.find(s => slotIs(e, s.slots));
 // Card type: API categoryName ("Chalice", "Parchment" …), falling back to the item name.
+const craftable = (model, e) => !isArcana(e) && !/belt|amulet|rune|bracelet/i.test(e.slotPosName);
+const craftPiece = (model, e) => Object.entries(model.gear.pieceNames || {}).find(([k]) => slotIs(e, [k]))?.[1] || e.slotPosName;
 export const cardType = (e, it) => ["Chalice", "Parchment", "Compass", "Bell", "Mirror"]
   .find(t => same(it?.categoryName, t) || norm(e.name).includes(norm(t))) || it?.categoryName || "Card";
+
+// Crafted Dragon Lord gear: transfer-craft moves it up the ladder with 100% success.
+export const craftLadder = model => model.crafting.ladderOverride || model.crafting.ladder.map(t => t.tier);
+export function craftedInfo(model, e, it) {
+  const C = model.crafting;
+  if (!new RegExp(C.detect, "i").test(e.name || "")) return null;
+  const tiers = craftLadder(model), now = it?.level ?? 0;
+  const next = tiers.filter(t => t > now);
+  let from = now;
+  const steps = next.map(to => {
+    const cost = C.steps[`${from}>${to}`] || null;
+    const names = C.ladder.find(l => l.tier === to)?.names || [];
+    const st = { from, to, gain: to - from, total: to - now, names, cost, known: !!cost && cost.kinah != null };
+    from = to; return st;
+  });
+  return { tier: now, steps, transfer: C.transfer };
+}
 
 // Keep / replace for one piece, with the reason. Arcana are judged by grade instead.
 export function itemStatus(model, e, it) {
   const g = model.gear;
   if (isArcana(e)) return { status: (it?.level ?? 0) >= model.arcana.byGrade.Unique ? "keeper" : "replace", why: "Arcana card grade" };
-  const crafted = g.crafted.find(c => same(e.name, c.match));
-  if (crafted) return { status: "keeper", why: `${crafted.why} — keep until ${crafted.keepUntil}`, crafted };
+  const craft = craftedInfo(model, e, it);
+  if (craft) return { status: "keeper", label: "CRAFT-UPGRADE", why: `crafted — upgrade by transfer-craft (100%)${craft.steps.length ? `, next ${craft.steps[0].to}` : ""}`, craft };
   const keep = g.keep.find(k => slotIs(e, k.match));
   if (keep) return { status: "keeper", why: keep.why };
   if ((it?.level ?? 0) >= g.keeperBase) return { status: "keeper", why: `item level ${it.level} base` };
@@ -47,6 +66,16 @@ export function diagnoseItem(model, e, it) {
     return { e, it, parts, ...st, stones, empty, actions, type };
   }
 
+  if (st.craft) {
+    const C = model.crafting, T = st.craft.transfer;
+    const keep = [T.enhancement && `enhancement +${e.enchantLevel || 0}`, T.soulBinding && "soul binding"].filter(Boolean).join(" and ");
+    st.craft.steps.forEach((x, i) => {
+      if (x.to > model.gear.keeperBase && i > 0) return; // show the path up to the next keeper tier, plus one step past it
+      const mats = x.cost?.materials?.length ? x.cost.materials.map(m => `${m.count ?? "?"}× ${m.name}`).join(", ") : "unknown";
+      act(i === 0 ? "yellow" : "grey", `${i === 0 ? "Next tier" : "Then"}: ${x.names.join(" / ") || "tier " + x.to} (item level ${x.to}) → +${x.gain}${i ? ` (+${x.total} in total)` : ""}, guaranteed. Materials: ${mats}; Kinah: ${x.cost?.kinah?.toLocaleString() ?? "unknown"}. Transfer keeps ${keep || "nothing"}${T.stones ? ", stones too" : "; stones are lost"} (${T.confidence} — check in game).`,
+        { min: x.gain, exp: x.gain, max: x.gain }, "craft");
+    });
+  }
   if (st.status === "replace") {
     const target = model.gear.keeperBase;
     const gross = target - (it.level ?? 0), lost = parts.stones;
@@ -56,10 +85,14 @@ export function diagnoseItem(model, e, it) {
     if (src) act("red", `Replace: ${src.drops} ${piece} (${src.name}, pity after ${src.pityClaims} claims) → +${gross} item level base. Enhancement transfers, the ${lost} item level of stones is lost until you re-socket.${note}`,
       { min: gross - lost, exp: gross - lost + round1(sockets * rolls.expectedPerRoll.Intermediate), max: gross + sockets * 4 - lost }, "replace");
     else act("red", `Below item level ${target}: replace when you can.`, { min: 0, exp: 0, max: gross }, "replace");
+    if (craftable(model, e)) act("grey", `Or craft: Dragon Lord ${craftPiece(model, e)} — ${craftLadder(model).filter(t => t <= target).join(" → ")}, 100% per step, ${/ring|earring|necklace/i.test(e.slotPosName) ? model.crafting.lines.accessories + " soul-binding lines" : "same lines"}; from-scratch cost ${model.crafting.fromScratch.kinah?.toLocaleString() ?? "unknown"}. ${model.crafting.guideHint}`, null, "craftAlt");
     act("grey", `Being replaced — no more stones${(e.enchantLevel || 0) >= model.gear.maxUsefulEnchant ? "" : ` or enhancing past +${model.gear.maxUsefulEnchant}`} on this piece.`, null, "noInvest");
     if (empty) act("grey", `${empty} empty socket${empty > 1 ? "s" : ""}: only cheap Lesser stones here (≈ +${round1(empty * rolls.expectedPerRoll.Lesser)}), the piece is being replaced.`, { min: empty, exp: round1(empty * rolls.expectedPerRoll.Lesser), max: empty * 2 }, "fillCheap");
   } else {
     if (empty) act("red", `${empty} empty socket${empty > 1 ? "s" : ""} → Superior manastones: ≈ +${round1(empty * rolls.expectedPerRoll.Superior)} item level.`, { min: empty * 2, exp: round1(empty * rolls.expectedPerRoll.Superior), max: empty * 4 }, "fill");
+    if (st.craft && !model.crafting.transfer.stones && st.craft.steps.some(x => x.to <= model.gear.keeperBase)) {
+      if (stones.some(s => !s.empty && s.grade !== "Unique")) act("grey", "Stones are lost on the transfer-craft — reroll after the last upgrade.", null, "craftStones");
+    } else
     // Grey (Common) lines are worth rerolling; green (Rare) is fine per Fubgun — optional.
     for (const [grade, level, kind, label] of [["Common", "yellow", "reroll", "grey"], ["Rare", "grey", "rerollOptional", "green"]]) {
       const low = stones.filter(s => !s.empty && s.grade === grade);
@@ -102,6 +135,8 @@ export function findings(model, input) {
   if (fill.length) add(sumExp(fill), `${fill.reduce((n, a) => n + a.d.empty, 0)} empty manastone sockets on pieces you keep`, "Empty sockets are free item level and stats.", `Socket Superior manastones: ${names(fill)}.`, `≈ +${sumExp(fill)} item level`);
   const repl = byKind("replace");
   if (repl.length) add(sumExp(repl), `${repl.length} piece${repl.length > 1 ? "s" : ""} below item level ${model.gear.keeperBase}`, "Every 70 → 86 swap is +16 base; enhancement transfers.", `Replace ${names(repl)} (Horn Den for armor and guard, Fire Temple for weapon and jewellery).`, `≈ +${sumExp(repl)} item level after re-socketing`);
+  const craft = diags.filter(d => d.craft?.steps.length).map(d => ({ d, s: d.craft.steps[0] }));
+  if (craft.length) add(craft.reduce((n, c) => n + c.s.gain, 0) * 1.2, `Transfer-craft ${craft.map(c => `${c.d.e.slotPosName} ${c.s.from} → ${c.s.to}`).join(", ")}`, "Crafted Dragon Lord gear moves up a tier with 100% success — guaranteed item level, enhancement transfers.", `Craft the next tier (materials and cost: see the item card; fill in ilvl-model.json if unknown).`, `+${craft.reduce((n, c) => n + c.s.gain, 0)} item level, guaranteed`);
   const cards = byKind("arcana");
   if (cards.length) add(sumExp(cards), `${cards.length} Arcana card${cards.length > 1 ? "s" : ""} below Unique`, "Each Unique card is 80 item level; Legend is 60.", cards.map(a => `${a.d.type}: ${a.text.split("From ")[1] || "Transcendence"}`).join(" "), `≈ +${sumExp(cards)} item level`);
   const rr = byKind("reroll");

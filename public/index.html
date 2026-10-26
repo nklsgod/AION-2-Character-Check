@@ -57,7 +57,7 @@
 
   /* level rows: the memorable thing — a 20-notch bar, filled to your level, with a hollow mark at the target */
   .row { display: grid; grid-template-columns: 1fr; gap: 6px 16px; padding: 12px 0; border-top: 1px dashed var(--line); }
-  @media (min-width: 640px) { .row { grid-template-columns: 220px 1fr 72px; align-items: center; } }
+  @media (min-width: 640px) { .row { grid-template-columns: 220px 1fr 72px; align-items: center; } .row.prog { grid-template-columns: 220px 1fr auto; } }
   .row .name { font-weight: 600; }
   .row .name small { display: block; font-weight: 400; color: var(--muted); font-size: 14px; }
   .bar { display: grid; grid-template-columns: repeat(20, 1fr); gap: 2px; height: 14px; }
@@ -174,6 +174,16 @@
   #build details { border-top: 1px dashed var(--line); padding: 10px 0; }
   #build summary { cursor: pointer; font-family: var(--display); font-size: 22px; font-weight: 600; }
   #build .lvl input, #extras .lvl input { width: 3.4em; }
+  .verdict-big { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 16px 18px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); margin: 8px 0 12px; }
+  .verdict-big b { font-family: var(--display); font-size: 28px; font-weight: 600; }
+  .verdict-big .light { width: 22px; height: 22px; }
+  .verdict-big.ok b { color: var(--ok); } .verdict-big.warn b { color: var(--warn); } .verdict-big.bad b { color: var(--bad); }
+  .verdict-big > span:last-child { color: var(--muted); }
+  .gapline { border-left: 3px solid var(--warn); padding-left: 12px; } .gapline.ok { border-color: var(--ok); }
+  #deadline h4 { font-family: var(--display); font-size: 22px; margin: 18px 0 6px; }
+  ol.must { padding-left: 22px; display: grid; gap: 6px; } ol.must label { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; }
+  ol.must small { display: block; color: var(--muted); } ol.must li.done b { text-decoration: line-through; opacity: .6; }
+  #deadline details summary, #deadline details summary { cursor: pointer; }
   footer { color: var(--muted); font-size: 14px; padding-top: 28px; }
   @media (prefers-reduced-motion: no-preference) { .bar i { transition: background .3s; } }
 </style>
@@ -201,6 +211,7 @@
     <div class="mode" id="mode" role="group" aria-label="Build to compare with"></div>
     <div class="profile" id="profile"></div>
     <section id="todo"></section>
+    <section id="deadline"></section>
     <section id="plan"></section>
     <section id="ludra"></section>
     <section id="skills"></section>
@@ -220,6 +231,8 @@ import { norm, same, sameTitle, findStat, ilvlBreakdown, boardPoints } from "./j
 import { diagnoseItem, cardLight, findings, skillLineSources } from "./js/doctor.js";
 import { LEVERS, upgrades, rank, plan } from "./js/calc.js";
 import * as BC from "./js/build.js";
+import * as DL from "./js/deadline.js";
+import { effectiveCubes } from "./js/budget.js";
 // ---------- helpers ----------
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -354,7 +367,7 @@ function render() {
   renderLevels($("#stigmas"), "Stigmas", build.stigmas, guide.skillCap, `${guide.stigmaSlots} slots in Season 1.${guide.stigmaNote ? " " + esc(guide.stigmaNote) : ""} Greyed rows are stigmas you have equipped that the preset doesn't use.`, true);
   renderLevels($("#passives"), "Passives", guide.passives.filter(x => x.priority < 3).map(x => ({ ...x, target: 10 })), 10, "Level these before any other passive; there is no hard cap in the guide, 10 is used as the first milestone.");
   statOf = stat;
-  renderTodo(); renderPlan(); renderLudra(stat); renderGear(); renderStats(stat); renderExtras(); renderBoards(); renderBuild();
+  renderTodo(); renderDeadline(); renderPlan(); renderLudra(stat); renderGear(); renderStats(stat); renderExtras(); renderBoards(); renderBuild();
 }
 
 function renderLevels(el, title, wanted, cap, lead, showExtras) {
@@ -503,7 +516,7 @@ function renderGear() {
     const lowWeapon = isWeapon && e.enchantLevel < guide.gear.minEnchantWeapon ? `<span class="tag bad">below +${guide.gear.minEnchantWeapon}</span>` : "";
     const d = model && diagnoseItem(model, e, it);
     const head = d ? `<div class="sum">base ${d.parts.base} · +${d.parts.enchant} enh${d.parts.amp ? ` · +${d.parts.amp} amp` : ""} · +${d.parts.stones} stones = <b>${d.parts.total}</b></div>
-        <span class="chip ${d.status}" title="${esc(d.why)}">${d.status === "keeper" ? "KEEPER" : "REPLACE"}</span> <small class="sum">${esc(d.why)}</small>` : "";
+        <span class="chip ${d.status}" title="${esc(d.why)}">${d.label || (d.status === "keeper" ? "KEEPER" : "REPLACE")}</span> <small class="sum">${esc(d.why)}</small>` : "";
     if (d && soulRep) {
       if (soulRep.rebind) d.actions.push({ level: "yellow", text: `${soulRep.bad.length} bad soul-binding lines → rebind toward ${(K.soulBinding.targets[soulRep.slot] || []).join(", ")}.` });
       if (soulRep.lines.some(l => l.endgame) && d.status === "keeper") d.actions.push({ level: "grey", text: K.soulBinding.endgameLines.note + " (Whelps)" });
@@ -535,12 +548,12 @@ async function loadItems() {
 async function loadItem(e) {
   try { items[e.slotPos] = await api("/api/item", { ...ctx, id: e.id, enchantLevel: e.enchantLevel || 0, slotPos: e.slotPos }); }
   catch (err) { items[e.slotPos] = { failed: true, error: err.message }; } // "not delivered" ≠ "no lines"
-  renderGear(); renderTodo(); renderBreakdown(); updatePlan(); renderBuildSoon();
+  renderGear(); renderTodo(); renderBreakdown(); updatePlan(); renderBuildSoon(); updateDeadlineSoon();
 }
 async function loadBoards() {
   for (const b of char.daevanion?.boardList || []) {
     try { boards[b.id] = await api("/api/daevanion", { ...ctx, boardId: b.id }); } catch { /* reported as missing */ }
-    renderBreakdown(); updatePlan(); renderBuildSoon();
+    renderBreakdown(); updatePlan(); renderBuildSoon(); updateDeadlineSoon();
   }
 }
 // The build section is heavy; rebuild it at most every 50 ms while gear and boards stream in.
@@ -566,7 +579,7 @@ function renderBreakdown() {
 }
 
 // ---------- Gear Doctor: findings sorted by impact ----------
-const diagnoses = () => (equip?.equipment?.equipmentList || []).map(e => diagnoseItem(model, e, items[e.slotPos])).filter(Boolean);
+const diagnoses = () => (applyModelOverrides(), equip?.equipment?.equipmentList || []).map(e => diagnoseItem(model, e, items[e.slotPos])).filter(Boolean);
 function renderTodo() {
   if (!char || !model) return;
   const ilvl = statOf("ItemLevel")?.value ?? 0;
@@ -604,25 +617,124 @@ function renderTodo() {
 }
 
 
+const odyleLine = (c, date) => { const o = c.odyle.parts;
+  return `Odyle until ${esc(date)}: ${c.odyle.total.toLocaleString()} (stock ${o.stock}, regen ${o.regen}, event ${o.event}, Wind Breeze ${o.windBreeze}, Substance Morph ${o.morph}) = ${c.byOdyle} cubes by Odyle; reward counts allow ${c.byCounts} (${c.counts.opens} opening${c.counts.opens > 1 ? "s" : ""} per clear) → <b>${c.cubes}</b> cubes, ${esc(c.binding)} is the limit.`; };
+function membershipLine(list, inp, ilvl) {
+  const a = plan(model, list, { ...inp, membership: true }, inp.levers), b = plan(model, list, { ...inp, membership: false }, inp.levers);
+  return `With membership: ${a.cubes.cubes} cubes / ${Math.round(ilvl + a.total.exp).toLocaleString()} expected · without: ${b.cubes.cubes} / ${Math.round(ilvl + b.total.exp).toLocaleString()}.`;
+}
+
+// ---------- Deadline mode ----------
+let deadlineQueued = false;
+function updateDeadlineSoon() { if (deadlineQueued) return; deadlineQueued = true; setTimeout(() => { deadlineQueued = false; updateDeadline(); }, 80); }
+function renderDeadline() {
+  if (!char || !model) return;
+  const inp = calcInputs();
+  const field = ([k, label, type]) => type === "checkbox"
+    ? `<label class="check"><input type="checkbox" data-k="${k}" ${inp[k] ? "checked" : ""}>${esc(label)}</label>`
+    : `<label>${esc(label)}<input type="${type}" data-k="${k}" value="${esc(inp[k] ?? "")}" placeholder="${type === "number" ? "0 if empty" : ""}"></label>`;
+  $("#deadline").innerHTML = `<h3>Deadline mode <small>what has to happen to hit the target by the date</small></h3>
+    <p class="lead">Guaranteed steps first, then likely ones, then luck — simulated ${model.deadline.sims.toLocaleString()} times. Empty fields count as 0 here. Inputs are shared with the calculator and saved for this character.</p>
+    <details><summary>Inputs</summary><div class="calc">${DEADLINE_FIELDS.map(field).join("")}</div>
+      <p class="note">Ladder options: ${model.crafting.ladderOptions.map(o => `${o.tiers.join(" → ")} (${esc(o.by)})`).join(" · ")}. Craft costs and materials: ${esc(model.crafting.stepsSource)}.</p></details>
+    <div id="deadlineOut"><p class="note">Calculating…</p></div>`;
+  $("#deadline").querySelectorAll("input[data-k]").forEach(i => i.onchange = () => {
+    const e = loadEdits("calcInputs"); e[i.dataset.k] = i.type === "checkbox" ? i.checked : i.value;
+    saveEdits(e, "calcInputs"); applyModelOverrides(); updateDeadlineSoon(); updatePlan(); renderGear();
+  });
+  updateDeadlineSoon();
+}
+function deadlineCtx() {
+  return { diags: diagnoses(), ilvl: statOf("ItemLevel")?.value ?? 0, boards, boardList: char.daevanion?.boardList || [] };
+}
+let lastEarliest = null;
+function updateDeadline() {
+  const out = $("#deadlineOut");
+  if (!out || !model) return;
+  const inp = calcInputs(), ctx = deadlineCtx();
+  const dInp = { ...inp, target: inp.dlTarget || 2800 };
+  const D = DL.deadline(model, ctx, dInp);
+  const other = DL.deadline(model, ctx, { ...dInp, membership: !inp.membership }, { sims: 2000 });
+  const done = loadEdits("deadlineDone");
+  const waiting = (equip?.equipment?.equipmentList || []).some(e => !items[e.slotPos]) || Object.keys(boards).length < (char.daevanion?.boardList || []).length;
+  const light = { likely: "ok", "possible with luck": "warn", unrealistic: "bad" }[D.verdict];
+  const dateTxt = D.end.toLocaleString("en-GB", { weekday: "short", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+  const must = DL.mustHappen(model, D);
+  const status = m => m.cls === "impossible" ? "not possible" : done[m.id] ? "done" : "open";
+  const fmtD = d => d ? d.toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit" }) : "–";
+  out.innerHTML = `${D.missing.length ? `<div class="notice">Forecast incomplete — these fields are empty and count as 0: ${esc(D.missing.join(", "))}.</div>` : ""}
+    ${waiting ? `<p class="note">Gear or Daevanion boards are still loading — numbers will change.</p>` : ""}
+    <div class="verdict-big ${light}"><span class="light ${light === "ok" ? "green" : light === "warn" ? "yellow" : "red"}"></span>
+      <b>${D.target.toLocaleString()} by ${esc(dateTxt)}: ${esc(D.verdict)}</b> <span>${Math.round(D.sim.p * 100)}% of ${model.deadline.sims.toLocaleString()} simulations</span></div>
+    <p class="summary">Guaranteed: <b>${Math.round(D.start + D.guaranteed).toLocaleString()}</b> · Expected: <b>${Math.round(D.expected).toLocaleString()}</b> · With luck: <b>${Math.round(D.withLuck).toLocaleString()}</b> · Target: ${D.target.toLocaleString()}</p>
+    <p class="note">Spread: 10% ${Math.round(D.sim.p10)} · median ${Math.round(D.sim.p50)} · 90% ${Math.round(D.sim.p90)}. ${odyleLine(D.eff, fmtD(D.end))} Membership ${inp.membership ? "off" : "on"} instead: ${other.eff.cubes} cubes, ${Math.round(other.expected).toLocaleString()} expected, ${Math.round(other.sim.p * 100)}%.</p>
+    ${D.gap > 0 ? `<p class="gapline">Even if everything guaranteed and expected works out, <b>${Math.round(D.gap)}</b> item level are missing. ${D.closable ? `They only come if at least ${D.needHits} of the ${D.luckItems} lucky drops land (P = ${Math.round(D.pNeedHits * 100)}%).` : `Not even every lucky drop (+${D.luckSum}) closes it.`}</p>` : `<p class="gapline ok">Guaranteed + expected already reach the target.</p>`}
+    <div id="earliest">${D.verdict === "unrealistic" ? `<p class="note">Looking for the earliest realistic date…</p>` : ""}</div>
+    <h4>Must happen</h4>
+    <ol class="must">${must.map(m => `<li class="${status(m).replace(" ", "-")} ${m.cls}"><label><input type="checkbox" data-done="${esc(m.id)}" ${done[m.id] ? "checked" : ""} ${m.cls === "impossible" ? "disabled" : ""}>
+      <span><b>${esc(m.text)}</b> <span class="tag ${m.cls === "guaranteed" ? "ok" : m.cls === "probable" ? "skill" : m.cls === "impossible" ? "bad" : ""}">${esc(m.cls)}</span>
+      <small>${m.expected != null ? `≈ +${m.expected} expected` : `+${m.gain}`} item level · ${esc(m.cost)} · ${esc(m.when)} · ${status(m)}${m.warn ? ` · ⚠ ${esc(m.warn)}` : ""}</small></span></label></li>`).join("")}</ol>
+    ${D.blocked.filter(l => l.blocked).length ? `<details class="raw"><summary>${D.blocked.filter(l => l.blocked).length} steps not possible with your resources</summary><ul>${D.blocked.filter(l => l.blocked).map(l => `<li>${esc(l.label)} — needs more ${esc(l.blocked)}</li>`).join("")}</ul></details>` : ""}
+    ${D.info.map(i => `<p class="note">${esc(i.label)}</p>`).join("")}
+    <h4>Conflicts</h4><ul>${D.conflicts.map(c => `<li>${esc(c)}</li>`).join("")}</ul>
+    <details><summary>Day by day until ${fmtD(D.end)}</summary><div class="tablewrap"><table class="rank">${DL.dailyPlan(model, D, inp).map(d => `<tr><td class="num">${esc(d.label)}</td><td>${d.events.map(esc).join("<br>") || "—"}</td></tr>`).join("")}</table></div></details>`;
+  out.querySelectorAll("input[data-done]").forEach(i => i.onchange = () => { const e = loadEdits("deadlineDone"); e[i.dataset.done] = i.checked; saveEdits(e, "deadlineDone"); updateDeadlineSoon(); });
+  if (D.verdict === "unrealistic") {
+    const key = JSON.stringify([dInp, ctx.ilvl, D.guaranteed]);
+    const show = r => { const el = $("#earliest"); if (el) el.innerHTML = `<p class="note">Earliest realistic date: ${model.deadline.earliest.map(q => `${Math.round(q * 100)}% → ${r[q] ? fmtD(r[q]) : "not within 60 days"}`).join(" · ")} (same plan and resources, later deadline).</p>`; };
+    if (lastEarliest?.key === key) show(lastEarliest.r);
+    else setTimeout(() => { const r = DL.earliestDates(model, ctx, dInp); lastEarliest = { key, r }; show(r); }, 30);
+  }
+}
+
 // ---------- Upgrade ranking + "path to 2,800" calculator ----------
 const CALC_FIELDS = [
-  ["target", "Target item level", "number", 2800], ["targetDate", "Target date", "date", "2026-11-04"],
+  ["target", "Target item level", "number", 2800], ["targetDate", "Target date", "date", "2026-11-05"],
   ["kinah", "Kinah", "number"], ["odyle", "Odyle now", "number"], ["ap", "Abyss Points", "number"],
   ["trainingExp", "Training Arcana EXP", "number"], ["crystals", "Mysterious Crystals", "number"], ["shards", "Stigma Shards", "number"],
   ["pityFireTemple", "Fire Temple pity (claims)", "number"], ["pityHornDen", "Horn Den pity (claims)", "number"],
   ["transcendenceRuns", "Transcendence runs planned", "number", 10],
-  ["membership", "Odyle membership", "checkbox"], ["event", "Event: double Odyle (Oct 28 – Nov 10)", "checkbox", true],
+  ["membership", "Membership (Special Quai)", "checkbox"], ["event", "Event: 2 Odyle items a day (Oct 28 – Nov 10)", "checkbox", true],
+  ["morph", "Craft Odyle items via Substance Morph", "checkbox", true],
+];
+// Extra fields for deadline mode (same store as the calculator).
+const DEADLINE_FIELDS = [
+  ["dlTarget", "Target item level", "number", 2800], ["date", "Deadline", "datetime-local", "2026-11-05T18:00"],
+  ["kinah", "Kinah", "number"], ["kinahPerDayAlts", "Kinah per day from alts", "number"],
+  ["odyle", "Odyle now", "number"], ["ap", "Abyss Points", "number"], ["apPerAbyssHour", "AP per Abyss hour", "number"],
+  ["trainingExp", "Training Arcana EXP", "number"], ["crystals", "Mysterious Crystals", "number"], ["lastTransmute", "Last transmute", "date"],
+  ["fragments", "Nightmare fragments", "number"], ["centuryroot", "Centuryroot", "number"], ["feathers", "Abyss Feathers collected (of 36)", "number"],
+  ["pityFireTemple", "Fire Temple pity (claims)", "number"], ["pityHornDen", "Horn Den pity (claims)", "number"],
+  ["countFT", "Fire Temple counts stored", "number"], ["countHD", "Horn Den counts stored", "number"], ["countTr", "Transcendence counts stored", "number"],
+  ["intermediateStones", "Intermediate stones on hand", "number"],
+  ["windBreezeBoughtThisWeek", "Wind Breeze items bought this week", "number"], ["morphCraftedThisWeek", "Morph Odyle items crafted this week", "number"],
+  ["ladder", "Crafted ladder tiers", "text", "70,78,86,94,102"], ["craft70", "Craft 70 → 78 Kinah", "number"], ["craft78", "Craft 78 → 86 Kinah", "number"],
+  ["membership", "Membership (Special Quai)", "checkbox"], ["event", "Event: 2 Odyle items a day (Oct 28 – Nov 10)", "checkbox", true],
+  ["morph", "Craft Odyle items via Substance Morph", "checkbox", true],
 ];
 const LEVER_NAMES = { stones: "Manastones", arcana: "Arcana", gear: "Gear swaps", daevanion: "Daevanion", enhance: "Enhancement" };
 function calcInputs() {
   const saved = loadEdits("calcInputs");
   const inp = {};
-  for (const [k, , type, def] of CALC_FIELDS) {
+  for (const [k, , type, def] of [...CALC_FIELDS, ...DEADLINE_FIELDS]) {
     const v = saved[k] ?? def;
     inp[k] = type === "checkbox" ? !!v : v === "" || v == null ? null : type === "number" ? +v : v;
   }
   inp.levers = saved.levers || LEVERS;
+  inp.counts = { "Fire Temple": inp.countFT || 0, "Ferocious Horn Den": inp.countHD || 0, Transcendence: inp.countTr || 0 };
   return inp;
+}
+// Inputs that change the model itself: crafted ladder and known craft costs.
+const MODEL_DEFAULTS = {};
+function applyModelOverrides() {
+  if (!model) return;
+  const inp = calcInputs(), C = model.crafting;
+  MODEL_DEFAULTS.steps ||= JSON.parse(JSON.stringify(C.steps));
+  const tiers = String(inp.ladder || "").split(/[,\s]+/).map(Number).filter(n => n > 0);
+  C.ladderOverride = tiers.length > 1 && tiers.join() !== C.ladder.map(t => t.tier).join() ? tiers : null;
+  C.steps = JSON.parse(JSON.stringify(MODEL_DEFAULTS.steps));
+  if (inp.craft70 != null) C.steps["70>78"].kinah = inp.craft70;
+  if (inp.craft78 != null) C.steps["78>86"].kinah = inp.craft78;
 }
 function renderPlan() {
   if (!char || !model) return;
@@ -663,7 +775,7 @@ function updatePlan() {
   const head = `<tr><th>Upgrade</th><th>Lever</th><th>Item level</th><th>Cost</th><th>Random</th><th>When</th><th>In plan</th></tr>`;
   out.innerHTML = `${waterfall(ilvl, target, p.byLever)}
     <p class="summary">With your resources: <b>${Math.round(got).toLocaleString()}</b> expected (${Math.round(ilvl + p.total.min).toLocaleString()}–${Math.round(ilvl + p.total.max).toLocaleString()}). ${gap ? `Gap to ${target.toLocaleString()}: <b>${Math.round(gap)}</b>` : `Reaches ${target.toLocaleString()} ✓`}</p>
-    <p class="note">Odyle until ${esc(inp.targetDate)}: ${p.odyle.total.toLocaleString()} (${p.odyle.regen} regen${p.odyle.bought ? `, ${p.odyle.bought} bought, ${p.odyle.crafted} crafted` : ""}) = ${p.odyle.cubes} cubes over ${p.odyle.days} days.${unlimited.length ? ` Not entered, counted as unlimited: ${unlimited.join(", ")}.` : ""}${waiting ? " Gear is still loading." : ""} Random upgrades count with their expected value; the band shows worst and best case.</p>
+    <p class="note">${odyleLine(p.cubes, inp.targetDate)} ${membershipLine(list, inp, ilvl)}${unlimited.length ? ` Not entered, counted as unlimited: ${unlimited.join(", ")}.` : ""}${waiting ? " Gear is still loading." : ""} Random upgrades count with their expected value; the band shows worst and best case.</p>
     <div class="tablewrap"><table class="rank">${head}${ranked.slice(0, 20).map(row).join("")}</table></div>
     ${ranked.length > 20 ? `<details class="raw"><summary>${ranked.length - 20} more upgrades</summary><div class="tablewrap"><table class="rank">${head}${ranked.slice(20).map(row).join("")}</table></div></details>` : ""}
     <p class="note">Prices, odds and drop rates are in <a href="/guide/ilvl-model.json" target="_blank">ilvl-model.json</a>, each with its source and how sure it is.</p>`;
@@ -725,7 +837,7 @@ function titleRows() {
 function progressRow(label, key, totalKey, fixed, note) {
   const inp = buildIn(), have = inp[key] ?? null, total = fixed ?? inp[totalKey] ?? null;
   const pct = have != null && total ? Math.min(100, Math.round(have / total * 100)) : 0;
-  return `<div class="row"><div class="name">${esc(label)}<small>type in from the game</small></div>
+  return `<div class="row prog"><div class="name">${esc(label)}<small>type in from the game</small></div>
     <div><div class="board"><div class="fill"><i style="width:${pct}%"></i></div></div></div>
     <div class="lvl"><input type="number" min="0" data-bin="${key}" value="${have ?? ""}" placeholder="–" aria-label="${esc(label)}"><span> / ${fixed ?? `<input type="number" min="0" data-bin="${totalKey}" value="${total ?? ""}" placeholder="?" aria-label="${esc(label)} total">`}</span></div>
     <p class="note">${esc(note)}</p></div>`;

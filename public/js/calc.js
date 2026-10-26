@@ -1,10 +1,10 @@
 // Upgrade ranking and the "path to 2,800" calculator. Pure functions, no DOM.
 import { same, boardPoints } from "./core.js";
 import { cardType } from "./doctor.js";
+import { effectiveCubes, kinahBudget, toDate } from "./budget.js";
 
 export const LEVERS = ["stones", "arcana", "gear", "daevanion", "enhance"];
 const r1 = x => Math.round(x * 10) / 10;
-const DAY = 864e5;
 
 // Expected tries until success when each failure adds `pity` to the chance (no level loss).
 export function expectedAttempts(p0, pity = 0) {
@@ -56,7 +56,7 @@ export function upgrades(model, ctx) {
       }
       // Enhancement steps we have prices for
       const tbl = model.enhance.attempts;
-      for (let lv = e.enchantLevel || 0; tbl[lv]; lv++) {
+      for (let lv = e.enchantLevel || 0; tbl[lv] && lv < (d.it.maxEnchantLevel ?? Infinity); lv++) {
         const a = expectedAttempts(tbl[lv].chance, model.enhance.pityPerFail);
         up({ id: `enh:${slot}:${lv}`, lever: "enhance", label: `${slot}: +${lv} → +${lv + 1}`, detail: `${Math.round(tbl[lv].chance * 100)}% per try, about ${r1(a)} tries${lv >= model.gear.maxUsefulEnchant ? " — past +11 is expensive for 1 item level" : ""}`,
           gain: { min: 1, exp: 1, max: 1 }, cost: { kinah: Math.round(a * tbl[lv].kinah) }, random: true, time: "now", after: lv > (e.enchantLevel || 0) ? `enh:${slot}:${lv - 1}` : null });
@@ -64,6 +64,8 @@ export function upgrades(model, ctx) {
       if ((e.enchantLevel || 0) < model.amplification.needs && /main|sub|weapon|guard|off/i.test(slot) && (d.it.level ?? 0) >= model.gear.keeperBase)
         up({ id: `amp:${slot}`, lever: "enhance", label: `${slot}: +15 Amp 2`, detail: "Needs +15 first (cost from +13 unknown), then Amp 1 (66%, 6 stones, ~600k) and Amp 2 (9 stones, ~900k). Not counted in the calculator.", gain: { min: 10, exp: 10, max: 10 }, cost: { kinah: 1500000 }, random: true, known: false, time: "weeks" });
     }
+    if (d.craft) d.craft.steps.forEach((x, i) => up({ id: `craft:${slot}:${x.to}`, lever: "gear", label: `${slot}: transfer-craft ${x.from} → ${x.to}`, detail: `${x.names.join(" / ")}; 100% success; Kinah ${x.cost?.kinah?.toLocaleString() ?? "unknown"}, materials ${x.cost?.materials?.map(m => m.name).join(", ") || "unknown"}`,
+      gain: { min: x.gain, exp: x.gain, max: x.gain }, cost: x.known ? { kinah: x.cost.kinah } : {}, known: x.known, craft: true, time: "now", after: i ? `craft:${slot}:${x.from}` : null }));
     if (d.status === "replace" && d.actions.some(a => a.kind === "replace")) {
       const a = d.actions.find(x => x.kind === "replace");
       const src = d.source, isGuard = /sub|off|guard/i.test(slot);
@@ -123,33 +125,19 @@ export function upgrades(model, ctx) {
 // Guaranteed first, then item level per effort.
 export const rank = list => [...list].sort((a, b) => (a.random - b.random) || (b.ratio - a.ratio));
 
-// Odyle until the target date: stock + regen (doubled during the event) + membership buys and crafts.
-export function odyleBudget(model, inp, now = new Date()) {
-  const O = model.odyle, end = new Date((inp.targetDate || "2026-11-04") + "T00:00:00");
-  const days = Math.max(0, (end - now) / DAY);
-  let regen = days * 8 * O.regenPer3h;
-  if (inp.event) {
-    const a = Math.max(now, new Date(O.event.from + "T00:00:00")), b = Math.min(end, new Date(O.event.to + "T23:59:59"));
-    if (b > a) regen += (b - a) / DAY * 8 * O.regenPer3h * (O.event.factor - 1);
-  }
-  const weeks = days / 7;
-  const bought = inp.membership ? Math.floor(weeks * O.membership.buyPerWeek) : 0;
-  const crafted = inp.membership ? Math.floor(weeks * O.membership.craftPerWeek) : 0;
-  const total = Math.floor((inp.odyle || 0) + regen + bought + crafted);
-  return { days: r1(days), regen: Math.floor(regen), bought, crafted, total, cubes: Math.floor(total / model.gear.drops.odylePerCube), kinahForBuys: bought * O.membership.buyKinahEach };
-}
-
 // Greedy plan: walk the ranked list, take what the resources pay for. Unentered resources count as unlimited.
 export function plan(model, list, inp, levers = LEVERS, now = new Date()) {
-  const odyle = odyleBudget(model, inp, now);
+  const end = toDate(inp.targetDate || model.deadline.defaultDate);
+  const cubesInfo = effectiveCubes(model, inp, now, end), odyle = cubesInfo.odyle;
+  const buys = odyle.kinah.windBreeze + odyle.kinah.morph;
   const pool = {
-    kinah: inp.kinah == null ? Infinity : inp.kinah - odyle.kinahForBuys,
+    kinah: inp.kinah == null ? Infinity : kinahBudget(model, inp, now, end).total - buys,
     ap: inp.ap == null ? Infinity : inp.ap,
     trainingExp: inp.trainingExp == null ? Infinity : inp.trainingExp,
     runs: Infinity, shop: Infinity, crystals: Infinity,
   };
   const pity = { "Fire Temple": inp.pityFireTemple || 0, "Ferocious Horn Den": inp.pityHornDen || 0 };
-  let cubes = odyle.cubes; // Odyle on hand not entered = 0, regen still counts
+  let cubes = cubesInfo.cubes; // Odyle on hand not entered = 0, regen still counts
   const taken = [], groups = new Set(), ids = new Set();
   for (const u of rank(list)) {
     if (!u.known || !levers.includes(u.lever) || (u.group && groups.has(u.group)) || (u.after && !ids.has(u.after))) continue;
@@ -163,5 +151,5 @@ export function plan(model, list, inp, levers = LEVERS, now = new Date()) {
   for (const u of taken) { const b = byLever[u.lever]; b.min += u.gain.min; b.exp += u.gain.exp; b.max += u.gain.max; b.n++; }
   for (const b of Object.values(byLever)) { b.min = r1(b.min); b.exp = r1(b.exp); b.max = r1(b.max); }
   const sum = k => r1(Object.values(byLever).reduce((n, b) => n + b[k], 0));
-  return { taken, byLever, total: { min: sum("min"), exp: sum("exp"), max: sum("max") }, odyle, left: { ...pool, cubes } };
+  return { taken, byLever, total: { min: sum("min"), exp: sum("exp"), max: sum("max") }, odyle, cubes: cubesInfo, left: { ...pool, cubes } };
 }

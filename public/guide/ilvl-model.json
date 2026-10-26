@@ -104,7 +104,10 @@
       "Chalice": "Transcendence: either dungeon (Unique Chalice from Stage 4 only)"
     },
     "transmute": {
-      "text": "Transmute Unique: 5 Mysterious Crystals + 2M Kina, pick 1 skill, 7-day cooldown",
+      "text": "Transmute into a Unique card: 5 Mysterious Crystals + 2M Kina, pick 1 skill, 7-day cooldown",
+      "crystals": 5,
+      "kinah": 2000000,
+      "cooldownDays": 7,
       "confidence": "inferred",
       "source": "user notes"
     },
@@ -265,13 +268,7 @@
         "why": "bracelet upgrades come with Ludra"
       }
     ],
-    "crafted": [
-      {
-        "match": "Splendent Star Dragon Lord Ring",
-        "keepUntil": "Splendent White/Dark Dragon Lord Ring (86, crafted)",
-        "why": "crafted ring with 5 lines"
-      }
-    ],
+    "crafted": [],
     "sources": [
       {
         "name": "Fire Temple",
@@ -380,22 +377,76 @@
     "source": "Fubgun (Amp 1 66%, 6 stones, ~600k; Amp 2 9 stones, ~900k)"
   },
   "odyle": {
-    "regenPer3h": 15,
-    "membership": {
-      "cap": 840,
-      "buyPerWeek": 20,
-      "buyKinahEach": 100000,
-      "craftPerWeek": 20
+    "_about": "Odyle energy. Items (Odyle Energy (Bound)) hold 40 energy each and don't count against the cap.",
+    "itemEnergy": 40,
+    "regen": {
+      "per3h": 15,
+      "perDay": 120,
+      "cap": {
+        "base": 560,
+        "membership": 840
+      },
+      "confidence": "inferred",
+      "source": "user notes"
     },
-    "capWithout": null,
+    "windBreeze": {
+      "itemsPerWeek": 20,
+      "kinahEach": 100000,
+      "membershipOnly": true,
+      "confidence": "inferred",
+      "source": "user notes (Wind Breeze Merchant)"
+    },
+    "substanceMorph": {
+      "itemsPerWeek": 20,
+      "split": "4 per character + 16 account-wide",
+      "cost": "25 Odyle + 5 Fine + 1 Pure + 50k Kinah",
+      "kinahEach": 50000,
+      "confidence": "inferred",
+      "source": "user notes (limit 20/week from the user's data)"
+    },
     "event": {
       "from": "2026-10-28",
       "to": "2026-11-10",
-      "factor": 2,
-      "what": "double Odyle mail"
+      "itemsPerDay": 2,
+      "mailExpiresDays": 7,
+      "confidence": "inferred",
+      "source": "user notes: 2 Odyle items per day by mail"
     },
-    "confidence": "inferred",
-    "source": "user notes; cap without membership unknown, event treated as double regen"
+    "weeklyReset": {
+      "weekday": 3,
+      "hour": 6,
+      "confidence": "inferred",
+      "source": "user notes: Wednesday; hour assumed 06:00 local"
+    },
+    "secondOpen": {
+      "membershipOnly": true,
+      "energy": 40,
+      "usesRewardCount": false,
+      "countsForPity": true,
+      "confidence": "inferred",
+      "source": "user notes — check in game: does the second opening use a reward count, does it count for the 28-claim pity?"
+    },
+    "rewardCounts": {
+      "conquest": {
+        "perDay": 2,
+        "max": 14,
+        "perDungeon": true,
+        "dungeons": [
+          "Fire Temple",
+          "Ferocious Horn Den"
+        ]
+      },
+      "transcendence": {
+        "per12h": 1,
+        "perDay": 2,
+        "max": 14
+      },
+      "exploration": {
+        "perWeek": 7
+      },
+      "confidence": "inferred",
+      "source": "user notes"
+    }
   },
   "effort": {
     "_about": "How costs are weighed against each other for the ranking (1 effort unit each). Adjust to taste.",
@@ -408,5 +459,189 @@
     "shop": 1,
     "confidence": "unknown",
     "source": "tool default"
+  },
+  "membership": {
+    "name": "Special Quai",
+    "effects": {
+      "secondCubeOpen": "a second cube opening after every Expedition / Transcendence / Sanctuary clear (another 40 Odyle)",
+      "market": "Market buying — stones and materials can be bought for Kinah",
+      "abyssHours": {
+        "with": 14,
+        "without": 7
+      },
+      "shugoKeysCap": {
+        "with": 21,
+        "without": null
+      },
+      "odyleCap": {
+        "with": 840,
+        "without": 560
+      },
+      "windBreeze": "Wind Breeze Merchant sells 20 Odyle items a week"
+    },
+    "confidence": "inferred",
+    "source": "user notes"
+  },
+  "kinah": {
+    "dailyCap": 1000000,
+    "confidence": "inferred",
+    "source": "user notes (open-world Kinah cap per day)"
+  },
+  "abyssFeathers": {
+    "total": 36,
+    "perFeather": 1,
+    "confidence": "creator-opinion",
+    "source": "Fubgun: all Abyss Feathers = +36 item level"
+  },
+  "crafting": {
+    "_about": "Dragon Lord crafted line. Transfer-craft upgrades one tier with 100% success.",
+    "detect": "Splendent|Dragon Lord",
+    "ladder": [
+      {
+        "tier": 70,
+        "names": [
+          "Splendent True",
+          "Splendent Star"
+        ]
+      },
+      {
+        "tier": 78,
+        "names": [
+          "White",
+          "Dark"
+        ]
+      },
+      {
+        "tier": 86,
+        "names": [
+          "Splendent White",
+          "Splendent Dark"
+        ]
+      },
+      {
+        "tier": 94,
+        "names": [
+          "Wise",
+          "Ebony"
+        ]
+      },
+      {
+        "tier": 102,
+        "names": [
+          "Splendent Wise",
+          "Splendent Ebony"
+        ]
+      }
+    ],
+    "ladderOptions": [
+      {
+        "tiers": [
+          70,
+          78,
+          86,
+          94,
+          102
+        ],
+        "by": "item database (aion2hub / questlog)"
+      },
+      {
+        "tiers": [
+          70,
+          78,
+          86,
+          104
+        ],
+        "by": "user note"
+      }
+    ],
+    "ladderConfidence": "inferred",
+    "slots": [
+      "Ring",
+      "Earring",
+      "Necklace",
+      "Weapon",
+      "Guard",
+      "Armor"
+    ],
+    "steps": {
+      "70>78": {
+        "kinah": null,
+        "materials": [
+          {
+            "name": "Wrathful Mind",
+            "count": null
+          },
+          {
+            "name": "Radiant Odyle",
+            "count": null
+          }
+        ],
+        "mastery": null
+      },
+      "78>86": {
+        "kinah": null,
+        "materials": [
+          {
+            "name": "Thick Balaur Scale",
+            "count": null
+          },
+          {
+            "name": "Rampaging Fearsome Aura",
+            "count": null
+          }
+        ],
+        "mastery": null
+      },
+      "86>94": {
+        "kinah": null,
+        "materials": [],
+        "mastery": null
+      },
+      "94>102": {
+        "kinah": null,
+        "materials": [],
+        "mastery": null
+      }
+    },
+    "stepsConfidence": "unknown",
+    "stepsSource": "fill in from aion2hub.com crafting calculator / questlog.gg — costs left unknown on purpose",
+    "transfer": {
+      "enhancement": true,
+      "soulBinding": true,
+      "stones": false,
+      "confidence": "inferred",
+      "note": "check in game what a transfer-craft keeps"
+    },
+    "lines": {
+      "accessories": 5,
+      "other": 4,
+      "confidence": "inferred"
+    },
+    "fromScratch": {
+      "tier": 70,
+      "kinah": null,
+      "note": "crafting a new Dragon Lord piece for a slot that isn't crafted yet — cost unknown"
+    },
+    "guideHint": "If you craft one thing, craft the weapon (+2 lines), then rings (extra active-skill lines).",
+    "source": "user notes; aion2hub.com, questlog.gg (database tiers); Fubgun / JOHNPAL (craft weapon first)"
+  },
+  "deadline": {
+    "defaultTarget": 2800,
+    "defaultDate": "2026-11-05T18:00",
+    "verdict": {
+      "likely": 0.8,
+      "possible": 0.2
+    },
+    "earliest": [
+      0.5,
+      0.8
+    ],
+    "sims": 10000,
+    "stoneToGreen": {
+      "type": "Intermediate",
+      "minGrade": "Rare"
+    },
+    "confidence": "inferred",
+    "source": "user spec (Ludra Nov 4, play start evening Nov 5)"
   }
 }

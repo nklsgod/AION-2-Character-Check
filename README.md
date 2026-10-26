@@ -75,6 +75,9 @@ per second and caches every answer for 10 minutes.
 * `public/guide/cleric-knowledge.json` + `public/js/build.js` – Cleric build knowledge (soul-binding
   targets per slot, manastone and Arcana rules, titles per faction, stigma presets, Daevanion,
   consumables, macro) with `source`, `confidence` and creator `options`; the build checks that use it.
+* `public/js/budget.js`, `public/js/deadline.js` – Odyle / Kinah / reward-count budgets with weekly
+  resets, and the deadline mode (guaranteed / probable / luck levers, seeded Monte Carlo, must-happen
+  list, day plan, earliest realistic date).
 * `public/guide/ilvl-model.json` – every number the model uses (stone and card values, Daevanion
   node costs, prices, drop rates, Odyle), each with its source and `confidence`
   (confirmed / inferred / unknown). Edit this when a value turns out wrong.
