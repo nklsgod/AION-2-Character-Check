@@ -99,6 +99,7 @@
   .stat b { display: block; font-family: var(--display); font-size: 28px; font-weight: 600; line-height: 1.1; }
   .stat.ok b { color: var(--ok); } .stat.warn b { color: var(--warn); }
   .stat small { color: var(--muted); }
+  .stat b input { width: 5em; font: inherit; color: inherit; background: transparent; border: 1px dashed var(--line); border-radius: 4px; padding: 0 4px; }
 
   .boards { display: flex; flex-wrap: wrap; gap: 10px; }
   .board { flex: 1 1 140px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; }
@@ -207,7 +208,7 @@ async function useGuide(className) {
   const regions = await api("/api/regions", {});
   $("#region").innerHTML = Object.entries(regions).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join("");
   const p = new URLSearchParams(location.search);
-  if (p.get("name")) { $("#name").value = p.get("name"); if (p.get("region")) $("#region").value = p.get("region"); search(); }
+  if (p.get("name")) { $("#name").value = p.get("name"); if (p.get("region")) $("#region").value = p.get("region"); search(p.get("server")); }
 })();
 
 $("#form").addEventListener("submit", e => { e.preventDefault(); search(); });
@@ -217,14 +218,15 @@ function say(text, isError) {
 }
 
 // ---------- 1. search ----------
-async function search() {
+async function search(server) {
   $("#go").disabled = true; $("#candidates").innerHTML = ""; $("#report").style.display = "none";
   const name = $("#name").value.trim(), region = $("#region").value, race = $("#race").value;
   say("Searching…");
   try {
     const data = await api("/api/search", { name, region, race });
     const list = data.list || [];
-    const exact = list.filter(r => norm(r.name) === norm(name));
+    let exact = list.filter(r => norm(r.name) === norm(name));
+    if (server && exact.length > 1) exact = exact.filter(r => norm(r.serverName) === norm(server));
     const pick = exact.length === 1 ? exact : list;
     if (!pick.length) return say(`No character called “${esc(name)}” in ${esc(region.toUpperCase())}. Check the spelling, or try the other faction.`, true);
     if (pick.length > 1) {
@@ -249,7 +251,7 @@ async function load(row, region) {
   } catch (e) { return say("Could not read the character: " + esc(e.message), true); }
   items = {};
   say("");
-  history.replaceState(null, "", `?name=${encodeURIComponent(row.name)}&region=${region}`);
+  history.replaceState(null, "", `?name=${encodeURIComponent(row.name)}&region=${region}&server=${encodeURIComponent(row.serverName || "")}`);
   render();
   loadItems(); // gear lines arrive slot by slot
 }
@@ -267,9 +269,10 @@ const findSkill = name => skillList().find(s => same(s.name, name));
 
 // Manual stigma levels: NCSOFT's page lags behind the game, so the user can type the real level.
 // Kept per character in this browser only.
-const editKey = () => `stigmaLevels:${ctx.region}:${ctx.characterId}`;
-function loadEdits() { try { return JSON.parse(localStorage.getItem(editKey())) || {}; } catch { return {}; } }
-function saveEdits(e) { try { Object.keys(e).length ? localStorage.setItem(editKey(), JSON.stringify(e)) : localStorage.removeItem(editKey()); } catch {} }
+// Same for stats NCSOFT's API doesn't send at all (Accuracy, Critical Hit).
+const editKey = kind => `${kind}:${ctx.region}:${ctx.characterId}`;
+function loadEdits(kind = "stigmaLevels") { try { return JSON.parse(localStorage.getItem(editKey(kind))) || {}; } catch { return {}; } }
+function saveEdits(e, kind = "stigmaLevels") { try { Object.keys(e).length ? localStorage.setItem(editKey(kind), JSON.stringify(e)) : localStorage.removeItem(editKey(kind)); } catch {} }
 // Level of a skill with any manual edit applied: { s, lvl, learned, edited }
 function levelOf(name) {
   const s = findSkill(name), e = loadEdits()[norm(name)];
@@ -279,7 +282,12 @@ function levelOf(name) {
 
 function render() {
   const p = char.profile || {};
-  const stat = n => findStat(char.stat?.statList || [], n);
+  const stat = n => {
+    const s = findStat(char.stat?.statList || [], n);
+    if (s) return s;
+    const v = loadEdits("statValues")[norm(n)];
+    return v != null ? { name: n, value: v, edited: true } : undefined;
+  };
   const noGuide = p.className && !same(p.className, guide.class);
   $("#report").style.display = "block";
 
@@ -365,7 +373,10 @@ function renderLudra(stat) {
   const results = L.checks.map(c => {
     let have = null, ok = false;
     if (c.type === "itemLevel") { have = ilvl; ok = ilvl >= L.itemLevel; }
-    else if (c.type === "stat") { have = c.match.map(stat).find(Boolean)?.value ?? null; ok = have != null && have >= c.min; }
+    else if (c.type === "stat") {
+      const s = c.match.map(stat).find(Boolean);
+      have = s ? s.value + (s.edited ? " (typed in)" : "") : null; ok = !!s && s.value >= c.min;
+    }
     else if (c.type === "skill") { have = levelOf(c.name).lvl; ok = have >= c.min; }
     else if (c.type === "weapon") { have = weapon ? "+" + weapon.enchantLevel : "no weapon"; ok = !!weapon && weapon.enchantLevel >= c.min; }
     return { ...c, have, ok };
@@ -384,7 +395,7 @@ function renderLudra(stat) {
     <div class="verdict">
       <div class="ilvl ${ready ? "ready" : ""}"><small>item level</small><b>${ilvl.toLocaleString()}<span> / ${L.itemLevel.toLocaleString()}</span></b>
         <div class="fill"><i style="width:${pct}%"></i></div><small>${ilvl >= L.itemLevel ? "entry requirement met" : (L.itemLevel - ilvl).toLocaleString() + " to go"}</small></div>
-      <ul class="checks">${results.map(r => `<li class="${r.ok ? "" : "miss"}"><span>${esc(r.label)} <small>— you: ${esc(r.have ?? (r.type === "stat" ? "not in NCSOFT's data" : "–"))}</small></span></li>`).join("")}</ul>
+      <ul class="checks">${results.map(r => `<li class="${r.ok ? "" : "miss"}"><span>${esc(r.label)} <small>— you: ${esc(r.have ?? (r.type === "stat" ? "not in NCSOFT's data — type it in under Stats" : "–"))}</small></span></li>`).join("")}</ul>
     </div>
     <div class="next"><small>Your next step at ${ilvl.toLocaleString()}</small><h4>${esc(now.title)}</h4><ul>${now.do.map(d => `<li>${esc(d)}</li>`).join("")}</ul></div>
     <div class="phases">${phases}</div>
@@ -405,7 +416,8 @@ function renderGear() {
     const lineTag = s => {
       const good = (rule?.want || guide.gear.goodLines).some(g => same(s.name, g)) || guide.gear.goodLines.some(g => same(s.name, g));
       const bad = guide.gear.badLinesPvE.some(b => same(s.name, b));
-      return `<span class="tag ${bad ? "bad" : good ? "ok" : ""}">${esc(s.name)} ${esc(s.value || "")}</span>`;
+      const pvpOnly = /\bpvp\b/i.test(s.name) && mode !== "pvp"; // PvP lines do nothing in PvE
+      return `<span class="tag ${pvpOnly ? "" : bad ? "bad" : good ? "ok" : ""}">${esc(s.name)} ${esc(s.value || "")}</span>`;
     };
     let lines = `<span class="tag">loading lines…</span>`;
     if (it) {
@@ -416,7 +428,8 @@ function renderGear() {
         const good = wanted.some(w => same(w, k.name));
         return `<span class="tag ${good ? "skill" : ""}">${esc(k.name)} +${k.level}</span>`;
       }).join("");
-      lines = `<div class="group"><small>Soul binding</small><div class="lines">${soul || `<span class="tag">no random lines</span>`}</div></div>`;
+      const arcana = /arcana/i.test(e.slotPosName) || e.slotPos >= 41;
+      lines = `<div class="group"><small>${arcana ? "Card skill lines" : "Soul binding"}</small><div class="lines">${soul || `<span class="tag">no random lines</span>`}</div></div>`;
       const stones = it.magicStoneStat || [], slots = Math.max(it.magicStoneSlotCount || 0, stones.length);
       if (slots) {
         let tags = "";
@@ -458,15 +471,23 @@ function renderStats(stat) {
     const s = r.match.map(stat).find(Boolean);
     const v = s?.value;
     const state = v == null ? "" : v >= r.min ? "ok" : "warn";
-    return `<div class="stat ${state}"><small>${esc(r.match[0])}</small><b>${v ?? "–"}</b><small>${esc(r.note)}</small></div>`;
+    // NCSOFT's API doesn't send this stat: let the user type the in-game number.
+    const typed = !s || s.edited;
+    const val = typed ? `<input type="number" min="0" value="${v ?? ""}" placeholder="–" data-stat="${esc(r.match[0])}" aria-label="${esc(r.match[0])}">` : v;
+    return `<div class="stat ${state}"><small>${esc(r.match[0])}${typed ? " · type in from the game" : ""}</small><b>${val}</b><small>${esc(r.note)}</small></div>`;
   }).join("");
   const all = char.stat?.statList || [];
   const shown = guide.stats.map(r => r.match.map(stat).find(Boolean)).filter(Boolean);
-  const rest = all.filter(s => !shown.includes(s) && norm(s.type) !== "itemlevel" && (s.name || s.type)).slice(0, 12)
+  const rest = all.filter(s => !shown.includes(s) && norm(s.type) !== "itemlevel" && (s.name || s.type))
     .map(s => `<div class="stat"><small>${esc(s.name)}</small><b>${s.value}</b></div>`).join("");
   $("#stats").innerHTML = `<h3>Stats</h3><p class="lead">The guide's hard numbers for the Ludra raid, then the rest of your sheet.</p><div class="stats">${cards}${rest}</div>
     <details class="raw"><summary>Raw stat fields from the API (${all.length})</summary><pre>${esc(all.map(s =>
       `type: ${s.type ?? "(none)"} · name: ${s.name ?? "(none)"} · value: ${s.value}`).join("\n"))}</pre></details>`;
+  $("#stats").querySelectorAll("input[data-stat]").forEach(i => i.onchange = () => {
+    const e = loadEdits("statValues"), k = norm(i.dataset.stat);
+    if (i.value === "") delete e[k]; else e[k] = Math.max(0, Math.round(+i.value));
+    saveEdits(e, "statValues"); render();
+  });
 }
 function renderExtras() {
   const t = guide.titles || {};
