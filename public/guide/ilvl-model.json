@@ -176,11 +176,6 @@
       },
       "confidence": "inferred",
       "source": "user notes (stage 3), Fubgun (stage 4: 6% per boss, 3 bosses); card type assumed evenly split"
-    },
-    "extraction": {
-      "percentPerDay": null,
-      "confidence": "unknown",
-      "source": "Mysterious Crystal extraction bar: 100% = 1 crystal; fill rate unknown"
     }
   },
   "daevanion": {
@@ -497,25 +492,6 @@
     "confidence": "inferred",
     "source": "user notes (open-world Kinah cap per day)"
   },
-  "monolith": {
-    "_about": "Abyss Feather monolith in Reshanta: every stage needs feathersPerStage feathers and gives Azphel Daevanion crystals (item level once spent).",
-    "maxStage": null,
-    "feathersPerStage": 20,
-    "rewardPerStage": {
-      "crystals": 4,
-      "kind": "Azphel"
-    },
-    "confidence": "inferred",
-    "maxStageConfidence": "unknown",
-    "source": "user notes (4 × Daevanion Crystal: Azphel per stage); max stage unknown — enter it in deadline mode"
-  },
-  "abyss": {
-    "stigmaShard": {
-      "apEach": null,
-      "confidence": "unknown",
-      "source": "fill in: Abyss Points per Stigma Shard"
-    }
-  },
   "crafting": {
     "_about": "Dragon Lord crafted line. Transfer-craft upgrades one tier with 100% success.",
     "detect": "Splendent|Dragon Lord",
@@ -651,21 +627,7 @@
   "deadline": {
     "defaultTarget": 2800,
     "defaultDate": "2026-11-05T18:00",
-    "verdict": {
-      "likely": 0.8,
-      "possible": 0.2
-    },
-    "earliest": [
-      0.5,
-      0.8
-    ],
-    "sims": 10000,
-    "stoneToGreen": {
-      "type": "Intermediate",
-      "minGrade": "Rare"
-    },
     "confidence": "inferred",
-    "source": "user spec (Ludra Nov 4, play start evening Nov 5)",
-    "enhanceProbableFrom": 11
+    "source": "user spec (Ludra Nov 4, play start evening Nov 5)"
   }
 }

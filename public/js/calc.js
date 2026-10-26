@@ -12,12 +12,6 @@ export function expectedAttempts(p0, pity = 0) {
   for (let k = 0; k < 1000 && reach > 1e-9; k++) { e += reach; reach *= 1 - Math.min(1, p); p += pity; }
   return e;
 }
-// Chance to succeed within n tries when each failure adds `pity` to the chance.
-export function pWithin(p0, pity = 0, n = 1) {
-  let fail = 1, p = p0;
-  for (let k = 0; k < n && fail > 0; k++) { fail *= 1 - Math.min(1, p); p += pity; }
-  return 1 - fail;
-}
 // Rolling one stone type until the line is at least `minGrade`: chance per roll and the expected grade value then.
 export function rollUntil(model, type, minGrade) {
   const odds = model.stone.types[type].odds, v = model.stone.byGrade, min = v[minGrade];
@@ -71,7 +65,7 @@ export function upgrades(model, ctx) {
         up({ id: `amp:${slot}`, lever: "enhance", label: `${slot}: +15 Amp 2`, detail: "Needs +15 first (cost from +13 unknown), then Amp 1 (66%, 6 stones, ~600k) and Amp 2 (9 stones, ~900k). Not counted in the calculator.", gain: { min: 10, exp: 10, max: 10 }, cost: { kinah: 1500000 }, random: true, known: false, time: "weeks" });
     }
     if (d.craft) d.craft.steps.forEach((x, i) => up({ id: `craft:${slot}:${x.to}`, lever: "gear", label: `${slot}: transfer-craft ${x.from} → ${x.to}`, detail: `${x.names.join(" / ")}; 100% success; Kinah ${x.cost?.kinah?.toLocaleString() ?? "unknown"}, materials ${x.cost?.materials?.map(m => m.name).join(", ") || "unknown"}`,
-      gain: { min: x.gain, exp: x.gain, max: x.gain }, cost: x.known ? { kinah: x.cost.kinah } : {}, known: x.known, mats: x.mats, step: `${x.from}>${x.to}`, craft: true, time: "now", after: i ? `craft:${slot}:${x.from}` : null }));
+      gain: { min: x.gain, exp: x.gain, max: x.gain }, cost: x.known ? { kinah: x.cost.kinah } : {}, known: x.known, craft: true, time: "now", after: i ? `craft:${slot}:${x.from}` : null }));
     if (d.status === "replace" && d.actions.some(a => a.kind === "replace")) {
       const a = d.actions.find(x => x.kind === "replace");
       const src = d.source, isGuard = /sub|off|guard/i.test(slot);
