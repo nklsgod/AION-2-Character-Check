@@ -68,6 +68,10 @@
   .lvl { font-family: var(--display); font-size: 24px; font-weight: 600; white-space: nowrap; }
   .lvl span { color: var(--muted); font-size: 16px; font-family: var(--body); font-weight: 400; }
   .lvl.ok { color: var(--ok); } .lvl.warn { color: var(--warn); } .lvl.bad { color: var(--bad); }
+  .lvl input { width: 2.6em; font: inherit; color: inherit; background: transparent; border: 1px dashed var(--line); border-radius: 4px; padding: 0 4px; text-align: right; }
+  .lvl input:hover { border-color: var(--muted); }
+  .lvl .edited { display: block; font-size: 12px; color: var(--gold); }
+  button.link { background: none; border: 0; padding: 0; color: var(--gold); text-decoration: underline; cursor: pointer; font-size: inherit; }
   .note { grid-column: 1 / -1; color: var(--muted); font-size: 15px; margin: 0; }
 
   /* gear list */
@@ -261,6 +265,18 @@ function buildFor(m) {
 const skillList = () => equip?.skill?.skillList || [];
 const findSkill = name => skillList().find(s => same(s.name, name));
 
+// Manual stigma levels: NCSOFT's page lags behind the game, so the user can type the real level.
+// Kept per character in this browser only.
+const editKey = () => `stigmaLevels:${ctx.region}:${ctx.characterId}`;
+function loadEdits() { try { return JSON.parse(localStorage.getItem(editKey())) || {}; } catch { return {}; } }
+function saveEdits(e) { try { Object.keys(e).length ? localStorage.setItem(editKey(), JSON.stringify(e)) : localStorage.removeItem(editKey()); } catch {} }
+// Level of a skill with any manual edit applied: { s, lvl, learned, edited }
+function levelOf(name) {
+  const s = findSkill(name), e = loadEdits()[norm(name)];
+  if (e != null) return { s, lvl: e, learned: true, edited: true };
+  return { s, lvl: s?.acquired ? (s.skillLevel || 0) : 0, learned: !!s?.acquired, edited: false };
+}
+
 function render() {
   const p = char.profile || {};
   const stat = n => findStat(char.stat?.statList || [], n);
@@ -292,15 +308,18 @@ function render() {
 function renderLevels(el, title, wanted, cap, lead, showExtras) {
   let hit = 0;
   const rows = wanted.map(w => {
-    const s = findSkill(w.name);
-    const lvl = s?.acquired ? (s.skillLevel || 0) : 0;
-    const state = !s || !s.acquired ? "bad" : lvl >= w.target ? "ok" : "warn";
+    const { s, lvl, learned, edited } = showExtras ? levelOf(w.name) : { s: findSkill(w.name), edited: false };
+    const level = showExtras ? lvl : s?.acquired ? (s.skillLevel || 0) : 0;
+    const state = !(showExtras ? learned : s?.acquired) ? "bad" : level >= w.target ? "ok" : "warn";
     if (state === "ok") hit++;
     const notEquipped = s && s.acquired && s.equip === 0 && showExtras;
+    const shown = showExtras
+      ? `<input type="number" min="0" max="${cap}" value="${level}" data-skill="${esc(w.name)}" aria-label="${esc(w.name)} level">`
+      : level;
     return `<div class="row">
-      <div class="name">${esc(w.name)}<small>${!s ? "not learned" : notEquipped ? "learned, not on the bar" : s.category ? esc(s.category) : ""}</small></div>
-      <div class="bar">${bar(lvl, w.target, cap)}</div>
-      <div class="lvl ${state}">${lvl}<span> / ${w.target}</span></div>
+      <div class="name">${esc(w.name)}<small>${!s && !edited ? "not learned" : notEquipped ? "learned, not on the bar" : s?.category ? esc(s.category) : ""}</small></div>
+      <div class="bar">${bar(level, w.target, cap)}</div>
+      <div class="lvl ${state}">${shown}<span> / ${w.target}</span>${edited ? `<small class="edited">edited (site: ${s?.acquired ? s.skillLevel : 0})</small>` : ""}</div>
       ${w.note ? `<p class="note">${esc(w.note)}</p>` : ""}
     </div>`;
   }).join("");
@@ -313,11 +332,21 @@ function renderLevels(el, title, wanted, cap, lead, showExtras) {
   let raw = "";
   if (showExtras) {
     const stig = skillList().filter(isStigma);
-    raw = `<p class="note">Levels shown are from the preset NCSOFT's site exposes; other presets may differ.</p>
+    const n = Object.keys(loadEdits()).length;
+    raw = `<p class="note">Levels shown are from the preset NCSOFT's site exposes; other presets may differ. If a level is out of date, type the real one into its box — it's saved in this browser.${n ? ` ${n} edited · <button type="button" class="link" id="resetEdits">reset to NCSOFT's levels</button>` : ""}</p>
       <details class="raw"><summary>Raw stigma rows from the API (${stig.length})</summary><pre>${esc(stig.map(s =>
         `${s.name} · id ${s.id} · category ${s.category} · level ${s.skillLevel} · equip ${s.equip} · acquired ${s.acquired}`).join("\n"))}</pre></details>`;
   }
   el.innerHTML = `<h3>${title} <small>${hit} of ${wanted.length} at target</small></h3><p class="lead">${lead}</p>${raw}${rows}${extra}`;
+  if (!showExtras) return;
+  el.querySelectorAll("input[data-skill]").forEach(i => i.onchange = () => {
+    const name = i.dataset.skill, e = loadEdits(), site = findSkill(name);
+    const v = Math.max(0, Math.min(cap, Math.round(+i.value || 0)));
+    if (v === (site?.acquired ? site.skillLevel || 0 : 0)) delete e[norm(name)]; else e[norm(name)] = v;
+    saveEdits(e); render();
+  });
+  const r = el.querySelector("#resetEdits");
+  if (r) r.onclick = () => { saveEdits({}); render(); };
 }
 function bar(lvl, target, cap) {
   let out = "";
@@ -337,7 +366,7 @@ function renderLudra(stat) {
     let have = null, ok = false;
     if (c.type === "itemLevel") { have = ilvl; ok = ilvl >= L.itemLevel; }
     else if (c.type === "stat") { have = c.match.map(stat).find(Boolean)?.value ?? null; ok = have != null && have >= c.min; }
-    else if (c.type === "skill") { const s = findSkill(c.name); have = s?.acquired ? s.skillLevel : 0; ok = have >= c.min; }
+    else if (c.type === "skill") { have = levelOf(c.name).lvl; ok = have >= c.min; }
     else if (c.type === "weapon") { have = weapon ? "+" + weapon.enchantLevel : "no weapon"; ok = !!weapon && weapon.enchantLevel >= c.min; }
     return { ...c, have, ok };
   });
