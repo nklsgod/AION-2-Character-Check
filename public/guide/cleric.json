@@ -338,7 +338,7 @@
       "Saint"
     ],
     "other": [
-      "Through Heaven Back",
+      "Through Hell and Back",
       "Empty Closet"
     ]
   },
@@ -354,7 +354,8 @@
     "name": "Abyssal Forge: Ludra",
     "itemLevel": 2800,
     "note": "10-player Sanctuary raid, four level-75 bosses. Entry needs level 45 and item level 2,800; groups usually also ask for a combat-power number.",
-    "warning": "NCSOFT pulled the raid from the global content menu after Early Access and said it will return — check the in-game content list before you plan around it.",
+    "warning": "The raid was temporarily removed after Early Access and returns on November 4, 2026.",
+    "returnDate": "2026-11-04",
     "checks": [
       {
         "type": "itemLevel",

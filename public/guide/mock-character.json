@@ -11,7 +11,9 @@
       "raceId": 2, "serverName": "Zikel", "regionName": "Night Owls", "combatPower": 71240, "titleName": "Guardian of Baran", "profileImage": ""
     },
     "stat": { "statList": [
-      { "type": "ItemLevel", "name": "Item Level", "value": 1810 },
+      { "type": "ItemLevel", "name": "아이템레벨", "value": 1810 },
+      { "type": "", "name": "", "value": 7 },
+      { "value": 3 },
       { "type": "Attack", "name": "Attack", "value": 2410 },
       { "type": "Accuracy", "name": "Accuracy", "value": 870 },
       { "type": "CritHit", "name": "Critical Hit", "value": 1120 },
@@ -20,7 +22,8 @@
     "title": { "totalCount": 120, "ownedCount": 23, "titleList": [
       { "id": 1, "name": "Guardian of Baran", "grade": "Rare", "equipCategory": "Attack" },
       { "id": 2, "name": "Saint", "grade": "Rare", "equipCategory": "Defense" },
-      { "id": 3, "name": "Wanderer", "grade": "Common", "equipCategory": "Other" }
+      { "id": 3, "name": "Wanderer", "grade": "Common", "equipCategory": "Other" },
+      { "id": 4, "name": "Through Hell and Back", "grade": "Rare", "equipCategory": "Other" }
     ]},
     "ranking": { "rankingList": [] },
     "daevanion": { "boardList": [
@@ -61,11 +64,11 @@
       { "id": 10, "name": "Debilitating Mark", "category": "Active", "skillLevel": 9, "needLevel": 8, "acquired": 1, "equip": 1, "icon": "" },
       { "id": 11, "name": "Lightning Strike Scattershot", "category": "Active", "skillLevel": 8, "needLevel": 14, "acquired": 1, "equip": 0, "icon": "" },
       { "id": 12, "name": "Defiance", "category": "Active", "skillLevel": 5, "needLevel": 10, "acquired": 1, "equip": 1, "icon": "" },
-      { "id": 20, "name": "Earth Punishment", "category": "Stigma", "skillLevel": 20, "needLevel": 22, "acquired": 1, "equip": 1, "icon": "" },
-      { "id": 21, "name": "Prayer of Amplification", "category": "Stigma", "skillLevel": 12, "needLevel": 22, "acquired": 1, "equip": 1, "icon": "" },
-      { "id": 22, "name": "Light of Protection", "category": "Stigma", "skillLevel": 15, "needLevel": 22, "acquired": 1, "equip": 1, "icon": "" },
-      { "id": 23, "name": "Benevolence", "category": "Stigma", "skillLevel": 5, "needLevel": 22, "acquired": 1, "equip": 1, "icon": "" },
-      { "id": 24, "name": "Noble Aura", "category": "Stigma", "skillLevel": 8, "needLevel": 22, "acquired": 1, "equip": 0, "icon": "" },
+      { "id": 20, "name": "Earth Punishment", "category": "Dp", "skillLevel": 20, "needLevel": 22, "acquired": 1, "equip": 1, "icon": "" },
+      { "id": 21, "name": "Prayer of Amplification", "category": "Dp", "skillLevel": 12, "needLevel": 22, "acquired": 1, "equip": 1, "icon": "" },
+      { "id": 22, "name": "Light of Protection", "category": "Dp", "skillLevel": 15, "needLevel": 22, "acquired": 1, "equip": 1, "icon": "" },
+      { "id": 23, "name": "Benevolence", "category": "Dp", "skillLevel": 5, "needLevel": 22, "acquired": 1, "equip": 1, "icon": "" },
+      { "id": 24, "name": "Noble Aura", "category": "Dp", "skillLevel": 8, "needLevel": 22, "acquired": 1, "equip": 0, "icon": "" },
       { "id": 30, "name": "Empyrean Lord's Grace", "category": "Passive", "skillLevel": 9, "needLevel": 15, "acquired": 1, "equip": 1, "icon": "" },
       { "id": 31, "name": "Earth's Grace", "category": "Passive", "skillLevel": 10, "needLevel": 21, "acquired": 1, "equip": 1, "icon": "" },
       { "id": 32, "name": "Healing Enhancement", "category": "Passive", "skillLevel": 4, "needLevel": 18, "acquired": 1, "equip": 1, "icon": "" },
@@ -73,10 +76,12 @@
     ]}
   },
   "items": {
-    "1":  { "name": "Spiritforged Mace", "subStats": [ { "name": "Might", "value": "+84" }, { "name": "Combat Speed", "value": "+3.1%" }, { "name": "Evasion", "value": "+120" } ], "subSkills": [] },
+    "1":  { "name": "Spiritforged Mace", "subStats": [ { "name": "Might", "value": "+84" }, { "name": "Combat Speed", "value": "+3.1%" }, { "name": "Evasion", "value": "+120" } ], "subSkills": [],
+          "magicStoneSlotCount": 4, "magicStoneStat": [ { "slotPos": 0, "name": "Critical Hit", "value": "+10", "grade": "Legend" }, { "slotPos": 1, "name": "Block", "value": "+15", "grade": "Legend" }, { "slotPos": 3, "name": "Attack", "value": "+12", "grade": "Unique" } ] },
     "2":  { "name": "Spiritforged Guard", "subStats": [ { "name": "Weapon Damage Boost", "value": "+2.4%" }, { "name": "Block", "value": "+90" } ], "subSkills": [] },
-    "3":  { "name": "Pilgrim Helm", "subStats": [ { "name": "HP", "value": "+410" } ], "subSkills": [] },
-    "5":  { "name": "Pilgrim Gloves", "subStats": [ { "name": "Combat Speed", "value": "+2.0%" } ], "subSkills": [] },
+    "3":  { "name": "Pilgrim Helm", "subStats": [ { "name": "HP", "value": "+410" } ], "subSkills": [],
+          "magicStoneSlotCount": 2, "magicStoneStat": [ { "slotPos": 0, "name": "Accuracy", "value": "+14", "grade": "Rare" }, { "slotPos": 1, "name": "Evasion Bonus", "value": "+7", "grade": "Rare" } ] },
+    "5":  { "name": "Pilgrim Gloves", "subStats": [ { "name": "Combat Speed", "value": "+2.0%" } ], "subSkills": [], "magicStoneSlotCount": 2, "magicStoneStat": [] },
     "6":  { "name": "Pilgrim Boots", "subStats": [ { "name": "Defense", "value": "+55" } ], "subSkills": [] },
     "11": { "name": "Crafted Ring of Light", "subStats": [ { "name": "Precision", "value": "+40" } ], "subSkills": [ { "name": "Condemnation", "level": 2 }, { "name": "Healing Light", "level": 1 }, { "name": "Salvation", "level": 1 } ] },
     "41": { "name": "Chalice of Vigor", "subStats": [], "subSkills": [ { "name": "Condemnation", "level": 2 } ] }

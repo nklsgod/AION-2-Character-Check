@@ -82,6 +82,12 @@
   .tag.ok { border-color: var(--ok); color: var(--ok); }
   .tag.bad { border-color: var(--bad); color: var(--bad); }
   .tag.skill { border-color: var(--gold); color: var(--gold); }
+  .tag.empty { border-style: dashed; opacity: .55; }
+  .group { margin-bottom: 6px; }
+  .group > small { display: block; color: var(--muted); font-size: 13px; margin-bottom: 2px; }
+  details.raw { margin: 8px 0 16px; color: var(--muted); font-size: 14px; }
+  details.raw summary { cursor: pointer; }
+  details.raw pre { white-space: pre-wrap; background: var(--bg2); border: 1px solid var(--line); border-radius: 6px; padding: 10px; overflow-x: auto; }
   .grade-Unique { color: #c99aff; } .grade-Epic { color: #ff9c5b; } .grade-Legend { color: #ffd166; } .grade-Rare { color: #6ec5ff; }
 
   .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
@@ -163,7 +169,16 @@
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const norm = s => String(s ?? "").toLowerCase().replace(/[’'`´]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
-const same = (a, b) => norm(a) === norm(b) || norm(a).includes(norm(b)) || norm(b).includes(norm(a));
+const same = (a, b) => { const x = norm(a), y = norm(b); return !!x && !!y && (x === y || x.includes(y) || y.includes(x)); };
+// Stats: exact type/name first; fuzzy only if nothing matches exactly, and never the item-level row.
+const findStat = (list, n) => {
+  const k = norm(n);
+  if (!k) return undefined;
+  return list.find(s => norm(s.type) === k || norm(s.name) === k)
+    || list.find(s => norm(s.type) !== "itemlevel" && (norm(s.type).startsWith(k) || norm(s.name).startsWith(k)))
+    || list.find(s => norm(s.type) !== "itemlevel" && (same(s.type, n) || same(s.name, n)));
+};
+const isStigma = s => /stigma|^dp$/i.test(s.category || ""); // NCSOFT's API calls stigmas "Dp"
 const api = async (path, params) => {
   const res = await fetch(path + "?" + new URLSearchParams(params));
   const data = await res.json();
@@ -239,7 +254,7 @@ const findSkill = name => skillList().find(s => same(s.name, name));
 
 function render() {
   const p = char.profile || {};
-  const stat = n => (char.stat?.statList || []).find(s => same(s.name, n) || same(s.type, n));
+  const stat = n => findStat(char.stat?.statList || [], n);
   const notCleric = p.className && !same(p.className, "Cleric");
   $("#report").style.display = "block";
 
@@ -283,10 +298,17 @@ function renderLevels(el, title, wanted, cap, lead, showExtras) {
   let extra = "";
   if (showExtras) {
     const used = wanted.map(w => w.name);
-    const others = skillList().filter(s => s.equip && /stigma/i.test(s.category || "") && !used.some(u => same(u, s.name)));
+    const others = skillList().filter(s => s.equip && isStigma(s) && !used.some(u => same(u, s.name)));
     extra = others.map(s => `<div class="row" style="opacity:.6"><div class="name">${esc(s.name)}<small>equipped, not in this preset</small></div><div class="bar">${bar(s.skillLevel, 0, cap)}</div><div class="lvl">${s.skillLevel}</div></div>`).join("");
   }
-  el.innerHTML = `<h3>${title} <small>${hit} of ${wanted.length} at target</small></h3><p class="lead">${lead}</p>${rows}${extra}`;
+  let raw = "";
+  if (showExtras) {
+    const stig = skillList().filter(isStigma);
+    raw = `<p class="note">Levels shown are from the preset NCSOFT's site exposes; other presets may differ.</p>
+      <details class="raw"><summary>Raw stigma rows from the API (${stig.length})</summary><pre>${esc(stig.map(s =>
+        `${s.name} · id ${s.id} · category ${s.category} · level ${s.skillLevel} · equip ${s.equip} · acquired ${s.acquired}`).join("\n"))}</pre></details>`;
+  }
+  el.innerHTML = `<h3>${title} <small>${hit} of ${wanted.length} at target</small></h3><p class="lead">${lead}</p>${raw}${rows}${extra}`;
 }
 function bar(lvl, target, cap) {
   let out = "";
@@ -311,18 +333,20 @@ function renderLudra(stat) {
     return { ...c, have, ok };
   });
   const passed = results.filter(r => r.ok).length, ready = passed === results.length;
+  const back = L.returnDate && new Date() < new Date(L.returnDate + "T00:00:00")
+    ? " · returns " + new Date(L.returnDate + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "";
   const pct = Math.min(100, Math.round(ilvl / L.itemLevel * 100));
   const idx = L.phases.findIndex(p => ilvl >= p.from && ilvl < p.to);
   const now = L.phases[idx] || L.phases[L.phases.length - 1];
   const phases = L.phases.map((p, i) => `<div class="phase ${i < idx ? "done" : i === idx ? "now" : ""}">
       <div class="range">${p.from.toLocaleString()}–${p.to > 9000 ? "" : p.to.toLocaleString()}</div>
       <div class="body"><b>${esc(p.title)}</b><ul>${p.do.map(d => `<li>${esc(d)}</li>`).join("")}</ul></div></div>`).join("");
-  $("#ludra").innerHTML = `<h3>Ready for Ludra? <small>${ready ? "yes — all checks pass" : passed + " of " + results.length + " checks pass"}</small></h3>
+  $("#ludra").innerHTML = `<h3>Ready for Ludra? <small>${ready ? "yes — all checks pass" : passed + " of " + results.length + " checks pass"}${back}</small></h3>
     <p class="lead">${esc(L.note)}</p>
     <div class="verdict">
       <div class="ilvl ${ready ? "ready" : ""}"><small>item level</small><b>${ilvl.toLocaleString()}<span> / ${L.itemLevel.toLocaleString()}</span></b>
         <div class="fill"><i style="width:${pct}%"></i></div><small>${ilvl >= L.itemLevel ? "entry requirement met" : (L.itemLevel - ilvl).toLocaleString() + " to go"}</small></div>
-      <ul class="checks">${results.map(r => `<li class="${r.ok ? "" : "miss"}"><span>${esc(r.label)} <small>— you: ${esc(r.have ?? "–")}</small></span></li>`).join("")}</ul>
+      <ul class="checks">${results.map(r => `<li class="${r.ok ? "" : "miss"}"><span>${esc(r.label)} <small>— you: ${esc(r.have ?? (r.type === "stat" ? "not in NCSOFT's data" : "–"))}</small></span></li>`).join("")}</ul>
     </div>
     <div class="next"><small>Your next step at ${ilvl.toLocaleString()}</small><h4>${esc(now.title)}</h4><ul>${now.do.map(d => `<li>${esc(d)}</li>`).join("")}</ul></div>
     <div class="phases">${phases}</div>
@@ -340,31 +364,41 @@ function renderGear() {
     const rule = slotRule(e.slotPosName, e.name);
     const isRing = /ring/i.test(e.slotPosName) && !/earring/i.test(e.slotPosName);
     const isWeapon = rule && rule.match.includes("Weapon");
+    const lineTag = s => {
+      const good = (rule?.want || guide.gear.goodLines).some(g => same(s.name, g)) || guide.gear.goodLines.some(g => same(s.name, g));
+      const bad = guide.gear.badLinesPvE.some(b => same(s.name, b));
+      return `<span class="tag ${bad ? "bad" : good ? "ok" : ""}">${esc(s.name)} ${esc(s.value || "")}</span>`;
+    };
     let lines = `<span class="tag">loading lines…</span>`;
     if (it) {
       const subs = it.subStats || [];
-      lines = subs.map(s => {
-        const good = (rule?.want || guide.gear.goodLines).some(g => same(s.name, g)) || guide.gear.goodLines.some(g => same(s.name, g));
-        const bad = guide.gear.badLinesPvE.some(b => same(s.name, b));
-        return `<span class="tag ${bad ? "bad" : good ? "ok" : ""}">${esc(s.name)} ${esc(s.value || "")}</span>`;
-      }).join("");
-      lines += (it.subSkills || []).map(k => {
+      let soul = subs.map(lineTag).join("");
+      soul += (it.subSkills || []).map(k => {
         const wanted = isRing || e.slotPos >= 41 ? guide.gear.ringSkills.concat(["Empyrean Lord's Grace", "Earth's Grace"]) : [];
         const good = wanted.some(w => same(w, k.name));
         return `<span class="tag ${good ? "skill" : ""}">${esc(k.name)} +${k.level}</span>`;
       }).join("");
-      if (!subs.length && !(it.subSkills || []).length) lines = `<span class="tag">no random lines</span>`;
+      lines = `<div class="group"><small>Soul binding</small><div class="lines">${soul || `<span class="tag">no random lines</span>`}</div></div>`;
+      const stones = it.magicStoneStat || [], slots = Math.max(it.magicStoneSlotCount || 0, stones.length);
+      if (slots) {
+        let tags = "";
+        for (let i = 0; i < slots; i++) {
+          const m = stones.find(x => x.slotPos === i);
+          tags += m ? lineTag(m) : `<span class="tag empty">empty</span>`;
+        }
+        lines += `<div class="group"><small>Manastones (${stones.length}/${slots} filled)</small><div class="lines">${tags}</div></div>`;
+      }
     }
     const want = rule ? `<div class="slot">guide wants: ${rule.want.join(", ")}${isRing ? " + active-skill lines" : ""}</div>` : "";
     const ench = e.enchantLevel ? `<span class="ench">+${e.enchantLevel}${e.exceedLevel ? " ★" + e.exceedLevel : ""}</span>` : "";
     const lowWeapon = isWeapon && e.enchantLevel < guide.gear.minEnchantWeapon ? `<span class="tag bad">below +${guide.gear.minEnchantWeapon}</span>` : "";
     return `<li><div><div class="slot">${esc(e.slotPosName)}</div><div class="item grade-${esc(e.grade)}">${esc(e.name)}${ench}</div></div>
-      <div><div class="lines">${lines}${lowWeapon}</div>${want}</div></li>`;
+      <div>${it ? lines : `<div class="lines">${lines}</div>`}${lowWeapon ? `<div class="lines">${lowWeapon}</div>` : ""}${want}</div></li>`;
   }).join("");
   const w = equip?.petwing?.wing;
   const wingState = !w ? "" : guide.wings.good.some(g => same(w.name, g)) ? "ok" : guide.wings.avoid.some(a => same(w.name, a)) ? "bad" : "";
   $("#gear").innerHTML = `<h3>Gear <small>${list.length} pieces</small></h3>
-    <p class="lead">Green lines are the ones the guide asks for; red lines are defensive or resist lines it tells you to skip in PvE. Gold tags are active-skill lines on rings and arcana.</p>
+    <p class="lead">Soul binding lines and engraved manastones per piece. Green lines are the ones the guide asks for; red lines are defensive or resist lines it tells you to skip in PvE. Gold tags are active-skill lines on rings and arcana.</p>
     <ul class="gear">${html}
       ${w ? `<li><div><div class="slot">Wings</div><div class="item grade-${esc(w.grade)}">${esc(w.name)}${w.enchantLevel ? `<span class="ench">+${w.enchantLevel}</span>` : ""}</div></div>
         <div><div class="lines"><span class="tag ${wingState}">${wingState === "ok" ? "guide pick" : wingState === "bad" ? "guide says: not these" : "any wing but Dark Veil works"}</span></div><div class="slot">${esc(guide.wings.note)}</div></div></li>` : ""}
@@ -374,7 +408,7 @@ async function loadItems() {
   const list = equip?.equipment?.equipmentList || [];
   for (const e of list) {
     try { items[e.slotPos] = await api("/api/item", { ...ctx, id: e.id, enchantLevel: e.enchantLevel || 0, slotPos: e.slotPos }); }
-    catch { items[e.slotPos] = { subStats: [], subSkills: [] }; }
+    catch { items[e.slotPos] = { subStats: [], subSkills: [], magicStoneStat: [] }; }
     renderGear();
   }
 }
@@ -387,9 +421,13 @@ function renderStats(stat) {
     const state = v == null ? "" : v >= r.min ? "ok" : "warn";
     return `<div class="stat ${state}"><small>${esc(r.match[0])}</small><b>${v ?? "–"}</b><small>${esc(r.note)}</small></div>`;
   }).join("");
-  const rest = (char.stat?.statList || []).filter(s => !guide.stats.some(r => r.match.some(m => same(s.name, m)))).slice(0, 12)
+  const all = char.stat?.statList || [];
+  const shown = guide.stats.map(r => r.match.map(stat).find(Boolean)).filter(Boolean);
+  const rest = all.filter(s => !shown.includes(s) && norm(s.type) !== "itemlevel" && (s.name || s.type)).slice(0, 12)
     .map(s => `<div class="stat"><small>${esc(s.name)}</small><b>${s.value}</b></div>`).join("");
-  $("#stats").innerHTML = `<h3>Stats</h3><p class="lead">The guide's hard numbers for the Ludra raid, then the rest of your sheet.</p><div class="stats">${cards}${rest}</div>`;
+  $("#stats").innerHTML = `<h3>Stats</h3><p class="lead">The guide's hard numbers for the Ludra raid, then the rest of your sheet.</p><div class="stats">${cards}${rest}</div>
+    <details class="raw"><summary>Raw stat fields from the API (${all.length})</summary><pre>${esc(all.map(s =>
+      `type: ${s.type ?? "(none)"} · name: ${s.name ?? "(none)"} · value: ${s.value}`).join("\n"))}</pre></details>`;
 }
 function renderExtras() {
   const t = guide.titles;
