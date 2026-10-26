@@ -1,0 +1,489 @@
+{
+  "class": "Cleric",
+  "source": "https://aion2-guides.info/en/cleric/",
+  "sourceUpdated": "2026-10-21",
+  "skillCap": 20,
+  "stigmaSlots": 4,
+  "modes": {
+    "pve": {
+      "label": "PvE, no Chanter",
+      "skills": [
+        {
+          "name": "Condemnation",
+          "target": 20,
+          "note": "About half of your damage. Picks: +12% single target, crit reset (12), Multi-Hit (16)."
+        },
+        {
+          "name": "Bolt",
+          "target": 18,
+          "note": "Strongest hit. +30% Skill Speed, +20% single target, guaranteed crit at 16."
+        },
+        {
+          "name": "Divine Aura",
+          "target": 16,
+          "note": "Attacking speed, +3s duration, -10s cooldown."
+        },
+        {
+          "name": "Earth's Retribution",
+          "target": 15,
+          "note": "Discharge chance, Multi-Hit, -7s Bolt cooldown on Discharge."
+        },
+        {
+          "name": "Light of Regeneration",
+          "target": 15,
+          "note": "+5% Incoming Heal; tolerance pick at 16."
+        },
+        {
+          "name": "Radiant Recovery",
+          "target": 16,
+          "note": "Strongest heal: -3s cooldown, +5% HP at 16."
+        },
+        {
+          "name": "Healing Light",
+          "target": 16,
+          "note": "+2 uses, +2% HP; -2s at 20."
+        },
+        {
+          "name": "Judgment Thunder",
+          "target": 13,
+          "note": "-20% MP, +12% single target. Leaves the macro once Earth Punishment is 20."
+        },
+        {
+          "name": "Lightning Strike Scattershot",
+          "target": 13,
+          "note": "Only during stagger; Multi-Hit, -1s cooldowns at 16."
+        },
+        {
+          "name": "Debilitating Mark",
+          "target": 13,
+          "note": "-15% Defense, 20% stun."
+        },
+        {
+          "name": "Chain of Torment",
+          "target": 12,
+          "note": "Enables Condemnation; 20% knockdown + tolerance reduction."
+        },
+        {
+          "name": "Defiance",
+          "target": 12,
+          "note": "CC break: 10% HP, +2s Tenacity."
+        }
+      ],
+      "stigmas": [
+        {
+          "name": "Earth Punishment",
+          "target": 20,
+          "note": "Condemnation always crits. First to 20."
+        },
+        {
+          "name": "Prayer of Amplification",
+          "target": 20,
+          "note": "+20% Attack and boosts your crit passives. Second to 20."
+        },
+        {
+          "name": "Light of Protection",
+          "target": 20,
+          "note": "Your mantra, a toggle. Third to 20 (15 is fine)."
+        },
+        {
+          "name": "Noble Aura",
+          "target": 13,
+          "note": "Orb that attacks alongside you; higher is better."
+        }
+      ]
+    },
+    "pve_chanter": {
+      "label": "PvE, with Chanter",
+      "inherit": "pve",
+      "stigmas": [
+        {
+          "name": "Earth Punishment",
+          "target": 20,
+          "note": "First to 20."
+        },
+        {
+          "name": "Prayer of Amplification",
+          "target": 20,
+          "note": "Second to 20."
+        },
+        {
+          "name": "Noble Aura",
+          "target": 20,
+          "note": "Third 20 in this preset."
+        },
+        {
+          "name": "Summon Resurrection",
+          "target": 5,
+          "note": "Replaces Light of Protection (doesn't stack with the Chanter's mantra). Absolution 15+ is the alternative."
+        }
+      ]
+    },
+    "pvp": {
+      "label": "PvP",
+      "inherit": "pve",
+      "skillOverrides": [
+        {
+          "name": "Earth's Retribution",
+          "target": 16,
+          "note": "Ignores Block and Evasion at 20."
+        },
+        {
+          "name": "Bolt",
+          "target": 16,
+          "note": "+300 Skill Accuracy matters against players with Evasion."
+        },
+        {
+          "name": "Light of Regeneration",
+          "target": 16,
+          "note": "Tolerance pick at 16."
+        },
+        {
+          "name": "Defiance",
+          "target": 16,
+          "note": "Your answer to a stun; decides fights."
+        }
+      ],
+      "stigmas": [
+        {
+          "name": "Prayer of Amplification",
+          "target": 20,
+          "note": "+20% Attack."
+        },
+        {
+          "name": "Light of Protection",
+          "target": 20,
+          "note": "Party damage boost/tolerance, accuracy, HP."
+        },
+        {
+          "name": "Yustiel's Power",
+          "target": 15,
+          "note": "Press when the enemy commits their burst."
+        },
+        {
+          "name": "Voice of Doom",
+          "target": 10,
+          "note": "-60% incoming heal on the target; removes shields at 10. Absolution in group PvP."
+        }
+      ]
+    }
+  },
+  "passives": [
+    {
+      "name": "Empyrean Lord's Grace",
+      "priority": 1,
+      "note": "The most important passive. As high as you can."
+    },
+    {
+      "name": "Healing Enhancement",
+      "priority": 1,
+      "note": "Heal boost scales with Attack."
+    },
+    {
+      "name": "Earth's Grace",
+      "priority": 1,
+      "note": "Critical Damage and Accuracy; straight to 10 at level 21."
+    },
+    {
+      "name": "Radiant Benediction",
+      "priority": 2,
+      "note": "Heals allies on attacks; early-game sustain."
+    },
+    {
+      "name": "Warm Benediction",
+      "priority": 3,
+      "note": "Fine to have."
+    },
+    {
+      "name": "Immortal Veil",
+      "priority": 3,
+      "note": "Helps early, falls off later."
+    },
+    {
+      "name": "Empyrean Lords' Benediction",
+      "priority": 3,
+      "note": "PvP only."
+    }
+  ],
+  "gear": {
+    "goodLines": [
+      "Might",
+      "Combat Speed",
+      "Damage Boost",
+      "Weapon Damage Boost",
+      "Precision",
+      "Attack",
+      "Critical",
+      "Accuracy",
+      "Cooldown",
+      "Double"
+    ],
+    "badLinesPvE": [
+      "Resist",
+      "Evasion",
+      "Defense",
+      "Block",
+      "Tolerance"
+    ],
+    "slotRules": [
+      {
+        "match": [
+          "Weapon",
+          "Mace",
+          "Main"
+        ],
+        "want": [
+          "Weapon Damage Boost",
+          "Might",
+          "Combat Speed",
+          "Precision"
+        ]
+      },
+      {
+        "match": [
+          "Guard",
+          "Off"
+        ],
+        "want": [
+          "Weapon Damage Boost",
+          "Might",
+          "Combat Speed",
+          "Precision"
+        ]
+      },
+      {
+        "match": [
+          "Glove",
+          "Hand"
+        ],
+        "want": [
+          "Combat Speed"
+        ]
+      },
+      {
+        "match": [
+          "Boot",
+          "Shoe",
+          "Feet"
+        ],
+        "want": [
+          "Move Speed",
+          "Movement Speed"
+        ]
+      },
+      {
+        "match": [
+          "Ring",
+          "Earring",
+          "Necklace",
+          "Bracelet",
+          "Belt"
+        ],
+        "want": [
+          "Combat Speed",
+          "Might",
+          "Precision"
+        ]
+      }
+    ],
+    "ringSkills": [
+      "Condemnation",
+      "Radiant Recovery",
+      "Judgment Thunder",
+      "Healing Light",
+      "Divine Aura"
+    ],
+    "minEnchantWeapon": 10,
+    "arcana": {
+      "Chalice": "Vigor (Time) — Condemnation",
+      "Parchment": "Any — Condemnation",
+      "Compass": "Vigor or Magic (Death) — Divine Aura",
+      "Bell": "Magic (Destruction) — Empyrean Lord's Grace",
+      "Mirror": "Vigor (Illusion) — Earth's Grace"
+    }
+  },
+  "stats": [
+    {
+      "match": [
+        "Accuracy"
+      ],
+      "min": 1000,
+      "note": "Ludra raid wants at least 1,000 Accuracy."
+    },
+    {
+      "match": [
+        "Critical Hit",
+        "Crit"
+      ],
+      "min": 1000,
+      "note": "Ludra raid wants at least 1,000 Critical Hit."
+    }
+  ],
+  "wings": {
+    "good": [
+      "Forest Spirit",
+      "Talisra"
+    ],
+    "avoid": [
+      "Dark Veil"
+    ],
+    "note": "Start with Forest Spirit wings; Talisra Wings from the season shop are best in slot."
+  },
+  "titles": {
+    "attack": [
+      "Guardian of Baran",
+      "Artguard",
+      "Unbound by Genus"
+    ],
+    "defense": [
+      "Saint"
+    ],
+    "other": [
+      "Through Heaven Back",
+      "Empty Closet"
+    ]
+  },
+  "daevanion": [
+    "Nezekan",
+    "Zikel",
+    "Vaizel",
+    "Triniel",
+    "Ariel",
+    "Azphel"
+  ],
+  "ludra": {
+    "name": "Abyssal Forge: Ludra",
+    "itemLevel": 2800,
+    "note": "10-player Sanctuary raid, four level-75 bosses. Entry needs level 45 and item level 2,800; groups usually also ask for a combat-power number.",
+    "warning": "NCSOFT pulled the raid from the global content menu after Early Access and said it will return — check the in-game content list before you plan around it.",
+    "checks": [
+      {
+        "type": "itemLevel",
+        "label": "Item level 2,800"
+      },
+      {
+        "type": "stat",
+        "match": [
+          "Accuracy"
+        ],
+        "min": 1000,
+        "label": "Accuracy 1,000"
+      },
+      {
+        "type": "stat",
+        "match": [
+          "Critical Hit",
+          "Crit"
+        ],
+        "min": 1000,
+        "label": "Critical Hit 1,000"
+      },
+      {
+        "type": "skill",
+        "name": "Condemnation",
+        "min": 16,
+        "label": "Condemnation 16+ (crit reset and Multi-Hit)"
+      },
+      {
+        "type": "skill",
+        "name": "Healing Light",
+        "min": 16,
+        "label": "Healing Light 16 (guide: before group dungeons)"
+      },
+      {
+        "type": "skill",
+        "name": "Earth Punishment",
+        "min": 20,
+        "label": "Earth Punishment 20"
+      },
+      {
+        "type": "skill",
+        "name": "Prayer of Amplification",
+        "min": 20,
+        "label": "Prayer of Amplification 20"
+      },
+      {
+        "type": "weapon",
+        "min": 10,
+        "label": "Weapon at least +10"
+      }
+    ],
+    "phases": [
+      {
+        "from": 0,
+        "to": 1000,
+        "title": "Finish the level phase",
+        "do": [
+          "Main story to 45; item level 1,000 is needed to finish the story (Abyss visit).",
+          "Side quests, sealed dungeons (map '?'), strongholds and the 5 daily quests.",
+          "Weapon to about +10; amulet +10 and morph it blue."
+        ]
+      },
+      {
+        "from": 1000,
+        "to": 1400,
+        "title": "Permanent upgrades first",
+        "do": [
+          "Belt: stronghold scrolls to +10, then craft it up to legendary — it never gets replaced.",
+          "Revelation Amulet: feathers from the world and the Abyss at the monolith, same idea.",
+          "Regional quests for accessories, runes and titles; clash runes only to +1.",
+          "Daevanion: sealed dungeons and regional quests give the crystals; Krao Cave and Draupnir open at 700.",
+          "Shugo Festival, rifts, daily dungeons."
+        ]
+      },
+      {
+        "from": 1400,
+        "to": 1600,
+        "title": "Farm Vakron Sky Island / Urugugu Canyon",
+        "do": [
+          "Conquest tier with item-level-70 Unique gear — take the chest piece last to skip the grind for the final slot.",
+          "Never skip Nightmare entries and the Ascension Trial each reset (normal difficulty from 1,500).",
+          "If a few points are missing: enhance the bracelets, they stay with you a long time."
+        ]
+      },
+      {
+        "from": 1600,
+        "to": 2100,
+        "title": "Transcendence and the first Arcana set",
+        "do": [
+          "Transcendence Stage 1 (Deus Research Base, Shattered Arkanis): plain Arcana cards are worth 20 item level each, green ones 40.",
+          "Fill the remaining Abyss feathers at the monolith; buy Daevanion crystals from the Nightmare and Shugo shops.",
+          "Level the cards to 10; Condemnation on the Chalice and Parchment first."
+        ]
+      },
+      {
+        "from": 2100,
+        "to": 2500,
+        "title": "Fire Temple / Ferocious Horn Den",
+        "do": [
+          "Conquest tier with item-level-86 gear; the Fire Temple weapons are the interesting part.",
+          "Transcendence Stage 2 for blue Arcana cards, then unique Arcana crafting.",
+          "Re-roll bad random lines (Evasion, resists) into Might, Combat Speed, Precision; fill every manastone slot."
+        ]
+      },
+      {
+        "from": 2500,
+        "to": 2800,
+        "title": "Last stretch",
+        "do": [
+          "Ascension Trial Extreme (2,500) and the Hard modes of Krao Cave and Draupnir (2,600) — the Ariel board fragments drop there.",
+          "Enhance every slot evenly: the cheapest item level is usually the lowest piece, not the weapon.",
+          "Season shop: Talisra Wings (about 250,000 points); titles Guardian of Baran or Artguard; pets to 3 and Genus Insight rolls."
+        ]
+      },
+      {
+        "from": 2800,
+        "to": 99999,
+        "title": "Raid-ready",
+        "do": [
+          "Ludra weapons (item level 102, max +15) drop from Eternal Ludra; the Unique armor and accessories have 4 manastone slots.",
+          "Keep two stigma presets ready: with and without a Chanter."
+        ]
+      }
+    ],
+    "sources": [
+      "https://aion2-guides.info/en/cleric/",
+      "https://mein-mmo.de/en/aion-2-equipment-guide-how-to-quickly-obtain-the-best-gear-in-pve,1586095/",
+      "https://gamingpromax.com/aion-2-endgame-guide/"
+    ]
+  }
+}

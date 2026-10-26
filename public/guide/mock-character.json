@@ -1,0 +1,84 @@
+{
+  "search": {
+    "list": [
+      { "name": "Mimisaki", "serverName": "Zikel", "className": "Cleric", "race": 2, "level": 45, "serverId": 2001, "characterId": "MOCKid==", "profileImageUrl": "" }
+    ],
+    "pagination": { "page": 1, "size": 40, "total": 1, "endPage": 1 }
+  },
+  "character": {
+    "profile": {
+      "characterId": "MOCKid==", "characterName": "Mimisaki", "characterLevel": 45, "className": "Cleric",
+      "raceId": 2, "serverName": "Zikel", "regionName": "Night Owls", "combatPower": 71240, "titleName": "Guardian of Baran", "profileImage": ""
+    },
+    "stat": { "statList": [
+      { "type": "ItemLevel", "name": "Item Level", "value": 1810 },
+      { "type": "Attack", "name": "Attack", "value": 2410 },
+      { "type": "Accuracy", "name": "Accuracy", "value": 870 },
+      { "type": "CritHit", "name": "Critical Hit", "value": 1120 },
+      { "type": "CombatSpeed", "name": "Combat Speed", "value": 112 }
+    ]},
+    "title": { "totalCount": 120, "ownedCount": 23, "titleList": [
+      { "id": 1, "name": "Guardian of Baran", "grade": "Rare", "equipCategory": "Attack" },
+      { "id": 2, "name": "Saint", "grade": "Rare", "equipCategory": "Defense" },
+      { "id": 3, "name": "Wanderer", "grade": "Common", "equipCategory": "Other" }
+    ]},
+    "ranking": { "rankingList": [] },
+    "daevanion": { "boardList": [
+      { "id": 1, "name": "Nezekan", "open": 1, "openNodeCount": 60, "totalNodeCount": 134, "openPercent": 45 },
+      { "id": 2, "name": "Zikel",   "open": 1, "openNodeCount": 40, "totalNodeCount": 134, "openPercent": 30 },
+      { "id": 3, "name": "Vaizel",  "open": 1, "openNodeCount": 12, "totalNodeCount": 134, "openPercent": 9 },
+      { "id": 4, "name": "Triniel", "open": 1, "openNodeCount": 0,  "totalNodeCount": 168, "openPercent": 0 },
+      { "id": 5, "name": "Azphel",  "open": 0, "openNodeCount": 0,  "totalNodeCount": 110, "openPercent": 0 }
+    ]}
+  },
+  "equipment": {
+    "equipment": {
+      "equipmentList": [
+        { "slotPos": 1, "slotPosName": "Main Weapon", "id": 100, "name": "Spiritforged Mace", "grade": "Unique", "enchantLevel": 10, "exceedLevel": 0, "icon": "" },
+        { "slotPos": 2, "slotPosName": "Off-hand", "id": 101, "name": "Spiritforged Guard", "grade": "Unique", "enchantLevel": 7, "exceedLevel": 0, "icon": "" },
+        { "slotPos": 3, "slotPosName": "Helm", "id": 102, "name": "Pilgrim Helm", "grade": "Epic", "enchantLevel": 5, "exceedLevel": 0, "icon": "" },
+        { "slotPos": 5, "slotPosName": "Gloves", "id": 103, "name": "Pilgrim Gloves", "grade": "Epic", "enchantLevel": 4, "exceedLevel": 0, "icon": "" },
+        { "slotPos": 6, "slotPosName": "Boots", "id": 104, "name": "Pilgrim Boots", "grade": "Epic", "enchantLevel": 3, "exceedLevel": 0, "icon": "" },
+        { "slotPos": 11, "slotPosName": "Ring 1", "id": 105, "name": "Crafted Ring of Light", "grade": "Unique", "enchantLevel": 6, "exceedLevel": 0, "icon": "" },
+        { "slotPos": 41, "slotPosName": "Arcana1", "id": 200, "name": "Chalice of Vigor", "grade": "Unique", "enchantLevel": 3, "exceedLevel": 0, "icon": "" }
+      ],
+      "skinList": []
+    },
+    "petwing": {
+      "pet": { "id": 1, "name": "Shugo Pup", "level": 3, "icon": "" },
+      "wing": { "id": 2, "name": "Dark Veil Wings", "grade": "Unique", "enchantLevel": 2, "icon": "" }
+    },
+    "skill": { "skillList": [
+      { "id": 1, "name": "Condemnation", "category": "Active", "skillLevel": 18, "needLevel": 6, "acquired": 1, "equip": 1, "icon": "" },
+      { "id": 2, "name": "Bolt", "category": "Active", "skillLevel": 14, "needLevel": 9, "acquired": 1, "equip": 1, "icon": "" },
+      { "id": 3, "name": "Divine Aura", "category": "Active", "skillLevel": 16, "needLevel": 12, "acquired": 1, "equip": 1, "icon": "" },
+      { "id": 4, "name": "Earth's Retribution", "category": "Active", "skillLevel": 12, "needLevel": 1, "acquired": 1, "equip": 1, "icon": "" },
+      { "id": 5, "name": "Judgment Thunder", "category": "Active", "skillLevel": 13, "needLevel": 1, "acquired": 1, "equip": 1, "icon": "" },
+      { "id": 6, "name": "Chain of Torment", "category": "Active", "skillLevel": 12, "needLevel": 6, "acquired": 1, "equip": 1, "icon": "" },
+      { "id": 7, "name": "Healing Light", "category": "Active", "skillLevel": 16, "needLevel": 9, "acquired": 1, "equip": 1, "icon": "" },
+      { "id": 8, "name": "Radiant Recovery", "category": "Active", "skillLevel": 10, "needLevel": 20, "acquired": 1, "equip": 1, "icon": "" },
+      { "id": 9, "name": "Light of Regeneration", "category": "Active", "skillLevel": 11, "needLevel": 25, "acquired": 1, "equip": 1, "icon": "" },
+      { "id": 10, "name": "Debilitating Mark", "category": "Active", "skillLevel": 9, "needLevel": 8, "acquired": 1, "equip": 1, "icon": "" },
+      { "id": 11, "name": "Lightning Strike Scattershot", "category": "Active", "skillLevel": 8, "needLevel": 14, "acquired": 1, "equip": 0, "icon": "" },
+      { "id": 12, "name": "Defiance", "category": "Active", "skillLevel": 5, "needLevel": 10, "acquired": 1, "equip": 1, "icon": "" },
+      { "id": 20, "name": "Earth Punishment", "category": "Stigma", "skillLevel": 20, "needLevel": 22, "acquired": 1, "equip": 1, "icon": "" },
+      { "id": 21, "name": "Prayer of Amplification", "category": "Stigma", "skillLevel": 12, "needLevel": 22, "acquired": 1, "equip": 1, "icon": "" },
+      { "id": 22, "name": "Light of Protection", "category": "Stigma", "skillLevel": 15, "needLevel": 22, "acquired": 1, "equip": 1, "icon": "" },
+      { "id": 23, "name": "Benevolence", "category": "Stigma", "skillLevel": 5, "needLevel": 22, "acquired": 1, "equip": 1, "icon": "" },
+      { "id": 24, "name": "Noble Aura", "category": "Stigma", "skillLevel": 8, "needLevel": 22, "acquired": 1, "equip": 0, "icon": "" },
+      { "id": 30, "name": "Empyrean Lord's Grace", "category": "Passive", "skillLevel": 9, "needLevel": 15, "acquired": 1, "equip": 1, "icon": "" },
+      { "id": 31, "name": "Earth's Grace", "category": "Passive", "skillLevel": 10, "needLevel": 21, "acquired": 1, "equip": 1, "icon": "" },
+      { "id": 32, "name": "Healing Enhancement", "category": "Passive", "skillLevel": 4, "needLevel": 18, "acquired": 1, "equip": 1, "icon": "" },
+      { "id": 33, "name": "Immortal Veil", "category": "Passive", "skillLevel": 7, "needLevel": 12, "acquired": 1, "equip": 1, "icon": "" }
+    ]}
+  },
+  "items": {
+    "1":  { "name": "Spiritforged Mace", "subStats": [ { "name": "Might", "value": "+84" }, { "name": "Combat Speed", "value": "+3.1%" }, { "name": "Evasion", "value": "+120" } ], "subSkills": [] },
+    "2":  { "name": "Spiritforged Guard", "subStats": [ { "name": "Weapon Damage Boost", "value": "+2.4%" }, { "name": "Block", "value": "+90" } ], "subSkills": [] },
+    "3":  { "name": "Pilgrim Helm", "subStats": [ { "name": "HP", "value": "+410" } ], "subSkills": [] },
+    "5":  { "name": "Pilgrim Gloves", "subStats": [ { "name": "Combat Speed", "value": "+2.0%" } ], "subSkills": [] },
+    "6":  { "name": "Pilgrim Boots", "subStats": [ { "name": "Defense", "value": "+55" } ], "subSkills": [] },
+    "11": { "name": "Crafted Ring of Light", "subStats": [ { "name": "Precision", "value": "+40" } ], "subSkills": [ { "name": "Condemnation", "level": 2 }, { "name": "Healing Light", "level": 1 }, { "name": "Salvation", "level": 1 } ] },
+    "41": { "name": "Chalice of Vigor", "subStats": [], "subSkills": [ { "name": "Condemnation", "level": 2 } ] }
+  }
+}

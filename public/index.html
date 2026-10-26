@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cleric Check — compare your AION 2 character with the guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #141a2b; --bg2: #0f1422; --surface: #1c2437; --line: #2d3750;
+    --text: #efe7d2; --muted: #9ba3b8; --gold: #d9b35b; --gold-soft: rgba(217,179,91,.18);
+    --ok: #6fb387; --warn: #e0a040; --bad: #d1655a;
+    --display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+    --body: "Source Sans 3", "Segoe UI", Helvetica, Arial, sans-serif;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--body); font-size: 17px; line-height: 1.5; }
+  a { color: var(--gold); }
+  main { max-width: 980px; margin: 0 auto; padding: 0 20px 80px; }
+
+  /* hero = the search itself */
+  header { padding: 56px 0 28px; border-bottom: 1px solid var(--line); }
+  h1 { font-family: var(--display); font-weight: 500; font-size: clamp(40px, 7vw, 64px); line-height: 1; margin: 0 0 10px; letter-spacing: -.01em; }
+  header p { margin: 0 0 24px; color: var(--muted); max-width: 60ch; }
+  form { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  @media (min-width: 640px) { form { grid-template-columns: 2fr 1fr 1fr auto; } }
+  input, select, button { font: inherit; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--text); padding: 12px 14px; }
+  input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  button.primary { background: var(--gold); color: #1a1507; border-color: var(--gold); font-weight: 600; cursor: pointer; }
+  button.primary:disabled { opacity: .6; cursor: progress; }
+
+  .notice { margin-top: 16px; padding: 12px 14px; border-left: 3px solid var(--gold); background: var(--gold-soft); border-radius: 0 6px 6px 0; }
+  .notice.error { border-color: var(--bad); background: rgba(209,101,90,.14); }
+  .candidates { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 8px; }
+  .candidates button { width: 100%; text-align: left; cursor: pointer; display: flex; justify-content: space-between; }
+
+  /* report */
+  #report { display: none; }
+  .mode { display: flex; gap: 8px; flex-wrap: wrap; margin: 24px 0 8px; }
+  .mode button { cursor: pointer; padding: 8px 14px; }
+  .mode button[aria-pressed="true"] { background: var(--gold-soft); border-color: var(--gold); color: var(--gold); }
+
+  .profile { display: flex; gap: 20px; align-items: center; padding: 24px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .profile img { width: 72px; height: 72px; border-radius: 50%; border: 2px solid var(--gold); background: var(--bg2); object-fit: cover; }
+  .profile h2 { font-family: var(--display); font-size: 36px; font-weight: 600; margin: 0; line-height: 1.1; }
+  .profile .sub { color: var(--muted); }
+  .profile .nums { margin-left: auto; display: flex; gap: 24px; }
+  .profile .nums b { display: block; font-family: var(--display); font-size: 30px; font-weight: 600; line-height: 1; color: var(--gold); }
+  .profile .nums span { color: var(--muted); font-size: 15px; }
+
+  section { padding: 28px 0 8px; border-bottom: 1px solid var(--line); }
+  section h3 { font-family: var(--display); font-weight: 600; font-size: 30px; margin: 0 0 4px; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  section h3 small { font-family: var(--body); font-size: 15px; font-weight: 400; color: var(--muted); }
+  section .lead { color: var(--muted); margin: 0 0 16px; max-width: 70ch; }
+
+  /* level rows: the memorable thing — a 20-notch bar, filled to your level, with a hollow mark at the target */
+  .row { display: grid; grid-template-columns: 1fr; gap: 6px 16px; padding: 12px 0; border-top: 1px dashed var(--line); }
+  @media (min-width: 640px) { .row { grid-template-columns: 220px 1fr 72px; align-items: center; } }
+  .row .name { font-weight: 600; }
+  .row .name small { display: block; font-weight: 400; color: var(--muted); font-size: 14px; }
+  .bar { display: grid; grid-template-columns: repeat(20, 1fr); gap: 2px; height: 14px; }
+  .bar i { display: block; background: var(--bg2); border: 1px solid var(--line); border-radius: 2px; }
+  .bar i.on { background: var(--gold); border-color: var(--gold); }
+  .bar i.on.under { background: var(--warn); border-color: var(--warn); }
+  .bar i.target { border-color: var(--text); border-width: 2px; }
+  .lvl { font-family: var(--display); font-size: 24px; font-weight: 600; white-space: nowrap; }
+  .lvl span { color: var(--muted); font-size: 16px; font-family: var(--body); font-weight: 400; }
+  .lvl.ok { color: var(--ok); } .lvl.warn { color: var(--warn); } .lvl.bad { color: var(--bad); }
+  .note { grid-column: 1 / -1; color: var(--muted); font-size: 15px; margin: 0; }
+
+  /* gear list */
+  .gear { list-style: none; padding: 0; margin: 0; }
+  .gear li { display: grid; grid-template-columns: 1fr; gap: 4px 16px; padding: 12px 0; border-top: 1px dashed var(--line); }
+  @media (min-width: 640px) { .gear li { grid-template-columns: 220px 1fr; } }
+  .gear .slot { color: var(--muted); font-size: 14px; }
+  .gear .item { font-weight: 600; }
+  .gear .ench { color: var(--gold); margin-left: 6px; }
+  .lines { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-size: 14px; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+  .tag.ok { border-color: var(--ok); color: var(--ok); }
+  .tag.bad { border-color: var(--bad); color: var(--bad); }
+  .tag.skill { border-color: var(--gold); color: var(--gold); }
+  .grade-Unique { color: #c99aff; } .grade-Epic { color: #ff9c5b; } .grade-Legend { color: #ffd166; } .grade-Rare { color: #6ec5ff; }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+  .stat { padding: 12px 14px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+  .stat b { display: block; font-family: var(--display); font-size: 28px; font-weight: 600; line-height: 1.1; }
+  .stat.ok b { color: var(--ok); } .stat.warn b { color: var(--warn); }
+  .stat small { color: var(--muted); }
+
+  .boards { display: flex; flex-wrap: wrap; gap: 10px; }
+  .board { flex: 1 1 140px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; }
+  .board .fill { height: 6px; background: var(--bg2); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+  .board .fill i { display: block; height: 100%; background: var(--gold); }
+
+  /* Ludra readiness */
+  .verdict { display: grid; grid-template-columns: 1fr; gap: 16px 28px; margin-bottom: 20px; }
+  @media (min-width: 720px) { .verdict { grid-template-columns: 300px 1fr; } }
+  .ilvl { padding: 18px 20px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+  .ilvl b { display: block; font-family: var(--display); font-size: 52px; font-weight: 600; line-height: 1; }
+  .ilvl b span { font-size: 22px; color: var(--muted); }
+  .ilvl .fill { height: 10px; background: var(--bg2); border-radius: 5px; margin: 12px 0 6px; overflow: hidden; }
+  .ilvl .fill i { display: block; height: 100%; background: var(--gold); }
+  .ilvl.ready b, .ilvl.ready .fill i { color: var(--ok); background: var(--ok); }
+  .ilvl.ready b { background: none; }
+  .checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+  .checks li { display: flex; gap: 10px; align-items: baseline; }
+  .checks li::before { content: "✓"; font-weight: 600; color: var(--ok); width: 18px; flex: none; }
+  .checks li.miss::before { content: "✕"; color: var(--bad); }
+  .checks li small { color: var(--muted); }
+  .next { border: 1px solid var(--gold); border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; background: var(--gold-soft); }
+  .next h4 { font-family: var(--display); font-size: 26px; font-weight: 600; margin: 0 0 6px; }
+  .next ul, .phase ul { margin: 6px 0 0; padding-left: 20px; }
+  .phases { display: grid; gap: 0; }
+  .phase { display: grid; grid-template-columns: 1fr; gap: 2px 16px; padding: 12px 0; border-top: 1px dashed var(--line); }
+  @media (min-width: 640px) { .phase { grid-template-columns: 150px 1fr; } }
+  .phase .range { font-family: var(--display); font-size: 22px; font-weight: 600; color: var(--muted); }
+  .phase.done .range { color: var(--ok); } .phase.now .range { color: var(--gold); }
+  .phase.done .body { opacity: .55; }
+  .phase .body b { font-weight: 600; }
+  footer { color: var(--muted); font-size: 14px; padding-top: 28px; }
+  @media (prefers-reduced-motion: no-preference) { .bar i { transition: background .3s; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Cleric Check</h1>
+    <p>Type your character name. Your skills, stigmas, passives, gear lines and stats are read from NCSOFT's character page and set against the Cleric build on <a href="https://aion2-guides.info/en/cleric/" target="_blank" rel="noopener">aion2-guides.info</a>.</p>
+    <form id="form">
+      <input id="name" placeholder="Character name" required autocomplete="off">
+      <select id="region"></select>
+      <select id="race">
+        <option value="">Both factions</option>
+        <option value="1">Elyos</option>
+        <option value="2">Asmodian</option>
+      </select>
+      <button class="primary" id="go" type="submit">Compare</button>
+    </form>
+    <div id="msg"></div>
+    <ul id="candidates" class="candidates"></ul>
+  </header>
+
+  <div id="report">
+    <div class="mode" id="mode" role="group" aria-label="Build to compare with"></div>
+    <div class="profile" id="profile"></div>
+    <section id="ludra"></section>
+    <section id="skills"></section>
+    <section id="stigmas"></section>
+    <section id="passives"></section>
+    <section id="gear"></section>
+    <section id="stats"></section>
+    <section id="extras"></section>
+    <section id="daevanion"></section>
+    <footer>Build data: aion2-guides.info (Cleric, Global Season 1, updated <span id="guideDate"></span>). Character data: NCSOFT's official character lookup, read through the local proxy. Unofficial fan tool, not affiliated with NCSOFT.</footer>
+  </div>
+</main>
+
+<script>
+// ---------- helpers ----------
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const norm = s => String(s ?? "").toLowerCase().replace(/[’'`´]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+const same = (a, b) => norm(a) === norm(b) || norm(a).includes(norm(b)) || norm(b).includes(norm(a));
+const api = async (path, params) => {
+  const res = await fetch(path + "?" + new URLSearchParams(params));
+  const data = await res.json();
+  if (!res.ok || data.error) throw new Error(data.error || res.statusText);
+  return data;
+};
+
+let guide, char, equip, items = {}, ctx = {}, mode = "pve";
+
+// ---------- setup ----------
+(async () => {
+  const regions = await api("/api/regions", {});
+  $("#region").innerHTML = Object.entries(regions).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join("");
+  guide = await api("/guide/cleric.json", {});
+  $("#guideDate").textContent = guide.sourceUpdated;
+  const p = new URLSearchParams(location.search);
+  if (p.get("name")) { $("#name").value = p.get("name"); if (p.get("region")) $("#region").value = p.get("region"); search(); }
+})();
+
+$("#form").addEventListener("submit", e => { e.preventDefault(); search(); });
+
+function say(text, isError) {
+  $("#msg").innerHTML = text ? `<div class="notice${isError ? " error" : ""}">${text}</div>` : "";
+}
+
+// ---------- 1. search ----------
+async function search() {
+  $("#go").disabled = true; $("#candidates").innerHTML = ""; $("#report").style.display = "none";
+  const name = $("#name").value.trim(), region = $("#region").value, race = $("#race").value;
+  say("Searching…");
+  try {
+    const data = await api("/api/search", { name, region, race });
+    const list = data.list || [];
+    const exact = list.filter(r => norm(r.name) === norm(name));
+    const pick = exact.length === 1 ? exact : list;
+    if (!pick.length) return say(`No character called “${esc(name)}” in ${esc(region.toUpperCase())}. Check the spelling, or try the other faction.`, true);
+    if (pick.length > 1) {
+      say("Several characters match — pick yours:");
+      $("#candidates").innerHTML = pick.slice(0, 12).map((r, i) =>
+        `<li><button data-i="${i}"><span>${esc(r.name)} <small>${esc(r.className || "")}</small></span><span>${esc(r.serverName)} · Lv ${r.level}</span></button></li>`).join("");
+      $("#candidates").querySelectorAll("button").forEach(b => b.onclick = () => load(pick[+b.dataset.i], region));
+      return;
+    }
+    await load(pick[0], region);
+  } catch (e) { say("Could not reach the character search: " + esc(e.message), true); }
+  finally { $("#go").disabled = false; }
+}
+
+// ---------- 2. load profile + equipment ----------
+async function load(row, region) {
+  ctx = { region, serverId: row.serverId, characterId: row.characterId };
+  $("#candidates").innerHTML = ""; say("Reading " + esc(row.name) + "…");
+  try {
+    [char, equip] = await Promise.all([api("/api/character", ctx), api("/api/equipment", ctx)]);
+  } catch (e) { return say("Could not read the character: " + esc(e.message), true); }
+  items = {};
+  say("");
+  history.replaceState(null, "", `?name=${encodeURIComponent(row.name)}&region=${region}`);
+  render();
+  loadItems(); // gear lines arrive slot by slot
+}
+
+// ---------- 3. render ----------
+function buildFor(m) {
+  const g = guide.modes;
+  const base = g[m].inherit ? g[g[m].inherit] : g[m];
+  const skills = (g[m].skills || base.skills).map(s => ({ ...s }));
+  for (const o of g[m].skillOverrides || []) { const t = skills.find(s => same(s.name, o.name)); if (t) Object.assign(t, o); }
+  return { label: g[m].label, skills, stigmas: g[m].stigmas || base.stigmas };
+}
+const skillList = () => equip?.skill?.skillList || [];
+const findSkill = name => skillList().find(s => same(s.name, name));
+
+function render() {
+  const p = char.profile || {};
+  const stat = n => (char.stat?.statList || []).find(s => same(s.name, n) || same(s.type, n));
+  const notCleric = p.className && !same(p.className, "Cleric");
+  $("#report").style.display = "block";
+
+  $("#mode").innerHTML = Object.keys(guide.modes).map(k =>
+    `<button type="button" data-m="${k}" aria-pressed="${k === mode}">${esc(guide.modes[k].label)}</button>`).join("");
+  $("#mode").querySelectorAll("button").forEach(b => b.onclick = () => { mode = b.dataset.m; render(); });
+
+  $("#profile").innerHTML = `
+    ${p.profileImage ? `<img src="${esc(p.profileImage)}" alt="">` : ""}
+    <div><h2>${esc(p.characterName)}</h2>
+      <div class="sub">Lv ${p.characterLevel} ${esc(p.className)} · ${esc(p.serverName)}${p.regionName ? " · " + esc(p.regionName) : ""}${p.titleName ? " · “" + esc(p.titleName) + "”" : ""}</div>
+      ${notCleric ? `<div class="notice">This is a ${esc(p.className)}, but the guide is for Clerics — the comparison below will mostly show misses.</div>` : ""}
+    </div>
+    <div class="nums">
+      <div><b>${(p.combatPower || 0).toLocaleString()}</b><span>combat power</span></div>
+      <div><b>${stat("ItemLevel")?.value ?? "–"}</b><span>item level</span></div>
+    </div>`;
+
+  const build = buildFor(mode);
+  renderLevels($("#skills"), "Skills", build.skills, guide.skillCap, `Endgame levels for “${esc(build.label)}”. The outlined notch is the guide's target.`);
+  renderLevels($("#stigmas"), "Stigmas", build.stigmas, guide.skillCap, `${guide.stigmaSlots} slots in Season 1. Greyed rows are stigmas you have equipped that the preset doesn't use.`, true);
+  renderLevels($("#passives"), "Passives", guide.passives.filter(x => x.priority < 3).map(x => ({ ...x, target: 10 })), 10, "Level these before any other passive; there is no hard cap in the guide, 10 is used as the first milestone.");
+  renderLudra(stat); renderGear(); renderStats(stat); renderExtras(); renderBoards();
+}
+
+function renderLevels(el, title, wanted, cap, lead, showExtras) {
+  let hit = 0;
+  const rows = wanted.map(w => {
+    const s = findSkill(w.name);
+    const lvl = s?.acquired ? (s.skillLevel || 0) : 0;
+    const state = !s || !s.acquired ? "bad" : lvl >= w.target ? "ok" : "warn";
+    if (state === "ok") hit++;
+    const notEquipped = s && s.acquired && s.equip === 0 && showExtras;
+    return `<div class="row">
+      <div class="name">${esc(w.name)}<small>${!s ? "not learned" : notEquipped ? "learned, not on the bar" : s.category ? esc(s.category) : ""}</small></div>
+      <div class="bar">${bar(lvl, w.target, cap)}</div>
+      <div class="lvl ${state}">${lvl}<span> / ${w.target}</span></div>
+      ${w.note ? `<p class="note">${esc(w.note)}</p>` : ""}
+    </div>`;
+  }).join("");
+  let extra = "";
+  if (showExtras) {
+    const used = wanted.map(w => w.name);
+    const others = skillList().filter(s => s.equip && /stigma/i.test(s.category || "") && !used.some(u => same(u, s.name)));
+    extra = others.map(s => `<div class="row" style="opacity:.6"><div class="name">${esc(s.name)}<small>equipped, not in this preset</small></div><div class="bar">${bar(s.skillLevel, 0, cap)}</div><div class="lvl">${s.skillLevel}</div></div>`).join("");
+  }
+  el.innerHTML = `<h3>${title} <small>${hit} of ${wanted.length} at target</small></h3><p class="lead">${lead}</p>${rows}${extra}`;
+}
+function bar(lvl, target, cap) {
+  let out = "";
+  for (let i = 1; i <= cap; i++) {
+    const on = i <= lvl, under = on && lvl < target, t = i === target;
+    out += `<i class="${on ? "on" : ""}${under ? " under" : ""}${t ? " target" : ""}"></i>`;
+  }
+  return out;
+}
+
+// ---------- Ludra readiness ----------
+function renderLudra(stat) {
+  const L = guide.ludra;
+  const ilvl = stat("ItemLevel")?.value ?? 0;
+  const weapon = (equip?.equipment?.equipmentList || []).find(e => slotRule(e.slotPosName, e.name)?.match.includes("Weapon"));
+  const results = L.checks.map(c => {
+    let have = null, ok = false;
+    if (c.type === "itemLevel") { have = ilvl; ok = ilvl >= L.itemLevel; }
+    else if (c.type === "stat") { have = c.match.map(stat).find(Boolean)?.value ?? null; ok = have != null && have >= c.min; }
+    else if (c.type === "skill") { const s = findSkill(c.name); have = s?.acquired ? s.skillLevel : 0; ok = have >= c.min; }
+    else if (c.type === "weapon") { have = weapon ? "+" + weapon.enchantLevel : "no weapon"; ok = !!weapon && weapon.enchantLevel >= c.min; }
+    return { ...c, have, ok };
+  });
+  const passed = results.filter(r => r.ok).length, ready = passed === results.length;
+  const pct = Math.min(100, Math.round(ilvl / L.itemLevel * 100));
+  const idx = L.phases.findIndex(p => ilvl >= p.from && ilvl < p.to);
+  const now = L.phases[idx] || L.phases[L.phases.length - 1];
+  const phases = L.phases.map((p, i) => `<div class="phase ${i < idx ? "done" : i === idx ? "now" : ""}">
+      <div class="range">${p.from.toLocaleString()}–${p.to > 9000 ? "" : p.to.toLocaleString()}</div>
+      <div class="body"><b>${esc(p.title)}</b><ul>${p.do.map(d => `<li>${esc(d)}</li>`).join("")}</ul></div></div>`).join("");
+  $("#ludra").innerHTML = `<h3>Ready for Ludra? <small>${ready ? "yes — all checks pass" : passed + " of " + results.length + " checks pass"}</small></h3>
+    <p class="lead">${esc(L.note)}</p>
+    <div class="verdict">
+      <div class="ilvl ${ready ? "ready" : ""}"><small>item level</small><b>${ilvl.toLocaleString()}<span> / ${L.itemLevel.toLocaleString()}</span></b>
+        <div class="fill"><i style="width:${pct}%"></i></div><small>${ilvl >= L.itemLevel ? "entry requirement met" : (L.itemLevel - ilvl).toLocaleString() + " to go"}</small></div>
+      <ul class="checks">${results.map(r => `<li class="${r.ok ? "" : "miss"}"><span>${esc(r.label)} <small>— you: ${esc(r.have ?? "–")}</small></span></li>`).join("")}</ul>
+    </div>
+    <div class="next"><small>Your next step at ${ilvl.toLocaleString()}</small><h4>${esc(now.title)}</h4><ul>${now.do.map(d => `<li>${esc(d)}</li>`).join("")}</ul></div>
+    <div class="phases">${phases}</div>
+    <p class="note" style="margin-top:12px">${esc(L.warning)} Route compiled from aion2-guides.info, mein-mmo.de and gamingpromax.com.</p>`;
+}
+
+// ---------- gear ----------
+function slotRule(slotName, itemName) {
+  return guide.gear.slotRules.find(r => r.match.some(m => same(slotName, m) || same(itemName, m)));
+}
+function renderGear() {
+  const list = equip?.equipment?.equipmentList || [];
+  const html = list.map(e => {
+    const it = items[e.slotPos];
+    const rule = slotRule(e.slotPosName, e.name);
+    const isRing = /ring/i.test(e.slotPosName) && !/earring/i.test(e.slotPosName);
+    const isWeapon = rule && rule.match.includes("Weapon");
+    let lines = `<span class="tag">loading lines…</span>`;
+    if (it) {
+      const subs = it.subStats || [];
+      lines = subs.map(s => {
+        const good = (rule?.want || guide.gear.goodLines).some(g => same(s.name, g)) || guide.gear.goodLines.some(g => same(s.name, g));
+        const bad = guide.gear.badLinesPvE.some(b => same(s.name, b));
+        return `<span class="tag ${bad ? "bad" : good ? "ok" : ""}">${esc(s.name)} ${esc(s.value || "")}</span>`;
+      }).join("");
+      lines += (it.subSkills || []).map(k => {
+        const wanted = isRing || e.slotPos >= 41 ? guide.gear.ringSkills.concat(["Empyrean Lord's Grace", "Earth's Grace"]) : [];
+        const good = wanted.some(w => same(w, k.name));
+        return `<span class="tag ${good ? "skill" : ""}">${esc(k.name)} +${k.level}</span>`;
+      }).join("");
+      if (!subs.length && !(it.subSkills || []).length) lines = `<span class="tag">no random lines</span>`;
+    }
+    const want = rule ? `<div class="slot">guide wants: ${rule.want.join(", ")}${isRing ? " + active-skill lines" : ""}</div>` : "";
+    const ench = e.enchantLevel ? `<span class="ench">+${e.enchantLevel}${e.exceedLevel ? " ★" + e.exceedLevel : ""}</span>` : "";
+    const lowWeapon = isWeapon && e.enchantLevel < guide.gear.minEnchantWeapon ? `<span class="tag bad">below +${guide.gear.minEnchantWeapon}</span>` : "";
+    return `<li><div><div class="slot">${esc(e.slotPosName)}</div><div class="item grade-${esc(e.grade)}">${esc(e.name)}${ench}</div></div>
+      <div><div class="lines">${lines}${lowWeapon}</div>${want}</div></li>`;
+  }).join("");
+  const w = equip?.petwing?.wing;
+  const wingState = !w ? "" : guide.wings.good.some(g => same(w.name, g)) ? "ok" : guide.wings.avoid.some(a => same(w.name, a)) ? "bad" : "";
+  $("#gear").innerHTML = `<h3>Gear <small>${list.length} pieces</small></h3>
+    <p class="lead">Green lines are the ones the guide asks for; red lines are defensive or resist lines it tells you to skip in PvE. Gold tags are active-skill lines on rings and arcana.</p>
+    <ul class="gear">${html}
+      ${w ? `<li><div><div class="slot">Wings</div><div class="item grade-${esc(w.grade)}">${esc(w.name)}${w.enchantLevel ? `<span class="ench">+${w.enchantLevel}</span>` : ""}</div></div>
+        <div><div class="lines"><span class="tag ${wingState}">${wingState === "ok" ? "guide pick" : wingState === "bad" ? "guide says: not these" : "any wing but Dark Veil works"}</span></div><div class="slot">${esc(guide.wings.note)}</div></div></li>` : ""}
+    </ul>`;
+}
+async function loadItems() {
+  const list = equip?.equipment?.equipmentList || [];
+  for (const e of list) {
+    try { items[e.slotPos] = await api("/api/item", { ...ctx, id: e.id, enchantLevel: e.enchantLevel || 0, slotPos: e.slotPos }); }
+    catch { items[e.slotPos] = { subStats: [], subSkills: [] }; }
+    renderGear();
+  }
+}
+
+// ---------- stats, titles, boards ----------
+function renderStats(stat) {
+  const cards = guide.stats.map(r => {
+    const s = r.match.map(stat).find(Boolean);
+    const v = s?.value;
+    const state = v == null ? "" : v >= r.min ? "ok" : "warn";
+    return `<div class="stat ${state}"><small>${esc(r.match[0])}</small><b>${v ?? "–"}</b><small>${esc(r.note)}</small></div>`;
+  }).join("");
+  const rest = (char.stat?.statList || []).filter(s => !guide.stats.some(r => r.match.some(m => same(s.name, m)))).slice(0, 12)
+    .map(s => `<div class="stat"><small>${esc(s.name)}</small><b>${s.value}</b></div>`).join("");
+  $("#stats").innerHTML = `<h3>Stats</h3><p class="lead">The guide's hard numbers for the Ludra raid, then the rest of your sheet.</p><div class="stats">${cards}${rest}</div>`;
+}
+function renderExtras() {
+  const t = guide.titles;
+  const owned = char.title?.titleList || [];
+  const row = (label, names) => {
+    const have = names.filter(n => owned.some(o => same(o.name, n)));
+    return `<div class="row"><div class="name">${label}</div><div class="lines">${names.map(n => `<span class="tag ${have.includes(n) ? "ok" : ""}">${esc(n)}</span>`).join("")}</div><div class="lvl ${have.length ? "ok" : "warn"}">${have.length}<span> / ${names.length}</span></div></div>`;
+  };
+  const pet = equip?.petwing?.pet;
+  const arcana = Object.entries(guide.gear.arcana).map(([k, v]) => `<span class="tag">${k}: ${esc(v)}</span>`).join("");
+  $("#extras").innerHTML = `<h3>Titles, pet, arcana</h3>
+    <p class="lead">Titles the guide names (${char.title?.ownedCount ?? "?"} of ${char.title?.totalCount ?? "?"} owned in total). Equipped now: “${esc(char.profile?.titleName || "none")}”.</p>
+    ${row("Attack title", t.attack)}${row("Defense title", t.defense)}${row("Cooldown title", t.other)}
+    <div class="row"><div class="name">Pet</div><div class="lines"><span class="tag">${pet ? esc(pet.name) + " · Lv " + pet.level : "none equipped"}</span></div><div class="lvl ${pet && pet.level >= 3 ? "ok" : "warn"}">${pet ? pet.level : 0}<span> / 3</span></div><p class="note">Get every pet to level 3 early for Genus Insight crystals.</p></div>
+    <div class="row"><div class="name">Arcana plan<small>what to roll for</small></div><div class="lines">${arcana}</div></div>`;
+}
+function renderBoards() {
+  const boards = char.daevanion?.boardList || [];
+  $("#daevanion").innerHTML = `<h3>Daevanion boards</h3><p class="lead">Guide priority: orange Cooldown and Combat Speed nodes first, then Attack and Critical, then the blue +1 skill nodes. Azphel is PvP only.</p>
+    <div class="boards">${boards.map(b => `<div class="board"><b>${esc(b.name)}</b> <small>${b.open ? (b.openNodeCount + "/" + b.totalNodeCount) : "locked"}</small><div class="fill"><i style="width:${b.openPercent || 0}%"></i></div></div>`).join("")}</div>`;
+}
+</script>
+</body>
+</html>

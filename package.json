@@ -1,0 +1,15 @@
+{
+  "name": "aion2-cleric-check",
+  "version": "1.0.0",
+  "description": "Compare an AION 2 Cleric's skills, stigmas and gear with the aion2-guides.info build",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "mock": "MOCK=1 node server.js"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
