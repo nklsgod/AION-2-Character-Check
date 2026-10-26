@@ -262,16 +262,18 @@
       "match": [
         "Accuracy"
       ],
-      "min": 1200,
-      "note": "Ludra: about 1,200 (aion2-guides.info's minimum is 1,000)."
+      "min": 1000,
+      "note": "Ludra: 1,000 to enter; aim for about 1,200 (JOHNPAL TV).",
+      "target": 1200
     },
     {
       "match": [
         "Critical Hit",
         "Crit"
       ],
-      "min": 1200,
-      "note": "Ludra: about 1,200–2,000 (aion2-guides.info's minimum is 1,000)."
+      "min": 1000,
+      "note": "Ludra: 1,000 to enter; aim for about 1,200–2,000 (JOHNPAL TV).",
+      "target": 1200
     }
   ],
   "daevanionNote": "Guide priority: blue nodes for Overhead Slam, Rending Blow and Ruinous Blow first, then the orange nodes, then stats. Azphel is PvP only.",
@@ -291,8 +293,9 @@
         "match": [
           "Accuracy"
         ],
-        "min": 1200,
-        "label": "Accuracy 1,200"
+        "min": 1000,
+        "label": "Accuracy 1,000 (aim for 1,200)",
+        "target": 1200
       },
       {
         "type": "stat",
@@ -300,8 +303,9 @@
           "Critical Hit",
           "Crit"
         ],
-        "min": 1200,
-        "label": "Critical Hit 1,200"
+        "min": 1000,
+        "label": "Critical Hit 1,000 (aim for 1,200)",
+        "target": 1200
       },
       {
         "type": "skill",

@@ -120,6 +120,7 @@
   .checks li { display: flex; gap: 10px; align-items: baseline; }
   .checks li::before { content: "✓"; font-weight: 600; color: var(--ok); width: 18px; flex: none; }
   .checks li.miss::before { content: "✕"; color: var(--bad); }
+  .checks li.short::before { content: "!"; color: var(--warn); }
   .checks li small { color: var(--muted); }
   .next { border: 1px solid var(--gold); border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; background: var(--gold-soft); }
   .next h4 { font-family: var(--display); font-size: 26px; font-weight: 600; margin: 0 0 6px; }
@@ -179,20 +180,11 @@
   </div>
 </main>
 
-<script>
+<script type="module">
+import { norm, same, sameTitle, findStat, ilvlBreakdown } from "./js/core.js";
 // ---------- helpers ----------
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const norm = s => String(s ?? "").toLowerCase().replace(/[’'`´]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
-const same = (a, b) => { const x = norm(a), y = norm(b); return !!x && !!y && (x === y || x.includes(y) || y.includes(x)); };
-// Stats: exact type/name first; fuzzy only if nothing matches exactly, and never the item-level row.
-const findStat = (list, n) => {
-  const k = norm(n);
-  if (!k) return undefined;
-  return list.find(s => norm(s.type) === k || norm(s.name) === k)
-    || list.find(s => norm(s.type) !== "itemlevel" && (norm(s.type).startsWith(k) || norm(s.name).startsWith(k)))
-    || list.find(s => norm(s.type) !== "itemlevel" && (same(s.type, n) || same(s.name, n)));
-};
 const isStigma = s => /stigma|^dp$/i.test(s.category || ""); // NCSOFT's API calls stigmas "Dp"
 const api = async (path, params) => {
   const res = await fetch(path + "?" + new URLSearchParams(params));
@@ -201,7 +193,7 @@ const api = async (path, params) => {
   return data;
 };
 
-let guide, char, equip, items = {}, ctx = {}, mode = "pve", statOf = () => undefined;
+let guide, model, char, equip, items = {}, boards = {}, ctx = {}, mode = "pve", statOf = () => undefined;
 const GUIDES = ["cleric", "gladiator"], guides = {};
 async function useGuide(className) {
   const key = GUIDES.find(k => norm(k) === norm(className)) || "cleric";
@@ -216,6 +208,7 @@ async function useGuide(className) {
 // ---------- setup ----------
 (async () => {
   const regions = await api("/api/regions", {});
+  model = await api("/guide/ilvl-model.json", {});
   $("#region").innerHTML = Object.entries(regions).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join("");
   const p = new URLSearchParams(location.search);
   if (p.get("name")) { $("#name").value = p.get("name"); if (p.get("region")) $("#region").value = p.get("region"); search(p.get("server")); }
@@ -260,11 +253,11 @@ async function load(row, region) {
     [char, equip] = await Promise.all([api("/api/character", ctx), api("/api/equipment", ctx)]);
     await useGuide(char.profile?.className);
   } catch (e) { return say("Could not read the character: " + esc(e.message), true); }
-  items = {};
+  items = {}; boards = {};
   say("");
   history.replaceState(null, "", `?name=${encodeURIComponent(row.name)}&region=${region}&server=${encodeURIComponent(row.serverName || "")}`);
   render();
-  loadItems(); // gear lines arrive slot by slot
+  loadBoards(); loadItems(); // gear lines and Daevanion boards arrive one by one
 }
 
 // ---------- 3. render ----------
@@ -388,6 +381,7 @@ function renderLudra(stat) {
     else if (c.type === "stat") {
       const s = c.match.map(stat).find(Boolean);
       have = s ? s.value + (s.edited ? " (typed in)" : "") : null; ok = !!s && s.value >= c.min;
+      if (ok && c.target && s.value < c.target) return { ...c, have: have + ` — passes, aim for ${c.target.toLocaleString()}`, ok, short: true };
     }
     else if (c.type === "skill") { have = levelOf(c.name).lvl; ok = have >= c.min; }
     else if (c.type === "weapon") { have = weapon ? "+" + weapon.enchantLevel : "no weapon"; ok = !!weapon && weapon.enchantLevel >= c.min; }
@@ -406,13 +400,15 @@ function renderLudra(stat) {
     <p class="lead">${esc(L.note)}</p>
     <div class="verdict">
       <div class="ilvl ${ready ? "ready" : ""}"><small>item level</small><b>${ilvl.toLocaleString()}<span> / ${L.itemLevel.toLocaleString()}</span></b>
-        <div class="fill"><i style="width:${pct}%"></i></div><small>${ilvl >= L.itemLevel ? "entry requirement met" : (L.itemLevel - ilvl).toLocaleString() + " to go"}</small></div>
-      <ul class="checks">${results.map(r => `<li class="${r.ok ? "" : "miss"}"><span>${esc(r.label)} <small>— you: ${esc(r.have ?? (r.type === "stat" ? "not in NCSOFT's data — type it in under Stats" : "–"))}</small></span></li>`).join("")}</ul>
+        <div class="fill"><i style="width:${pct}%"></i></div><small>${ilvl >= L.itemLevel ? "entry requirement met" : (L.itemLevel - ilvl).toLocaleString() + " to go"}</small>
+        <div id="ilvlParts" class="group" style="margin-top:12px"></div></div>
+      <ul class="checks">${results.map(r => `<li class="${!r.ok ? "miss" : r.short ? "short" : ""}"><span>${esc(r.label)} <small>— you: ${esc(r.have ?? (r.type === "stat" ? "not in NCSOFT's data — type it in under Stats" : "–"))}</small></span></li>`).join("")}</ul>
     </div>
     <div class="next"><small>Your next step at ${ilvl.toLocaleString()}</small><h4>${esc(now.title)}</h4><ul>${now.do.map(d => `<li>${esc(d)}</li>`).join("")}</ul></div>
     <div class="phases">${phases}</div>
     ${L.tips?.length ? `<div class="tips">${L.tips.map(t => `<details><summary>${esc(t.title)}</summary><ul>${t.do.map(d => `<li>${esc(d)}</li>`).join("")}</ul></details>`).join("")}</div>` : ""}
     <p class="note" style="margin-top:12px">${esc(L.warning)} Route compiled from ${esc(L.credits || "aion2-guides.info, mein-mmo.de and gamingpromax.com")}.</p>`;
+  renderBreakdown();
 }
 
 // ---------- gear ----------
@@ -433,7 +429,8 @@ function renderGear() {
       return `<span class="tag ${pvpOnly ? "" : bad ? "bad" : good ? "ok" : ""}">${esc(s.name)} ${esc(s.value || "")}</span>`;
     };
     let lines = `<span class="tag">loading lines…</span>`;
-    if (it) {
+    if (it?.failed) lines = `<span class="tag bad">not delivered by NCSOFT (${esc(it.error)}) — retried once; reload to try again</span>`;
+    else if (it) {
       const subs = it.subStats || [];
       let soul = subs.map(lineTag).join("");
       soul += (it.subSkills || []).map(k => {
@@ -457,7 +454,7 @@ function renderGear() {
     const ench = e.enchantLevel ? `<span class="ench">+${e.enchantLevel}${e.exceedLevel ? " ★" + e.exceedLevel : ""}</span>` : "";
     const lowWeapon = isWeapon && e.enchantLevel < guide.gear.minEnchantWeapon ? `<span class="tag bad">below +${guide.gear.minEnchantWeapon}</span>` : "";
     return `<li><div><div class="slot">${esc(e.slotPosName)}</div><div class="item grade-${esc(e.grade)}">${esc(e.name)}${ench}</div></div>
-      <div>${it ? lines : `<div class="lines">${lines}</div>`}${lowWeapon ? `<div class="lines">${lowWeapon}</div>` : ""}${want}</div></li>`;
+      <div>${it && !it.failed ? lines : `<div class="lines">${lines}</div>`}${lowWeapon ? `<div class="lines">${lowWeapon}</div>` : ""}${want}</div></li>`;
   }).join("");
   const w = equip?.petwing?.wing;
   const wings = guide.wings;
@@ -473,10 +470,39 @@ function renderGear() {
 async function loadItems() {
   const list = equip?.equipment?.equipmentList || [];
   for (const e of list) {
-    try { items[e.slotPos] = await api("/api/item", { ...ctx, id: e.id, enchantLevel: e.enchantLevel || 0, slotPos: e.slotPos }); }
-    catch { items[e.slotPos] = { subStats: [], subSkills: [], magicStoneStat: [] }; }
-    renderGear(); renderTodo();
+    await loadItem(e);
   }
+  // one more try for pieces NCSOFT didn't answer
+  for (const e of list) if (items[e.slotPos]?.failed) await loadItem(e);
+}
+async function loadItem(e) {
+  try { items[e.slotPos] = await api("/api/item", { ...ctx, id: e.id, enchantLevel: e.enchantLevel || 0, slotPos: e.slotPos }); }
+  catch (err) { items[e.slotPos] = { failed: true, error: err.message }; } // "not delivered" ≠ "no lines"
+  renderGear(); renderTodo(); renderBreakdown();
+}
+async function loadBoards() {
+  for (const b of char.daevanion?.boardList || []) {
+    try { boards[b.id] = await api("/api/daevanion", { ...ctx, boardId: b.id }); } catch { /* reported as missing */ }
+    renderBreakdown();
+  }
+}
+
+// ---------- item level breakdown: model vs. the game's number ----------
+function renderBreakdown() {
+  const el = $("#ilvlParts");
+  if (!el || !model) return;
+  const r = ilvlBreakdown(model, {
+    statList: char.stat?.statList || [], equipmentList: equip?.equipment?.equipmentList || [],
+    items, boards, boardIds: (char.daevanion?.boardList || []).map(b => b.id),
+  });
+  const names = { gear: "Gear (base)", enchant: "Enhancement", amplification: "Amplification", stones: "Manastones", arcana: "Arcana", daevanion: "Daevanion points" };
+  const parts = Object.entries(r.parts).filter(([k, v]) => v || k !== "amplification")
+    .map(([k, v]) => `<span class="tag">${names[k]} ${v.toLocaleString()}</span>`).join("");
+  const wait = [r.missingItems.length && `${r.missingItems.length} item${r.missingItems.length > 1 ? "s" : ""}`, r.missingBoards.length && `${r.missingBoards.length} board${r.missingBoards.length > 1 ? "s" : ""}`].filter(Boolean).join(" and ");
+  const rest = r.unexplained == null ? "" : r.complete
+    ? `<span class="tag ${Math.abs(r.unexplained) <= 10 ? "ok" : "bad"}">unexplained ${r.unexplained > 0 ? "+" : ""}${r.unexplained}</span>`
+    : `<span class="tag">waiting for ${wait}</span>`;
+  el.innerHTML = `<small>Where ${r.api?.toLocaleString() ?? "your item level"} comes from — model ${r.total.toLocaleString()}</small><div class="lines">${parts}${rest}</div>`;
 }
 
 // ---------- top 5 toward 2,800 ----------
@@ -532,7 +558,8 @@ function todoList() {
   if (core.length) add(50, `Skill lines: ${core.map(x => `${x.w.name} ${x.s?.skillLevel || 0}/${x.w.target}`).join(", ")}`, "From Arcana cards and ring lines. 16 opens the bottom specialization row, 20 the third slot. Roll the ring last.");
   for (const r of guide.stats) {
     const v = r.match.map(statOf).find(Boolean)?.value;
-    if (v != null && v < r.min) add(45, `${r.match[0]} ${v} → ${r.min.toLocaleString()}`, "Ludra bosses parry and resist crits; the training dummy doesn't. Manastones and soul-binding lines.");
+    const aim = r.target || r.min;
+    if (v != null && v < aim) add(v < r.min ? 45 : 25, `${r.match[0]} ${v} → ${aim.toLocaleString()}`, "Ludra bosses parry and resist crits; the training dummy doesn't. Manastones and soul-binding lines.");
   }
   if (ilvl >= 2600 && !(char.daevanion?.boardList || []).some(b => same(b.name, "Ariel") && b.open)) add(40, "Ariel board: Krao Cave and Draupnir Hard", "Up to +60 item level. Lowest priority for damage (Fubgun) — run it when you need the raw item level.");
   const pet = equip?.petwing?.pet;
@@ -555,7 +582,7 @@ function renderStats(stat) {
   const cards = guide.stats.map(r => {
     const s = r.match.map(stat).find(Boolean);
     const v = s?.value;
-    const state = v == null ? "" : v >= r.min ? "ok" : "warn";
+    const state = v == null ? "" : v >= (r.target || r.min) ? "ok" : "warn";
     // NCSOFT's API doesn't send this stat: let the user type the in-game number.
     const typed = !s || s.edited;
     const val = typed ? `<input type="number" min="0" value="${v ?? ""}" placeholder="–" data-stat="${esc(r.match[0])}" aria-label="${esc(r.match[0])}">` : v;
@@ -579,7 +606,7 @@ function renderExtras() {
   const owned = char.title?.titleList || [];
   const row = (label, names) => {
     if (!names?.length) return "";
-    const have = names.filter(n => owned.some(o => same(o.name, n)));
+    const have = names.filter(n => owned.some(o => sameTitle(o.name, n)));
     return `<div class="row"><div class="name">${label}</div><div class="lines">${names.map(n => `<span class="tag ${have.includes(n) ? "ok" : ""}">${esc(n)}</span>`).join("")}</div><div class="lvl ${have.length ? "ok" : "warn"}">${have.length}<span> / ${names.length}</span></div></div>`;
   };
   const pet = equip?.petwing?.pet;

@@ -922,7 +922,1451 @@
           ],
           "level": 70
         }
+      },
+      "daevanionDetail": {
+        "1": {
+          "nodeList": [
+            {
+              "boardId": 1,
+              "type": "Start",
+              "grade": "None",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 1,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            }
+          ]
+        },
+        "2": {
+          "nodeList": [
+            {
+              "boardId": 2,
+              "type": "Start",
+              "grade": "None",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            },
+            {
+              "boardId": 2,
+              "type": "Stat",
+              "grade": "Common",
+              "open": 1
+            }
+          ]
+        }
       }
+    }
+  },
+  "daevanionDetail": {
+    "1": {
+      "nodeList": [
+        {
+          "boardId": 1,
+          "type": "Start",
+          "grade": "None",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 1,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        }
+      ]
+    },
+    "2": {
+      "nodeList": [
+        {
+          "boardId": 2,
+          "type": "Start",
+          "grade": "None",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 2,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        }
+      ]
+    },
+    "3": {
+      "nodeList": [
+        {
+          "boardId": 3,
+          "type": "Start",
+          "grade": "None",
+          "open": 1
+        },
+        {
+          "boardId": 3,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 3,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 3,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 3,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 3,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 3,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 3,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 3,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 3,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 3,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 3,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        },
+        {
+          "boardId": 3,
+          "type": "Stat",
+          "grade": "Common",
+          "open": 1
+        }
+      ]
+    },
+    "4": {
+      "nodeList": [
+        {
+          "boardId": 4,
+          "type": "Start",
+          "grade": "None",
+          "open": 1
+        }
+      ]
     }
   }
 }

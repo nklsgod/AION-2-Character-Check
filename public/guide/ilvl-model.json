@@ -1,0 +1,30 @@
+{
+  "_about": "How profile item level is built from its parts. Every value has a source and a confidence: confirmed = checked against the game's own item level (nkls, 2,540, Oct 26 2026: model 2,534, 6 unexplained), inferred = from guides or a reasonable guess, unknown = placeholder. NCSOFT's API grades are Common / Rare / Legend / Unique (Legend is what guides call Epic / blue).",
+  "item": {
+    "base": { "field": "item.level", "confidence": "confirmed", "source": "API /api/character/equipment/item `level` (86, 70, 65 …) — sums to the game value" },
+    "enchant": { "perLevel": 1, "confidence": "confirmed", "source": "reconciliation; Fubgun / JOHNPAL: +1 per enhancement level" },
+    "amplification": { "perLevel": 5, "confidence": "inferred", "source": "JOHNPAL TV, Fubgun (“every +1 Amp = +5 ilvl”); not yet seen in API data (exceedLevel 0)" }
+  },
+  "stone": {
+    "byGrade": { "Common": 1, "Rare": 2, "Legend": 3, "Unique": 4 },
+    "confidence": "confirmed",
+    "source": "API magicStoneStat[].grade + reconciliation; matches Fubgun (white 1, green 2, blue 3) and JOHNPAL (gold 4)",
+    "socketsByItemGrade": { "Common": 1, "Rare": 2, "Legend": 3, "Unique": 4 },
+    "socketsConfidence": "inferred",
+    "socketsSource": "user notes; the API sends magicStoneSlotCount per item, which is used whenever present"
+  },
+  "arcana": {
+    "byGrade": { "Common": 20, "Rare": 40, "Legend": 60, "Unique": 80 },
+    "confidence": "confirmed",
+    "source": "API item.level of Arcana cards is 60 (Legend) / 80 (Unique); 20/40 from JOHNPAL TV (inferred)",
+    "maxLevel": { "Common": 2, "Rare": 3, "Legend": 4, "Unique": 5 },
+    "maxLevelSource": "API maxEnchantLevel (Legend 4, Unique 5 confirmed; Common/Rare from user notes)"
+  },
+  "daevanion": {
+    "nodeCost": { "Common": 1, "Rare": 2, "Legend": 3, "Unique": 4 },
+    "perPoint": 1,
+    "confidence": "confirmed",
+    "source": "API /api/character/daevanion/detail node grades (github.com/nuriland/aion2-api); aion2-guides.info: grey 1, green 2, blue 3, orange 4; sums to the game value"
+  },
+  "notCounted": ["titles", "wings", "pets", "stigmas", "potential", "theostones"]
+}
