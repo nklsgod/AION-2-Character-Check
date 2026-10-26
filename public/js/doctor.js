@@ -22,7 +22,7 @@ export function craftedInfo(model, e, it) {
   const steps = next.map(to => {
     const cost = C.steps[`${from}>${to}`] || null;
     const names = C.ladder.find(l => l.tier === to)?.names || [];
-    const st = { from, to, gain: to - from, total: to - now, names, cost, known: !!cost && cost.kinah != null };
+    const st = { from, to, gain: to - from, total: to - now, names, cost, known: !!cost && cost.kinah != null, mats: cost?.matStatus ?? "unknown" };
     from = to; return st;
   });
   return { tier: now, steps, transfer: C.transfer };

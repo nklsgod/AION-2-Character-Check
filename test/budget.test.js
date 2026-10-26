@@ -38,6 +38,14 @@ test("effective cubes: the smaller of Odyle and reward counts, and which binds",
   assert.equal(e.cubes, (2 + 2 + 2) * 2, "1 day: Fire Temple 2 + Horn Den 2 + Transcendence 2, opened twice");
 });
 
+test("Substance Morph: craft materials cap it once entered", () => {
+  const free = odyleBudget(model, {}, "2026-10-26T12:00", "2026-11-05T18:00");
+  assert.equal(free.items.morph, 60, "not entered = weekly limit only (calculator): 3 weekly windows × 20");
+  const mats = odyleBudget(model, { matOdyle: 100, matFine: 50, matPure: 30 }, "2026-10-26T12:00", "2026-11-05T18:00");
+  assert.equal(mats.items.morph, 4, "100 Odyle / 25");
+  assert.equal(odyleBudget(model, { matOdyle: 1e4, matFine: 1e4 }, "2026-10-26T12:00", "2026-11-05T18:00").items.morph, 0, "no Pure Odyle");
+});
+
 test("transmute cooldown: at most one per 7-day window", () => {
   assert.equal(transmuteDates(model, {}, "2026-10-26T12:00", "2026-11-05T18:00").length, 2);
   assert.equal(transmuteDates(model, { lastTransmute: "2026-10-25" }, "2026-10-26T12:00", "2026-11-05T18:00").length, 1, "next one Nov 1");

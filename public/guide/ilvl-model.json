@@ -176,6 +176,11 @@
       },
       "confidence": "inferred",
       "source": "user notes (stage 3), Fubgun (stage 4: 6% per boss, 3 bosses); card type assumed evenly split"
+    },
+    "extraction": {
+      "percentPerDay": null,
+      "confidence": "unknown",
+      "source": "Mysterious Crystal extraction bar: 100% = 1 crystal; fill rate unknown"
     }
   },
   "daevanion": {
@@ -402,7 +407,12 @@
       "cost": "25 Odyle + 5 Fine + 1 Pure + 50k Kinah",
       "kinahEach": 50000,
       "confidence": "inferred",
-      "source": "user notes (limit 20/week from the user's data)"
+      "source": "user notes (limit 20/week from the user's data)",
+      "materials": {
+        "odyle": 25,
+        "fine": 5,
+        "pure": 1
+      }
     },
     "event": {
       "from": "2026-10-28",
@@ -487,11 +497,24 @@
     "confidence": "inferred",
     "source": "user notes (open-world Kinah cap per day)"
   },
-  "abyssFeathers": {
-    "total": 36,
-    "perFeather": 1,
-    "confidence": "creator-opinion",
-    "source": "Fubgun: all Abyss Feathers = +36 item level"
+  "monolith": {
+    "_about": "Abyss Feather monolith in Reshanta: every stage needs feathersPerStage feathers and gives Azphel Daevanion crystals (item level once spent).",
+    "maxStage": null,
+    "feathersPerStage": 20,
+    "rewardPerStage": {
+      "crystals": 4,
+      "kind": "Azphel"
+    },
+    "confidence": "inferred",
+    "maxStageConfidence": "unknown",
+    "source": "user notes (4 × Daevanion Crystal: Azphel per stage); max stage unknown — enter it in deadline mode"
+  },
+  "abyss": {
+    "stigmaShard": {
+      "apEach": null,
+      "confidence": "unknown",
+      "source": "fill in: Abyss Points per Stigma Shard"
+    }
   },
   "crafting": {
     "_about": "Dragon Lord crafted line. Transfer-craft upgrades one tier with 100% success.",
@@ -642,6 +665,7 @@
       "minGrade": "Rare"
     },
     "confidence": "inferred",
-    "source": "user spec (Ludra Nov 4, play start evening Nov 5)"
+    "source": "user spec (Ludra Nov 4, play start evening Nov 5)",
+    "enhanceProbableFrom": 11
   }
 }
