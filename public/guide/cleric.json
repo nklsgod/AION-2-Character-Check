@@ -310,16 +310,16 @@
       "match": [
         "Accuracy"
       ],
-      "min": 1000,
-      "note": "Ludra raid wants at least 1,000 Accuracy."
+      "min": 1200,
+      "note": "Ludra: about 1,200 (aion2-guides.info's minimum is 1,000)."
     },
     {
       "match": [
         "Critical Hit",
         "Crit"
       ],
-      "min": 1000,
-      "note": "Ludra raid wants at least 1,000 Critical Hit."
+      "min": 1200,
+      "note": "Ludra: about 1,200–2,000 (aion2-guides.info's minimum is 1,000)."
     }
   ],
   "wings": {
@@ -370,8 +370,8 @@
         "match": [
           "Accuracy"
         ],
-        "min": 1000,
-        "label": "Accuracy 1,000"
+        "min": 1200,
+        "label": "Accuracy 1,200"
       },
       {
         "type": "stat",
@@ -379,8 +379,8 @@
           "Critical Hit",
           "Crit"
         ],
-        "min": 1000,
-        "label": "Critical Hit 1,000"
+        "min": 1200,
+        "label": "Critical Hit 1,200"
       },
       {
         "type": "skill",
@@ -457,10 +457,27 @@
       },
       {
         "from": 2100,
-        "to": 2500,
-        "title": "Fire Temple / Ferocious Horn Den",
+        "to": 2200,
+        "title": "Ferocious Horn Den before Fire Temple",
         "do": [
-          "Conquest tier with item-level-86 gear; the Fire Temple weapons are the interesting part.",
+          "Conquest Ferocious Horn Den first: much better odds of armor you can use, while Fire Temple can drop weapons for classes you don't play.",
+          "Don't open pity chests right away. Keep the Horn Den vouchers until only 1–2 slots are left, or Substance Morph (500k Kina) the exact piece once you see what drops.",
+          "Guard through pity: the Nocom Guard costs 3 vouchers and 2 million Kina (about 84 runs) and takes the slot from item level 70 to 86.",
+          "With armor done, move to Fire Temple for jewellery and the weapon. A Kromede weapon only transfers into a higher tier, so the target is the 102 crafted weapon.",
+          "Crafting order: weapon, then rings and guard — crafted rings give extra active-skill lines. Crafting procs at 25%, so compare the cost with the market price (questlog.gg); if they're close, buy it."
+        ]
+      },
+      {
+        "from": 2200,
+        "to": 2500,
+        "title": "Arcana, enhancing and stones",
+        "do": [
+          "Arcana give flat item level: grey 20, green 40, blue 60, gold 80, plus 1 per enhancement level. Run Transcendence 3 once or twice to fill empty slots with blue cards; gold cards are worth farming from 2,500.",
+          "Feeding a card into a better one keeps 100% of its EXP. +4 to +5 needs 48k EXP (nearly double the 26k for +3), so stop at +4 early. Skip transmutation for now (5M Kina and 15 crystals to lock two lines).",
+          "Pick strong Divine stats (Time gives Combat Speed) over small set bonuses like +60 PvE Attack.",
+          "Enhance to +11/+12; each amplification level is +5 item level but gets expensive fast.",
+          "Cheaper enhancing: take a low-tier unique (e.g. Bakarma Hard drops) to +15 at about half the Kina, then transfer the levels — this overwrites the target piece's lines.",
+          "Manastones give 1/2/3/4 item level by grade (up to 16 per piece). There's no pity, so settle for 1–2 good lines. Farm the highest Ascension Trial you can and combine stones with Alchemy (20% proc).",
           "Transcendence Stage 2 for blue Arcana cards, then unique Arcana crafting.",
           "Re-roll bad random lines (Evasion, resists) into Might, Combat Speed, Precision; fill every manastone slot."
         ]
@@ -470,7 +487,9 @@
         "to": 2800,
         "title": "Last stretch",
         "do": [
-          "Ascension Trial Extreme (2,500) and the Hard modes of Krao Cave and Draupnir (2,600) — the Ariel board fragments drop there.",
+          "Gold Arcana cards from Transcendence now pay off.",
+          "Ascension Trial Extreme (2,500), then the Hard modes of Krao Cave and Draupnir (2,600) for Ariel fragments: both boards give 60 item level (30 each) and about 2,000–3,000 Combat Power. Route Damage Boost nodes first, then Boss Attack.",
+          "Daevanion crystals from the Shugo shop (up to 416 points) and the Nightmare shop (another 50). Don't spend Abyss Points on the Azphel board just for item level — it's PvP-only and you need the points for Stigma Shards.",
           "Enhance every slot evenly: the cheapest item level is usually the lowest piece, not the weapon.",
           "Season shop: Talisra Wings (about 250,000 points); titles Guardian of Baran or Artguard; pets to 3 and Genus Insight rolls."
         ]
@@ -480,6 +499,7 @@
         "to": 99999,
         "title": "Raid-ready",
         "do": [
+          "Ludra bosses have Crit Defense, Evasion and Parry (the training dummy has none): aim for about 1,200 Accuracy and 1,200–2,000 Critical Hit, and keep going toward 3,000 item level.",
           "Ludra weapons (item level 102, max +15) drop from Eternal Ludra; the Unique armor and accessories have 4 manastone slots.",
           "Keep two stigma presets ready: with and without a Chanter."
         ]
@@ -488,8 +508,59 @@
     "sources": [
       "https://aion2-guides.info/en/cleric/",
       "https://mein-mmo.de/en/aion-2-equipment-guide-how-to-quickly-obtain-the-best-gear-in-pve,1586095/",
-      "https://gamingpromax.com/aion-2-endgame-guide/"
-    ]
+      "https://gamingpromax.com/aion-2-endgame-guide/",
+      "https://www.youtube.com/@JOHNPALTV"
+    ],
+    "tips": [
+      {
+        "title": "Stigma Shards and Abyss Points",
+        "do": [
+          "Stigma Shards are your biggest source of real damage and Combat Power.",
+          "Buy shards in the Nightmare Trade Shop and the Shugo shop. In the Shugo shop, take Daevanion crystals up to step 3, finish your stigmas, then buy the expensive crystals.",
+          "Supply requests and world-boss trains (Gartua, Kaira, Kashapa): turning in boss armor or accessories pays a lot (over 111k AP for one set).",
+          "Weekly Abyss time (outside the open-world Kina cap), sieges every two days and, while your faction holds them, the corridors (25–30k AP each for AoE classes).",
+          "Daily Duties and weekly Commands on your main only; Abyss boss platoon tokens morph into weekly AP chests; Battlefield twice a day (1k per match, 3k per win, three wins a week)."
+        ]
+      },
+      {
+        "title": "Soul binding, syncing and skill breakpoints",
+        "do": [
+          "Check the soul-binding lines on every unique you loot, even low-tier and Shugo gear: Combat Speed or Perfect Chance on gloves, Move Speed on boots, Double Chance on cloaks are rare.",
+          "Don't bind bad lines to 100% — rolling a new line resets its percentage.",
+          "Soul Reset Codex rerolls every line; supply is tiny, so use it only on weapon, guard and rings.",
+          "Syncing rerolls one line by eating a unique or a Sync Stone; use bound uniques from alts (server storage) or Shugo events instead of 1.7M Kina market ones.",
+          "Maxed soul binding opens a Philosopher Stone slot; roll something common like Attack % — the stone breaks when you transfer or upgrade the item.",
+          "Crafted rings and Arcana push main skills to 16 (bottom specialization row) and 20 (third specialization slot)."
+        ]
+      },
+      {
+        "title": "More Combat Power",
+        "do": [
+          "Wings: each has an equipped effect and an owned effect that stays. Collect several; Forest Spirit worn plus Dark Veil owned (1% Damage Boost) is strong before end-game wings.",
+          "Pets and Genus give stats to every character on the server, alts included.",
+          "Pantheon: statues and boss/event paintings give a lot of Combat Power and Divine stats; the two Shugo Festival artworks are easy Wisdom and Illusion.",
+          "Titles (about 5,000 CP) and closet skins (small permanent damage bonuses).",
+          "Theostones are under 1% of PvE damage — don't overspend; pick Seal or Stun for PvP."
+        ]
+      },
+      {
+        "title": "Kina and alts",
+        "do": [
+          "Daily Dungeon tickets share a server-wide bucket: the top Battle Pass on alts funnels extra tickets to your main for enhancement and amplification stones.",
+          "Transcendence has its own weekly reward bucket: after 84 Conquest runs, switch to it for full Kina.",
+          "When morphing gold materials like Esveta logs, convert Radiant Odal into them — cheaper 90% of the time.",
+          "Not rushing Ludra? Sell unbound Amp Stones and Superior Soulstones (about 400k each) while raiders push prices up."
+        ]
+      },
+      {
+        "title": "Testing your damage",
+        "do": [
+          "Training dummy in front of Safe Haven, Ctrl + X opens the DPS meter. Run 2-minute tests to compare stigmas, skills and gear.",
+          "The dummy has no resistances, so real bosses need the Accuracy and Crit above."
+        ]
+      }
+    ],
+    "credits": "aion2-guides.info, mein-mmo.de, gamingpromax.com and JOHNPAL TV, “The Path to 2800+ Gear Score (& Beyond)”"
   },
   "daevanionNote": "Guide priority: orange Cooldown and Combat Speed nodes first, then Attack and Critical, then the blue +1 skill nodes. Azphel is PvP only."
 }

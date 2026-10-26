@@ -131,6 +131,10 @@
   .phase.done .range { color: var(--ok); } .phase.now .range { color: var(--gold); }
   .phase.done .body { opacity: .55; }
   .phase .body b { font-weight: 600; }
+  .tips { margin-top: 16px; }
+  .tips details { border-top: 1px dashed var(--line); padding: 10px 0; }
+  .tips summary { cursor: pointer; font-family: var(--display); font-size: 22px; font-weight: 600; }
+  .tips ul { margin: 6px 0 0; padding-left: 20px; }
   footer { color: var(--muted); font-size: 14px; padding-top: 28px; }
   @media (prefers-reduced-motion: no-preference) { .bar i { transition: background .3s; } }
 </style>
@@ -399,7 +403,8 @@ function renderLudra(stat) {
     </div>
     <div class="next"><small>Your next step at ${ilvl.toLocaleString()}</small><h4>${esc(now.title)}</h4><ul>${now.do.map(d => `<li>${esc(d)}</li>`).join("")}</ul></div>
     <div class="phases">${phases}</div>
-    <p class="note" style="margin-top:12px">${esc(L.warning)} Route compiled from aion2-guides.info, mein-mmo.de and gamingpromax.com.</p>`;
+    ${L.tips?.length ? `<div class="tips">${L.tips.map(t => `<details><summary>${esc(t.title)}</summary><ul>${t.do.map(d => `<li>${esc(d)}</li>`).join("")}</ul></details>`).join("")}</div>` : ""}
+    <p class="note" style="margin-top:12px">${esc(L.warning)} Route compiled from ${esc(L.credits || "aion2-guides.info, mein-mmo.de and gamingpromax.com")}.</p>`;
 }
 
 // ---------- gear ----------
