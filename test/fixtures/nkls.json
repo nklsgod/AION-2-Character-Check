@@ -7,7 +7,9 @@
    "className": "Cleric",
    "serverName": "Nemon",
    "combatPower": 120449,
-   "titleName": "Through Hell and Back"
+   "titleName": "Through Hell and Back",
+   "raceName": "Asmodians",
+   "raceId": 2
   },
   "stat": {
    "statList": [
@@ -159,15 +161,59 @@
    ]
   },
   "title": {
+   "ownedCount": 196,
+   "totalCount": 297,
    "titleList": [
     {
-     "name": "Through Hell and Back"
+     "name": "Through Hell and Back",
+     "equipCategory": "Etc",
+     "equipStatList": [
+      {
+       "desc": "Cooldown Reduction +3%"
+      },
+      {
+       "desc": "HP +900"
+      },
+      {
+       "desc": "Stamina +225"
+      }
+     ],
+     "grade": "Unique",
+     "ownedCount": 67,
+     "totalCount": 99
     },
     {
-     "name": "Guardian of Altgard"
+     "name": "Guardian of Altgard",
+     "equipCategory": "Attack",
+     "equipStatList": [
+      {
+       "desc": "PvE Damage Boost +3%"
+      },
+      {
+       "desc": "Penetration +210"
+      }
+     ],
+     "grade": "Legend",
+     "ownedCount": 64,
+     "totalCount": 103
     },
     {
-     "name": "Saint of Altgard"
+     "name": "Saint of Altgard",
+     "equipCategory": "Defense",
+     "equipStatList": [
+      {
+       "desc": "Defense Bonus +300"
+      },
+      {
+       "desc": "Damage Tolerance +3%"
+      },
+      {
+       "desc": "Block +100"
+      }
+     ],
+     "grade": "Unique",
+     "ownedCount": 65,
+     "totalCount": 95
     }
    ]
   },
@@ -847,6 +893,37 @@
      "grade": "Rare",
      "slotPos": 3
     }
+   ],
+   "mainStats": [
+    {
+     "id": "WeaponFixingDamage",
+     "name": "Attack",
+     "minValue": "309",
+     "value": "398",
+     "extra": "116",
+     "exceed": false
+    },
+    {
+     "id": "WeaponAccuracy",
+     "name": "Accuracy",
+     "value": "100",
+     "extra": "0",
+     "exceed": false
+    },
+    {
+     "id": "Critical",
+     "name": "Critical Hit",
+     "value": "50",
+     "extra": "0",
+     "exceed": false
+    },
+    {
+     "id": "Block",
+     "name": "Block",
+     "value": "50",
+     "extra": "0",
+     "exceed": false
+    }
    ]
   },
   "2": {
@@ -914,6 +991,29 @@
      "name": "PvP Attack",
      "grade": "Rare",
      "slotPos": 3
+    }
+   ],
+   "mainStats": [
+    {
+     "id": "WeaponFixingDamage",
+     "name": "Attack",
+     "value": "144",
+     "extra": "79",
+     "exceed": false
+    },
+    {
+     "id": "WeaponAccuracy",
+     "name": "Accuracy",
+     "value": "50",
+     "extra": "0",
+     "exceed": false
+    },
+    {
+     "id": "Critical",
+     "name": "Critical Hit",
+     "value": "50",
+     "extra": "0",
+     "exceed": false
     }
    ]
   },
@@ -983,6 +1083,22 @@
      "grade": "Rare",
      "slotPos": 3
     }
+   ],
+   "mainStats": [
+    {
+     "id": "ArmorDefense",
+     "name": "Defense",
+     "value": "477",
+     "extra": "250",
+     "exceed": false
+    },
+    {
+     "id": "HPMax",
+     "name": "HP",
+     "value": "215",
+     "extra": "200",
+     "exceed": false
+    }
    ]
   },
   "4": {
@@ -1050,6 +1166,22 @@
      "grade": "Legend",
      "slotPos": 3
     }
+   ],
+   "mainStats": [
+    {
+     "id": "ArmorDefense",
+     "name": "Defense",
+     "value": "388",
+     "extra": "200",
+     "exceed": false
+    },
+    {
+     "id": "HPMax",
+     "name": "HP",
+     "value": "175",
+     "extra": "162",
+     "exceed": false
+    }
    ]
   },
   "5": {
@@ -1116,6 +1248,22 @@
      "name": "Block",
      "grade": "Unique",
      "slotPos": 3
+    }
+   ],
+   "mainStats": [
+    {
+     "id": "ArmorDefense",
+     "name": "Defense",
+     "value": "637",
+     "extra": "275",
+     "exceed": false
+    },
+    {
+     "id": "HPMax",
+     "name": "HP",
+     "value": "344",
+     "extra": "220",
+     "exceed": false
     }
    ]
   },
@@ -1185,6 +1333,22 @@
      "grade": "Rare",
      "slotPos": 3
     }
+   ],
+   "mainStats": [
+    {
+     "id": "ArmorDefense",
+     "name": "Defense",
+     "value": "531",
+     "extra": "250",
+     "exceed": false
+    },
+    {
+     "id": "HPMax",
+     "name": "HP",
+     "value": "258",
+     "extra": "200",
+     "exceed": false
+    }
    ]
   },
   "7": {
@@ -1251,6 +1415,22 @@
      "name": "Attack",
      "grade": "Rare",
      "slotPos": 3
+    }
+   ],
+   "mainStats": [
+    {
+     "id": "ArmorDefense",
+     "name": "Defense",
+     "value": "424",
+     "extra": "275",
+     "exceed": false
+    },
+    {
+     "id": "HPMax",
+     "name": "HP",
+     "value": "172",
+     "extra": "220",
+     "exceed": false
     }
    ]
   },
@@ -1320,6 +1500,22 @@
      "grade": "Legend",
      "slotPos": 3
     }
+   ],
+   "mainStats": [
+    {
+     "id": "ArmorDefense",
+     "name": "Defense",
+     "value": "424",
+     "extra": "275",
+     "exceed": false
+    },
+    {
+     "id": "HPMax",
+     "name": "HP",
+     "value": "172",
+     "extra": "220",
+     "exceed": false
+    }
    ]
   },
   "10": {
@@ -1387,6 +1583,22 @@
      "name": "Critical Hit Resist",
      "grade": "Common",
      "slotPos": 3
+    }
+   ],
+   "mainStats": [
+    {
+     "id": "WeaponFixingDamage",
+     "name": "Attack",
+     "value": "133",
+     "extra": "57",
+     "exceed": false
+    },
+    {
+     "id": "ArmorDefense",
+     "name": "Defense",
+     "value": "318",
+     "extra": "145",
+     "exceed": false
     }
    ]
   },
@@ -1456,6 +1668,22 @@
      "grade": "Rare",
      "slotPos": 3
     }
+   ],
+   "mainStats": [
+    {
+     "id": "WeaponFixingDamage",
+     "name": "Attack",
+     "value": "111",
+     "extra": "57",
+     "exceed": false
+    },
+    {
+     "id": "ArmorDefense",
+     "name": "Defense",
+     "value": "265",
+     "extra": "145",
+     "exceed": false
+    }
    ]
   },
   "12": {
@@ -1523,6 +1751,22 @@
      "name": "MP",
      "grade": "Common",
      "slotPos": 3
+    }
+   ],
+   "mainStats": [
+    {
+     "id": "WeaponFixingDamage",
+     "name": "Attack",
+     "value": "90",
+     "extra": "39",
+     "exceed": false
+    },
+    {
+     "id": "ArmorDefense",
+     "name": "Defense",
+     "value": "216",
+     "extra": "99",
+     "exceed": false
     }
    ]
   },
@@ -1597,6 +1841,22 @@
      "grade": "Common",
      "slotPos": 3
     }
+   ],
+   "mainStats": [
+    {
+     "id": "WeaponFixingDamage",
+     "name": "Attack",
+     "value": "72",
+     "extra": "47",
+     "exceed": false
+    },
+    {
+     "id": "ArmorDefense",
+     "name": "Defense",
+     "value": "172",
+     "extra": "119",
+     "exceed": false
+    }
    ]
   },
   "14": {
@@ -1664,6 +1924,22 @@
      "name": "MP",
      "grade": "Unique",
      "slotPos": 3
+    }
+   ],
+   "mainStats": [
+    {
+     "id": "WeaponFixingDamage",
+     "name": "Attack",
+     "value": "72",
+     "extra": "39",
+     "exceed": false
+    },
+    {
+     "id": "ArmorDefense",
+     "name": "Defense",
+     "value": "172",
+     "extra": "99",
+     "exceed": false
     }
    ]
   },
@@ -1736,6 +2012,22 @@
      "grade": "Rare",
      "slotPos": 3
     }
+   ],
+   "mainStats": [
+    {
+     "id": "WeaponFixingDamage",
+     "name": "Attack",
+     "value": "65",
+     "extra": "34",
+     "exceed": false
+    },
+    {
+     "id": "ArmorDefense",
+     "name": "Defense",
+     "value": "156",
+     "extra": "84",
+     "exceed": false
+    }
    ]
   },
   "16": {
@@ -1794,6 +2086,22 @@
      "grade": "Legend",
      "slotPos": 2
     }
+   ],
+   "mainStats": [
+    {
+     "id": "WeaponFixingDamage",
+     "name": "Attack",
+     "value": "55",
+     "extra": "24",
+     "exceed": false
+    },
+    {
+     "id": "ArmorDefense",
+     "name": "Defense",
+     "value": "131",
+     "extra": "61",
+     "exceed": false
+    }
    ]
   },
   "17": {
@@ -1811,7 +2119,37 @@
    "soulBindRate": "100",
    "subStats": null,
    "subSkills": null,
-   "magicStoneStat": null
+   "magicStoneStat": null,
+   "mainStats": [
+    {
+     "id": "ArmorDefense",
+     "name": "Defense",
+     "value": "500",
+     "extra": "300",
+     "exceed": false
+    },
+    {
+     "id": "HPMax",
+     "name": "HP",
+     "value": "1100",
+     "extra": "500",
+     "exceed": false
+    },
+    {
+     "id": "HpPotionRate",
+     "name": "HP Potion Recovery increase",
+     "value": "30%",
+     "extra": "0%",
+     "exceed": false
+    },
+    {
+     "id": "Restoration",
+     "name": "Regeneration",
+     "value": "5%",
+     "extra": "0%",
+     "exceed": false
+    }
+   ]
   },
   "19": {
    "name": "Nuakum Cloak",
@@ -1878,6 +2216,22 @@
      "grade": "Rare",
      "slotPos": 3
     }
+   ],
+   "mainStats": [
+    {
+     "id": "ArmorDefense",
+     "name": "Defense",
+     "value": "424",
+     "extra": "250",
+     "exceed": false
+    },
+    {
+     "id": "HPMax",
+     "name": "HP",
+     "value": "172",
+     "extra": "200",
+     "exceed": false
+    }
    ]
   },
   "22": {
@@ -1895,7 +2249,37 @@
    "soulBindRate": "100",
    "subStats": null,
    "subSkills": null,
-   "magicStoneStat": null
+   "magicStoneStat": null,
+   "mainStats": [
+    {
+     "id": "DefensePierce",
+     "name": "Penetration",
+     "value": "700",
+     "extra": "300",
+     "exceed": false
+    },
+    {
+     "id": "SealStoneAddDamage",
+     "name": "Power Shard Damage Bonus",
+     "value": "40",
+     "extra": "30",
+     "exceed": false
+    },
+    {
+     "id": "AmplifyWeaponDamage",
+     "name": "Weapon Damage Boost",
+     "value": "10%",
+     "extra": "0%",
+     "exceed": false
+    },
+    {
+     "id": "Perfect",
+     "name": "Perfect Chance",
+     "value": "5%",
+     "extra": "0%",
+     "exceed": false
+    }
+   ]
   },
   "23": {
    "name": "Clash Rune",
@@ -1912,7 +2296,44 @@
    "soulBindRate": "100",
    "subStats": null,
    "subSkills": null,
-   "magicStoneStat": null
+   "magicStoneStat": null,
+   "mainStats": [
+    {
+     "id": "CombatSpeed",
+     "name": "Combat Speed",
+     "value": "1%",
+     "extra": "0%",
+     "exceed": false
+    },
+    {
+     "id": "DefensePierce",
+     "name": "Penetration",
+     "value": "100",
+     "extra": "0",
+     "exceed": false
+    },
+    {
+     "id": "AdditionalHitRate",
+     "name": "Multi-hit Chance",
+     "value": "1%",
+     "extra": "0%",
+     "exceed": false
+    },
+    {
+     "id": "PvEAmplifyDamage",
+     "name": "PvE Damage Boost",
+     "value": "0.5%",
+     "extra": "1%",
+     "exceed": false
+    },
+    {
+     "id": "PvEDecreaseDamage",
+     "name": "PvE Damage Tolerance",
+     "value": "0.5%",
+     "extra": "2%",
+     "exceed": false
+    }
+   ]
   },
   "24": {
    "name": "Clash Rune",
@@ -1929,7 +2350,44 @@
    "soulBindRate": "100",
    "subStats": null,
    "subSkills": null,
-   "magicStoneStat": null
+   "magicStoneStat": null,
+   "mainStats": [
+    {
+     "id": "CombatSpeed",
+     "name": "Combat Speed",
+     "value": "1%",
+     "extra": "0%",
+     "exceed": false
+    },
+    {
+     "id": "DefensePierce",
+     "name": "Penetration",
+     "value": "100",
+     "extra": "0",
+     "exceed": false
+    },
+    {
+     "id": "AdditionalHitRate",
+     "name": "Multi-hit Chance",
+     "value": "1%",
+     "extra": "0%",
+     "exceed": false
+    },
+    {
+     "id": "PvEAmplifyDamage",
+     "name": "PvE Damage Boost",
+     "value": "0.5%",
+     "extra": "0.5%",
+     "exceed": false
+    },
+    {
+     "id": "PvEDecreaseDamage",
+     "name": "PvE Damage Tolerance",
+     "value": "0.5%",
+     "extra": "1.5%",
+     "exceed": false
+    }
+   ]
   },
   "41": {
    "name": "Chalice of Vigor",
@@ -1967,7 +2425,16 @@
      "name": "Heal Block"
     }
    ],
-   "magicStoneStat": null
+   "magicStoneStat": null,
+   "mainStats": [
+    {
+     "id": "Time",
+     "name": "Time [Siel]",
+     "value": "20",
+     "extra": "1",
+     "exceed": false
+    }
+   ]
   },
   "42": {
    "name": "Parchment of Magic",
@@ -2005,7 +2472,16 @@
      "name": "Earth's Retribution"
     }
    ],
-   "magicStoneStat": null
+   "magicStoneStat": null,
+   "mainStats": [
+    {
+     "id": "Destiny",
+     "name": "Destiny [Marchutan]",
+     "value": "16",
+     "extra": "2",
+     "exceed": false
+    }
+   ]
   },
   "43": {
    "name": "Compass of Magic",
@@ -2043,7 +2519,16 @@
      "name": "Divine Aura"
     }
    ],
-   "magicStoneStat": null
+   "magicStoneStat": null,
+   "mainStats": [
+    {
+     "id": "Death",
+     "name": "Death [Triniel]",
+     "value": "20",
+     "extra": "0",
+     "exceed": false
+    }
+   ]
   },
   "44": {
    "name": "Bell of Magic",
@@ -2081,7 +2566,16 @@
      "name": "Empyrean Lord's Grace"
     }
    ],
-   "magicStoneStat": null
+   "magicStoneStat": null,
+   "mainStats": [
+    {
+     "id": "Destruction",
+     "name": "Destruction [Zikel]",
+     "value": "20",
+     "extra": "1",
+     "exceed": false
+    }
+   ]
   },
   "45": {
    "name": "Mirror of Vigor",
@@ -2119,7 +2613,16 @@
      "name": "Earth's Grace"
     }
    ],
-   "magicStoneStat": null
+   "magicStoneStat": null,
+   "mainStats": [
+    {
+     "id": "Illusion",
+     "name": "Illusion [Kaisinel]",
+     "value": "16",
+     "extra": "2",
+     "exceed": false
+    }
+   ]
   }
  },
  "daevanionDetail": {

@@ -72,6 +72,9 @@ per second and caches every answer for 10 minutes.
 * `public/index.html` – the page (HTML, CSS and the UI code).
 * `public/js/core.js`, `doctor.js`, `calc.js` – item-level model, Gear Doctor rules and the
   upgrade calculator as plain ES modules (no DOM), shared by the page and the tests.
+* `public/guide/cleric-knowledge.json` + `public/js/build.js` – Cleric build knowledge (soul-binding
+  targets per slot, manastone and Arcana rules, titles per faction, stigma presets, Daevanion,
+  consumables, macro) with `source`, `confidence` and creator `options`; the build checks that use it.
 * `public/guide/ilvl-model.json` – every number the model uses (stone and card values, Daevanion
   node costs, prices, drop rates, Odyle), each with its source and `confidence`
   (confirmed / inferred / unknown). Edit this when a value turns out wrong.

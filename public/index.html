@@ -171,6 +171,9 @@
   .rank .num { white-space: nowrap; font-variant-numeric: tabular-nums; }
   .rank tr.off td { opacity: .5; }
   .tablewrap { overflow-x: auto; }
+  #build details { border-top: 1px dashed var(--line); padding: 10px 0; }
+  #build summary { cursor: pointer; font-family: var(--display); font-size: 22px; font-weight: 600; }
+  #build .lvl input, #extras .lvl input { width: 3.4em; }
   footer { color: var(--muted); font-size: 14px; padding-top: 28px; }
   @media (prefers-reduced-motion: no-preference) { .bar i { transition: background .3s; } }
 </style>
@@ -207,6 +210,7 @@
     <section id="stats"></section>
     <section id="extras"></section>
     <section id="daevanion"></section>
+    <section id="build"></section>
     <footer>Build data: <a id="guideSrc" href="https://aion2-guides.info/en/">aion2-guides.info</a> (<span id="guideClass"></span>, Global Season 1, updated <span id="guideDate"></span>). Character data: NCSOFT's official character lookup, read through the local proxy. Unofficial fan tool, not affiliated with NCSOFT.</footer>
   </div>
 </main>
@@ -215,6 +219,7 @@
 import { norm, same, sameTitle, findStat, ilvlBreakdown, boardPoints } from "./js/core.js";
 import { diagnoseItem, cardLight, findings, skillLineSources } from "./js/doctor.js";
 import { LEVERS, upgrades, rank, plan } from "./js/calc.js";
+import * as BC from "./js/build.js";
 // ---------- helpers ----------
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -226,12 +231,13 @@ const api = async (path, params) => {
   return data;
 };
 
-let guide, model, char, equip, items = {}, boards = {}, ctx = {}, mode = "pve", statOf = () => undefined;
+let guide, K = null, model, char, equip, items = {}, boards = {}, ctx = {}, mode = "pve", statOf = () => undefined;
 const GUIDES = ["cleric", "gladiator"], guides = {};
 async function useGuide(className) {
   const key = GUIDES.find(k => norm(k) === norm(className)) || "cleric";
   guide = guides[key] ||= await api(`/guide/${key}.json`, {});
   if (!guide.modes[mode]) mode = Object.keys(guide.modes)[0];
+  K = guide.knowledge ? (guides[guide.knowledge] ||= await api(`/guide/${guide.knowledge}`, {})) : null; // class knowledge base, if any
   $("#title").textContent = guide.class + " Check";
   $("#guideClass").textContent = guide.class;
   $("#guideDate").textContent = guide.sourceUpdated;
@@ -348,7 +354,7 @@ function render() {
   renderLevels($("#stigmas"), "Stigmas", build.stigmas, guide.skillCap, `${guide.stigmaSlots} slots in Season 1.${guide.stigmaNote ? " " + esc(guide.stigmaNote) : ""} Greyed rows are stigmas you have equipped that the preset doesn't use.`, true);
   renderLevels($("#passives"), "Passives", guide.passives.filter(x => x.priority < 3).map(x => ({ ...x, target: 10 })), 10, "Level these before any other passive; there is no hard cap in the guide, 10 is used as the first milestone.");
   statOf = stat;
-  renderTodo(); renderPlan(); renderLudra(stat); renderGear(); renderStats(stat); renderExtras(); renderBoards();
+  renderTodo(); renderPlan(); renderLudra(stat); renderGear(); renderStats(stat); renderExtras(); renderBoards(); renderBuild();
 }
 
 function renderLevels(el, title, wanted, cap, lead, showExtras) {
@@ -455,7 +461,11 @@ function renderGear() {
     const rule = slotRule(e.slotPosName, e.name);
     const isRing = /ring/i.test(e.slotPosName) && !/earring/i.test(e.slotPosName);
     const isWeapon = rule && rule.match.includes("Weapon");
+    const soulRep = K && it && !it.failed ? BC.soulBindingReport(K, e, it, model && diagnoseItem(model, e, it)?.status) : null;
+    const MARK = { target: "✅ ", neutral: "➖ ", bad: "❌ " }, RCLS = { target: "ok", bad: "bad", neutral: "" };
     const lineTag = s => {
+      const r = soulRep?.lines.find(l => l.name === s.name && l.value === s.value);
+      if (r) return `<span class="tag ${RCLS[r.rating]}" title="${esc(r.why)}">${MARK[r.rating]}${esc(s.name)} ${esc(s.value || "")}</span>`;
       const good = (rule?.want || guide.gear.goodLines).some(g => same(s.name, g)) || guide.gear.goodLines.some(g => same(s.name, g));
       const bad = guide.gear.badLinesPvE.some(b => same(s.name, b));
       const pvpOnly = /\bpvp\b/i.test(s.name) && mode !== "pvp"; // PvP lines do nothing in PvE
@@ -467,6 +477,8 @@ function renderGear() {
       const subs = it.subStats || [];
       let soul = subs.map(lineTag).join("");
       soul += (it.subSkills || []).map(k => {
+        const r = soulRep?.skills.find(x => x.name === k.name);
+        if (r) return `<span class="tag ${r.rating === "target" ? "skill" : RCLS[r.rating]}" title="${esc(r.why)}">${MARK[r.rating]}${esc(k.name)} +${k.level}</span>`;
         const wanted = isRing || e.slotPos >= 41 ? guide.gear.ringSkills.concat(guide.gear.arcanaSkills || []) : [];
         const good = wanted.some(w => same(w, k.name));
         return `<span class="tag ${good ? "skill" : ""}">${esc(k.name)} +${k.level}</span>`;
@@ -478,7 +490,9 @@ function renderGear() {
         let tags = "";
         for (let i = 0; i < slots; i++) {
           const m = stones.find(x => x.slotPos === i);
-          tags += m ? `<span class="tag g-${esc(m.grade)}" title="${esc(m.grade)}: +${model.stone.byGrade[m.grade] ?? "?"} item level">${esc(m.name)} ${esc(m.value || "")} · ${model.stone.byGrade[m.grade] ?? "?"}</span>` : `<span class="tag empty">empty</span>`;
+          const sr = K && m ? BC.rateStone(K, m) : null;
+          const mark = sr?.rating === "lock" ? "🔒 " : sr?.rating === "bad" ? "❌ " : "";
+          tags += m ? `<span class="tag g-${esc(m.grade)}" title="${esc(m.grade)}: +${model.stone.byGrade[m.grade] ?? "?"} item level${sr?.why ? " · " + esc(sr.why) : ""}">${mark}${esc(m.name)} ${esc(m.value || "")} · ${model.stone.byGrade[m.grade] ?? "?"}</span>` : `<span class="tag empty">empty</span>`;
         }
         const sum = stones.reduce((n, m) => n + (model.stone.byGrade[m.grade] ?? 0), 0);
         lines += `<div class="group"><small>Manastones (${stones.length}/${slots} filled) · +${sum} item level of ${slots * 4}</small><div class="lines">${tags}</div></div>`;
@@ -490,6 +504,11 @@ function renderGear() {
     const d = model && diagnoseItem(model, e, it);
     const head = d ? `<div class="sum">base ${d.parts.base} · +${d.parts.enchant} enh${d.parts.amp ? ` · +${d.parts.amp} amp` : ""} · +${d.parts.stones} stones = <b>${d.parts.total}</b></div>
         <span class="chip ${d.status}" title="${esc(d.why)}">${d.status === "keeper" ? "KEEPER" : "REPLACE"}</span> <small class="sum">${esc(d.why)}</small>` : "";
+    if (d && soulRep) {
+      if (soulRep.rebind) d.actions.push({ level: "yellow", text: `${soulRep.bad.length} bad soul-binding lines → rebind toward ${(K.soulBinding.targets[soulRep.slot] || []).join(", ")}.` });
+      if (soulRep.lines.some(l => l.endgame) && d.status === "keeper") d.actions.push({ level: "grey", text: K.soulBinding.endgameLines.note + " (Whelps)" });
+      if (soulRep.missingRequired.length) d.actions.push({ level: d.status === "keeper" ? "yellow" : "grey", text: `No ${soulRep.missingRequired.join("/")} skill line.${soulRep.crafted ? " " + K.soulBinding.ringSkills.craftedNote : ""}` });
+    }
     const acts = d?.actions.length ? `<ul class="actions">${d.actions.map(a => `<li class="${a.level}">${esc(a.text)}</li>`).join("")}</ul>` : "";
     return `<li><div><div class="slot"><span class="light ${cardLight(d)}"></span>${esc(e.slotPosName)}</div><div class="item grade-${esc(e.grade)}">${esc(e.name)}${ench}</div>${head}</div>
       <div>${it && !it.failed ? lines : `<div class="lines">${lines}</div>`}${lowWeapon ? `<div class="lines">${lowWeapon}</div>` : ""}${want}${acts}</div></li>`;
@@ -516,14 +535,17 @@ async function loadItems() {
 async function loadItem(e) {
   try { items[e.slotPos] = await api("/api/item", { ...ctx, id: e.id, enchantLevel: e.enchantLevel || 0, slotPos: e.slotPos }); }
   catch (err) { items[e.slotPos] = { failed: true, error: err.message }; } // "not delivered" ≠ "no lines"
-  renderGear(); renderTodo(); renderBreakdown(); updatePlan();
+  renderGear(); renderTodo(); renderBreakdown(); updatePlan(); renderBuildSoon();
 }
 async function loadBoards() {
   for (const b of char.daevanion?.boardList || []) {
     try { boards[b.id] = await api("/api/daevanion", { ...ctx, boardId: b.id }); } catch { /* reported as missing */ }
-    renderBreakdown(); updatePlan();
+    renderBreakdown(); updatePlan(); renderBuildSoon();
   }
 }
+// The build section is heavy; rebuild it at most every 50 ms while gear and boards stream in.
+let buildQueued = false;
+function renderBuildSoon() { if (buildQueued) return; buildQueued = true; setTimeout(() => { buildQueued = false; renderBuild(); }, 50); }
 
 // ---------- item level breakdown: model vs. the game's number ----------
 function renderBreakdown() {
@@ -556,8 +578,8 @@ function renderTodo() {
   const az = (char.daevanion?.boardList || []).find(b => same(b.name, "Azphel"));
   const f = findings(model, {
     diags, ilvl, target: guide.ludra.itemLevel,
-    stigmas: build.stigmas.filter(w => w.target >= 20).slice(0, 2).map(w => ({ name: w.name, lvl: levelOf(w.name).lvl, target: w.target })),
-    mainSkill: main && { name: main.name, lvl: findSkill(main.name)?.skillLevel || 0, target: main.target, sources: skillLineSources(list, items, main.name) },
+    stigmas: build.stigmas.filter(w => w.target >= 20).slice(0, K ? 1 : 2).map(w => ({ name: w.name, lvl: levelOf(w.name).lvl, target: w.target })),
+    mainSkill: !K && main && { name: main.name, lvl: findSkill(main.name)?.skillLevel || 0, target: main.target, sources: skillLineSources(list, items, main.name) },
     stats: guide.stats.map(r => ({ name: r.match[0], value: r.match.map(statOf).find(Boolean)?.value ?? null, min: r.min })),
     azphel: az && boards[az.id] && { points: boardPoints(model, boards[az.id]), shopMax: model.daevanion.azphelShop.crystals.reduce((a, b) => a + b, 0) },
   });
@@ -572,8 +594,9 @@ function renderTodo() {
   if (ilvl >= 2600 && !(char.daevanion?.boardList || []).some(b => same(b.name, "Ariel"))) f.push({ impact: 4, title: "Ariel board locked", why: "Up to +60 item level; low damage value (Fubgun).", action: `${model.daevanion.ariel.from}: ${model.daevanion.ariel.fragmentsPerCrystal} fragments = 1 crystal, max ${model.daevanion.ariel.maxPerDungeon} per dungeon.`, gain: "up to +60 item level" });
   const pet = equip?.petwing?.pet;
   if (!pet || pet.level < 3) f.push({ impact: 1, title: "Pet to level 3", why: "Genus Insight crystals; pet stats apply to every character on the server.", action: "Level your pets.", gain: "stats" });
+  if (K) f.push(...BC.buildFindings(K, buildData()));
   f.sort((a, b) => b.impact - a.impact);
-  const li = x => `<li><div><b>${esc(x.title)}</b> <span class="tag ok">${esc(x.gain)}</span><small>${esc(x.why)} <b>Do:</b> ${esc(x.action)}</small></div></li>`;
+  const li = x => `<li><div><b>${esc(x.title)}</b> <span class="tag ok">${esc(x.gain)}</span><small>${esc(x.why)} <b>Do:</b> ${esc(x.action)}${x.source ? ` <i>Source: ${esc(x.source)}</i>` : ""}</small></div></li>`;
   $("#todo").innerHTML = `<h3>Gear Doctor <small>${ilvl.toLocaleString()} → ${guide.ludra.itemLevel.toLocaleString()} item level</small></h3>
     <p class="lead">Checked from this character's gear, cards, boards and stigmas, biggest impact first.${waiting ? ` ${waiting} piece${waiting > 1 ? "s are" : " is"} still loading — the list fills in.` : ""}</p>
     <ol class="todo">${f.slice(0, 6).map(li).join("") || "<li><b>Nothing urgent found</b><small>Follow the roadmap below.</small></li>"}</ol>
@@ -668,6 +691,119 @@ function waterfall(start, target, by) {
     <line x1="40" x2="${W - 6}" y1="${ty}" y2="${ty}" stroke="var(--bad)" stroke-dasharray="5 4"/><text x="${W - 6}" y="${ty - 5}" text-anchor="end">target ${target.toLocaleString()}</text>${bars}</svg>`;
 }
 
+
+// ---------- Cleric build check (cleric-knowledge.json) ----------
+const buildIn = () => loadEdits("buildInputs");
+const setBuildIn = (k, v) => { const e = buildIn(); if (v === "" || v == null) delete e[k]; else e[k] = v; saveEdits(e, "buildInputs"); };
+function buildData() {
+  const list = equip?.equipment?.equipmentList || [];
+  const diags = Object.fromEntries(diagnoses().map(d => [d.e.slotPos, d]));
+  const ready = e => items[e.slotPos] && !items[e.slotPos].failed;
+  const inp = buildIn();
+  return {
+    ilvl: statOf("ItemLevel")?.value ?? 0, raidIlvl: guide.ludra.itemLevel,
+    titles: BC.titleCheck(K, char.profile, char.title?.titleList || []),
+    soul: list.filter(ready).map(e => ({ ...BC.soulBindingReport(K, e, items[e.slotPos], diags[e.slotPos]?.status), status: diags[e.slotPos]?.status })).filter(r => r.slot),
+    stones: list.filter(ready).filter(e => e.slotPos < 41).map(e => ({ slot: e.slotPosName, status: diags[e.slotPos]?.status, report: BC.stoneReport(K, items[e.slotPos].magicStoneStat || []) })),
+    arcana: list.filter(e => e.slotPos >= 41 && ready(e)).map(e => BC.arcanaCheck(K, e, items[e.slotPos])),
+    condemnation: list.every(ready) && Object.keys(boards).length ? BC.skillSum(K, { skillList: skillList(), equipmentList: list, items, boards }) : null,
+    stigmaLevels: K.stigmas.priority.map(p => ({ name: p.name, lvl: levelOf(p.name).lvl })),
+    consumablesMissing: K.consumables.items.filter(c => !(inp.consumables || {})[c.id]).map(c => c.name),
+    daevanionWarnings: BC.daevanionWarnings(K, boards),
+  };
+}
+function titleRows() {
+  const inp = buildIn();
+  return BC.titleCheck(K, char.profile, char.title?.titleList || []).map(t => `<div class="row"><div class="name">${esc(t.slot === "Etc" ? "Other" : t.slot)} title<small>${t.equipped ? "equipped: " + esc(t.equipped) : "nothing equipped"}</small></div>
+      <div class="lines">${t.chain.map((c, i) => `<span class="tag ${i === t.rank ? (i === 0 ? "ok" : "skill") : ""}" title="${esc(c.effect)} · unlock: ${esc(c.unlock)}">${i === t.rank ? "● " : ""}${esc(c.name)}</span>`).join("<span class='sum'>→</span>")}</div>
+      <div class="lvl ${t.ok ? "ok" : t.fallback ? "warn" : "bad"}">${t.ok ? "BiS" : t.fallback ? "#" + (t.rank + 1) : "–"}</div>
+      <p class="note">${t.ok ? esc(t.chain[0].effect) : `Next: ${esc(t.chain[Math.max(0, (t.rank < 0 ? t.chain.length : t.rank) - 1)].name)} — ${esc(t.chain[Math.max(0, (t.rank < 0 ? t.chain.length : t.rank) - 1)].effect)} (unlock: ${esc(t.chain[Math.max(0, (t.rank < 0 ? t.chain.length : t.rank) - 1)].unlock)})`}${t.owned ? ` · ${t.owned} titles of this kind owned` : ""}</p></div>`).join("")
+    + progressRow("Genus Insight wheels at 10", "genusDone", "genusTotal", null, "Unbound by Genus needs every wheel at 10.")
+    + progressRow("Skins", "skins", null, K.titles.skins.goal, K.titles.skins.text)
+    + `<p class="note">${esc(K.titles.owned)} Source: ${esc(K.titles.source)}.</p>`;
+}
+function progressRow(label, key, totalKey, fixed, note) {
+  const inp = buildIn(), have = inp[key] ?? null, total = fixed ?? inp[totalKey] ?? null;
+  const pct = have != null && total ? Math.min(100, Math.round(have / total * 100)) : 0;
+  return `<div class="row"><div class="name">${esc(label)}<small>type in from the game</small></div>
+    <div><div class="board"><div class="fill"><i style="width:${pct}%"></i></div></div></div>
+    <div class="lvl"><input type="number" min="0" data-bin="${key}" value="${have ?? ""}" placeholder="–" aria-label="${esc(label)}"><span> / ${fixed ?? `<input type="number" min="0" data-bin="${totalKey}" value="${total ?? ""}" placeholder="?" aria-label="${esc(label)} total">`}</span></div>
+    <p class="note">${esc(note)}</p></div>`;
+}
+const src = x => `<p class="note">Source: ${esc(x.source)} · ${esc(x.confidence)}</p>`;
+function renderBuild() {
+  const el = $("#build");
+  if (!K || !char) { el.innerHTML = ""; el.style.display = "none"; return; }
+  el.style.display = "";
+  const d = buildData(), inp = buildIn();
+  const ar = d.arcana.filter(Boolean), set = BC.arcanaSet(K, ar), c = d.condemnation;
+  const yes = ok => ok ? "✅" : "❌";
+  const arcRows = ar.map(a => `<tr><td><b>${esc(a.type)}</b><small>+${a.level} of +${a.maxLevel}</small></td>
+      <td>${yes(a.familyOk)} ${esc(a.family || "?")}<small>wants ${esc(a.want.family.join(" or "))}</small></td>
+      <td>${a.want.stat ? `${yes(a.statOk)} ${esc(a.stat || "?")}<small>wants ${esc(a.want.stat.join("/"))}</small>` : `➖ ${esc(a.stat || "")}<small>any</small>`}</td>
+      <td>${a.skills.map(k => `<span class="tag ${k.rating === "target" ? "skill" : k.rating === "bad" ? "bad" : ""}">${{ target: "✅ ", bad: "❌ ", neutral: "" }[k.rating]}${esc(k.name)} +${k.level}</span>`).join(" ")}<small>${esc(a.want.note)}</small></td></tr>`).join("");
+  const specs = inp.specs || {};
+  const specRows = Object.entries(K.skills.specializations).map(([sk, picks]) => `<div class="row"><div class="name">${esc(sk)}<small>level ${findSkill(sk)?.skillLevel ?? 0}</small></div>
+      <div class="lines">${picks.map(p => `<label class="tag"><input type="checkbox" data-spec="${esc(sk)}|${esc(p)}" ${specs[sk + "|" + p] ? "checked" : ""}> ${esc(p)}</label>`).join("")}</div></div>`).join("");
+  const preset = BC.stigmaPreset(K, skillList());
+  const presetName = { noChanter: "without Chanter", withChanter: "with Chanter", ludraKetu: "Ludra-Ketu" };
+  const showList = l => l.map(x => Array.isArray(x) ? x.join(" / ") : x).join(", ");
+  const az = (char.daevanion?.boardList || []).find(b => same(b.name, "Azphel")), ariel = (char.daevanion?.boardList || []).find(b => same(b.name, "Ariel"));
+  const arielPts = ariel && boards[ariel.id] ? boardPoints(model, boards[ariel.id]) : 0;
+  const divine = K.stats.divine.map(x => { const st = findStat(char.stat?.statList || [], x.type); return `<div class="stat"><small>${esc(st?.name || x.type)}</small><b>${st?.value ?? "–"}</b><small>${esc(x.why)}</small></div>`; }).join("");
+  const statIn = (key, label, aim) => { const v = inp[key]; const ok = v == null ? "" : aim != null && v >= aim ? "ok" : "warn";
+    return `<div class="stat ${ok}"><small>${esc(label)} · type in</small><b><input type="number" step="0.1" min="0" data-bin="${key}" value="${v ?? ""}" placeholder="–" aria-label="${esc(label)}"></b><small>${aim != null ? "aim " + aim : ""}</small></div>`; };
+  const cons = inp.consumables || {};
+  el.innerHTML = `<h3>Cleric build check <small>from creator guides, every value with its source</small></h3>
+    <p class="lead">What the guides and creators (aion2-guides.info, Whelps, Lucia, MrRosaPony, Madsin) say, checked against this character. Where they disagree, both views are shown.</p>
+    <details open><summary>Arcana</summary>
+      <div class="tablewrap"><table class="rank"><tr><th>Card</th><th>Family</th><th>Divine stat</th><th>Skill lines</th></tr>${arcRows}</table></div>
+      <p>Set: ${set.vigor} Vigor + ${set.magic} Magic. ${set.options.map(o => `${o.ok ? "✅" : "❌"} ${esc(o.pick)} (${esc(o.by)})`).join(" · ")}</p>
+      <p class="note">Training Arcana first on cards with ${esc(K.arcana.trainingPriority.join(", "))}. ${esc(K.arcana.transmuteTwo.text)} (${esc(K.arcana.transmuteTwo.by)})</p>${src(K.arcana)}
+    </details>
+    <details open><summary>${esc(K.condemnation.skill)} to ${K.condemnation.target}</summary>
+      ${c ? `<p class="summary"><b>${c.total}</b> / ${c.target} = base ${c.base} + Daevanion ${c.daevanion} + ${c.lines.map(l => `${esc(l.card ? l.item : l.slot)} +${l.level}`).join(" + ") || "no gear lines"}${c.missing ? ` · <b>${c.missing}</b> missing` : " ✓"}</p>
+        ${c.missing ? `<ol>${K.condemnation.order.map((o, i) => `<li><b>${esc(o.how)}</b> — ${esc(o.why)}${i === 0 && c.cardPaths.length ? `: ${c.cardPaths.map(p => `${esc(p.item)} has ${p.levelsLeft} levels left over ${p.lineCount} lines ≈ +${p.expected}`).join("; ")} (≈ +${c.expectedFromCards} in total)` : ""}</li>`).join("")}</ol>` : ""}` : `<p class="note">Waiting for gear and Daevanion boards…</p>`}
+      ${src(K.condemnation)}
+    </details>
+    <details><summary>Skill specializations</summary>
+      <p class="note">NCSOFT's API doesn't show specializations — tick the ones you've taken.</p>${specRows}
+      ${K.skills.notes.map(n => `<p class="note">${esc(n.text)} (${esc(n.source)})</p>`).join("")}
+    </details>
+    <details><summary>Stigma presets and Ludra</summary>
+      <p>Equipped stigmas (all presets NCSOFT reports): ${esc(preset.equipped.join(", ") || "none")}. ${preset.match ? `Matches the <b>${presetName[preset.match]}</b> preset.` : "Doesn't match a guide preset."}</p>
+      <p>Priority: ${K.stigmas.priority.map(p => `${esc(p.name)} ${p.target}${p.when ? ` (${esc(p.when)})` : ""} — you: ${levelOf(p.name).lvl}`).join(" → ")}</p>
+      <ul>${Object.entries(K.stigmas.presets).map(([k, l]) => `<li><b>${presetName[k]}:</b> ${esc(showList(l))}</li>`).join("")}</ul>
+      <ul>${K.stigmas.tips.map(t => `<li>${esc(t)}</li>`).join("")}</ul>
+      <div class="next"><small>Ludra · ${esc(K.ludra.players)} players</small><ul>${K.ludra.facts.map(f => `<li>${esc(f)}</li>`).join("")}</ul><p>${esc(K.ludra.recommend)}</p></div>${src(K.stigmas)}
+    </details>
+    <details><summary>Daevanion priorities</summary>
+      <ol>${K.daevanion.priority.map(p => `<li>${esc(p)}</li>`).join("")}</ol>
+      <p>${esc(K.daevanion.route.text)} (${esc(K.daevanion.route.by)})</p>
+      ${d.daevanionWarnings.length ? `<p>${d.daevanionWarnings.map(w => `<span class="tag bad">❌ ${w.count} × ${esc(w.match)} — ${esc(w.why)}</span>`).join(" ")}</p>` : "<p>✅ No nodes from the avoid list are open.</p>"}
+      <p>Ariel: <b>${arielPts}</b> / ${K.daevanion.ariel.max}${ariel ? "" : " (locked)"} — ${esc(K.daevanion.ariel.text)} · Azphel: ${az && boards[az.id] ? boardPoints(model, boards[az.id]) : "?"} points — ${esc(K.daevanion.azphel)}</p>${src(K.daevanion)}
+    </details>
+    <details><summary>Wings, pets and Genus Insight</summary>
+      <p>Equipped wings: ${esc(equip?.petwing?.wing?.name || "none")}. ${esc(K.wings.boss)} Best in slot: <b>${esc(K.wings.bis.name)}</b> (${esc(K.wings.bis.from)}; ${esc(K.wings.bis.stats)}). ${esc(K.wings.collect)}</p>
+      <p>${esc(K.pets.text)}</p>
+      <div class="tablewrap"><table class="rank"><tr><th>Genus slots</th><th>Pick (${esc(K.genus.source)})</th></tr>${K.genus.picks.map(g => `<tr><td>${esc(g.slots)}</td><td>${esc(g.pick)}</td></tr>`).join("")}</table></div>
+      <p class="note">${esc(K.genus.lockFrom)}</p>
+    </details>
+    <details><summary>Stat targets</summary>
+      <p class="note">Accuracy and Critical Hit are typed in under Stats (Ludra needs ${K.stats.targets[0].min.toLocaleString()} each).</p>
+      <div class="stats">${statIn("cdr", "Cooldown Reduction %", K.stats.targets[2].min)}${statIn("combatSpeed", "Combat Speed %", null)}${divine}</div>
+      <p>Cheapest Accuracy, in order: ${K.stats.accuracySources.map(esc).join(" → ")}.</p>${src(K.stats)}
+    </details>
+    <details><summary>Raid consumables (Ludra)</summary>
+      <p class="note">${esc(K.consumables.note)} Ticks are saved in this browser.</p>
+      ${K.consumables.items.map(i => `<div class="row"><div class="name"><label><input type="checkbox" data-cons="${i.id}" ${cons[i.id] ? "checked" : ""}> ${esc(i.name)}</label></div><div class="lines"><span class="tag">${esc(i.effect)}</span></div><p class="note">${esc(i.from)}</p></div>`).join("")}
+    </details>
+    <details><summary>Macro</summary><ul>${K.macro.lines.map(l => `<li>${esc(l)}</li>`).join("")}</ul>${src(K.macro)}</details>`;
+  el.querySelectorAll("input[data-spec]").forEach(i => i.onchange = () => { const e = buildIn(); e.specs = { ...(e.specs || {}), [i.dataset.spec]: i.checked }; saveEdits(e, "buildInputs"); });
+  el.querySelectorAll("input[data-cons]").forEach(i => i.onchange = () => { const e = buildIn(); e.consumables = { ...(e.consumables || {}), [i.dataset.cons]: i.checked }; saveEdits(e, "buildInputs"); renderTodo(); });
+  el.querySelectorAll("input[data-bin]").forEach(i => i.onchange = () => { setBuildIn(i.dataset.bin, i.value === "" ? null : +i.value); render(); });
+}
+
 // ---------- stats, titles, boards ----------
 function renderStats(stat) {
   const cards = guide.stats.map(r => {
@@ -693,6 +829,7 @@ function renderStats(stat) {
   });
 }
 function renderExtras() {
+  queueMicrotask(() => $("#extras").querySelectorAll("input[data-bin]").forEach(i => i.onchange = () => { setBuildIn(i.dataset.bin, i.value === "" ? null : +i.value); renderExtras(); }));
   const t = guide.titles || {};
   const owned = char.title?.titleList || [];
   const row = (label, names) => {
@@ -703,8 +840,8 @@ function renderExtras() {
   const pet = equip?.petwing?.pet;
   const arcana = Object.entries(guide.gear.arcana).map(([k, v]) => `<span class="tag">${k}: ${esc(v)}</span>`).join("");
   $("#extras").innerHTML = `<h3>Titles, pet, arcana</h3>
-    <p class="lead">${guide.titles ? "Titles the guide names" : "The guide names no titles for this class"} (${char.title?.ownedCount ?? "?"} of ${char.title?.totalCount ?? "?"} owned in total). Equipped now: “${esc(char.profile?.titleName || "none")}”.</p>
-    ${row("Attack title", t.attack)}${row("Defense title", t.defense)}${row("Cooldown title", t.other)}
+    <p class="lead">${K ? "Equipped title per slot against the best-in-slot chain (names for your faction)" : guide.titles ? "Titles the guide names" : "The guide names no titles for this class"} (${char.title?.ownedCount ?? "?"} of ${char.title?.totalCount ?? "?"} owned in total). ${K ? "" : `Equipped now: “${esc(char.profile?.titleName || "none")}”.`}</p>
+    ${K ? titleRows() : row("Attack title", t.attack) + row("Defense title", t.defense) + row("Cooldown title", t.other)}
     ${(t.notes || []).map(n => `<p class="note">${esc(n)}</p>`).join("")}
     <div class="row"><div class="name">Pet</div><div class="lines"><span class="tag">${pet ? esc(pet.name) + " · Lv " + pet.level : "none equipped"}</span></div><div class="lvl ${pet && pet.level >= 3 ? "ok" : "warn"}">${pet ? pet.level : 0}<span> / 3</span></div><p class="note">Get every pet to level 3 early for Genus Insight crystals.</p></div>
     <div class="row"><div class="name">Arcana plan<small>what to roll for</small></div><div class="lines">${arcana}</div>${(guide.gear.arcanaNotes || []).map(n => `<p class="note">${esc(n)}</p>`).join("")}</div>`;

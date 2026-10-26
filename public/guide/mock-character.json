@@ -39,8 +39,9 @@
       "serverName": "Zikel",
       "regionName": "Night Owls",
       "combatPower": 71240,
-      "titleName": "Guardian of Baran",
-      "profileImage": ""
+      "titleName": "Guardian of Altgard",
+      "profileImage": "",
+      "raceName": "Asmodians"
     },
     "stat": {
       "statList": [
@@ -85,7 +86,7 @@
       "titleList": [
         {
           "id": 1,
-          "name": "Guardian of Baran",
+          "name": "Guardian of Altgard",
           "grade": "Rare",
           "equipCategory": "Attack"
         },
@@ -96,16 +97,10 @@
           "equipCategory": "Defense"
         },
         {
-          "id": 3,
-          "name": "Wanderer",
-          "grade": "Common",
-          "equipCategory": "Other"
-        },
-        {
           "id": 4,
           "name": "Through Hell and Back",
           "grade": "Rare",
-          "equipCategory": "Other"
+          "equipCategory": "Etc"
         }
       ]
     },

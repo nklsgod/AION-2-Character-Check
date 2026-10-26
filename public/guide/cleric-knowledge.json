@@ -1,0 +1,255 @@
+{
+  "_about": "Cleric build knowledge for PvE, Global Season 1. Every entry: source (URL or creator), confidence (confirmed = checked against NCSOFT's API data, creator-opinion = what a guide or creator says, inferred = derived or a guess). Where creators disagree, `options` lists each view with its creator. Creator notes were collected by the user (Oct 2026). The page reads every number from here.",
+  "guide": "https://aion2-guides.info/en/cleric/",
+
+  "soulBinding": {
+    "source": "MrRosaPony, Lucia, Whelps (creator notes)",
+    "confidence": "creator-opinion",
+    "slotMap": { "MainHand": "Mace", "Main Weapon": "Mace", "SubHand": "Guard", "Off-hand": "Guard", "Helmet": "Helm", "Helm": "Helm", "Cape": "Cloak", "Shoulder": "Pauldrons", "Torso": "Breastplate", "Pants": "Greaves", "Gloves": "Gloves", "Boots": "Boots", "Necklace": "Necklace", "Earring": "Earrings", "Ring": "Rings", "Bracelet": "Bracelets" },
+    "targets": {
+      "Mace": ["Combat Speed", "Weapon Damage Boost", "Might"],
+      "Guard": ["Combat Speed", "Weapon Damage Boost", "Might", "Precision"],
+      "Helm": ["Double Chance", "Attack"],
+      "Cloak": ["Double Chance", "Attack"],
+      "Pauldrons": ["Critical Damage Boost", "Double Chance"],
+      "Breastplate": ["Damage Boost", "Perfect Chance"],
+      "Greaves": ["Perfect Chance", "Damage Tolerance"],
+      "Gloves": ["Combat Speed", "Perfect Chance"],
+      "Boots": ["Move Speed", "Perfect Chance"],
+      "Necklace": ["Combat Speed", "Might", "Precision"],
+      "Earrings": ["Move Speed", "Might", "Precision"],
+      "Bracelets": ["Illusion", "Time", "Wisdom", "Destruction"]
+    },
+    "bad": {
+      "lines": ["Natural HP Regen", "Natural MP Regen", "MP", "Max MP", "HP", "Max HP", "Block", "Evasion", "Critical Hit Resist", "Critical Damage Defense", "Critical Damage Tolerance", "Status Effect Resist", "Front Defense", "Heal Block"],
+      "pvp": true,
+      "source": "creator notes (PvE)", "confidence": "creator-opinion"
+    },
+    "endgameLines": {
+      "lines": ["Accuracy", "Critical Hit"],
+      "note": "Accuracy and Crit on armor are the endgame rolls — but don't commit yet, especially Accuracy, before the target items are in.",
+      "source": "Whelps", "confidence": "creator-opinion"
+    },
+    "armorSkills": {
+      "required": ["Empyrean Lord's Grace"],
+      "second": { "options": [
+        { "pick": "Healing Enhancement", "by": "MrRosaPony / Lucia" },
+        { "pick": "Earth's Grace", "by": "Whelps" }
+      ] },
+      "source": "creator notes", "confidence": "creator-opinion"
+    },
+    "ringSkills": {
+      "required": ["Condemnation"],
+      "then": ["Judgment Thunder", "Chain of Torment", "Debilitating Mark", "Divine Aura", "Bolt"],
+      "craftedNote": "Crafted rings have 5 lines instead of 4 — use them for skill lines.",
+      "source": "creator notes; aion2-guides.info", "confidence": "creator-opinion"
+    },
+    "uselessSkills": ["Defiance", "Heal Block", "Empyrean Lords' Benediction", "Prayer of Concentration"],
+    "rebindAt": { "badLines": 2, "onlyKeepers": true, "source": "user rule", "confidence": "inferred" },
+    "rerollTools": { "text": "Soul Reset Codex rerolls all lines (save it for weapon, guard and rings); Syncing rerolls one line with a sacrificial unique.", "source": "JOHNPAL TV", "confidence": "creator-opinion" }
+  },
+
+  "manastones": {
+    "lock": {
+      "options": [
+        { "rule": "gold Attack line", "by": "Whelps", "text": "Stop rolling once the piece has at least one gold (Unique) Attack line." },
+        { "rule": "gold Damage Boost line or more than 15 Attack in total", "by": "Madsin" }
+      ],
+      "attackTotal": 15,
+      "confidence": "creator-opinion"
+    },
+    "goodOrder": ["Attack", "Critical Hit", "Accuracy", "Defense"],
+    "accuracyCap": 1000,
+    "bad": ["MP", "Block", "Evasion", "Critical Hit Resist", "HP"],
+    "badPvp": true,
+    "note": "Item level only counts the grade (color); damage depends on the stat. At equal grade, reroll bad stats first. Pieces you'll replace get only cheap stones — they're lost on transfer.",
+    "source": "Whelps, Madsin (creator notes)", "confidence": "creator-opinion"
+  },
+
+  "arcana": {
+    "slots": {
+      "Chalice": { "family": ["Vigor"], "stat": ["Time"], "skills": ["Condemnation"], "note": "Condemnation plus a second target skill" },
+      "Parchment": { "family": ["Vigor", "Magic"], "stat": null, "skills": ["Condemnation"], "note": "Keep and level every Parchment with Condemnation" },
+      "Compass": { "family": ["Vigor", "Magic"], "stat": ["Death"], "skills": ["Divine Aura"], "note": "+4 Divine Aura reaches 20 with a +2 ring; +2 reaches 16" },
+      "Bell": { "family": ["Magic"], "stat": ["Destruction"], "skills": ["Empyrean Lord's Grace"], "target": 3, "note": "Empyrean Lord's Grace, aim for +3" },
+      "Mirror": { "family": ["Vigor"], "stat": ["Illusion"], "skills": ["Earth's Grace", "Healing Enhancement"], "note": "Earth's Grace (Healing Enhancement is fine)" }
+    },
+    "set": { "options": [
+      { "pick": "at least 2 Vigor (Chalice + Mirror)", "min": 2, "by": "Whelps" },
+      { "pick": "3 Vigor + 2 Magic", "min": 3, "by": "most top Clerics (creator notes)" }
+    ] },
+    "uselessSkills": ["Defiance", "Heal Block", "Empyrean Lords' Benediction", "Prayer of Concentration"],
+    "trainingPriority": ["Condemnation", "Divine Aura", "Empyrean Lord's Grace", "Earth's Grace"],
+    "transmuteTwo": { "text": "2-skill transmute (15 Mysterious Crystals + 5M Kina) is not recommended — level cards instead.", "by": "Whelps", "confidence": "creator-opinion" },
+    "source": "aion2-guides.info; Whelps (creator notes)", "confidence": "creator-opinion"
+  },
+
+  "condemnation": {
+    "skill": "Condemnation", "target": 20, "baseCap": 10,
+    "order": [
+      { "how": "Chalice card levels", "why": "each card level raises one of the card's existing lines by 1 at random — the Chalice holds Condemnation" },
+      { "how": "Parchment with Condemnation (transmute one in if needed)", "why": "every Parchment with Condemnation is worth keeping and leveling" },
+      { "how": "Ring skill line", "why": "last — roll rings once the cards can reach 20 (crafted rings have 5 lines)" }
+    ],
+    "share": "about half of your damage",
+    "source": "aion2-guides.info; Whelps (creator notes)", "confidence": "creator-opinion"
+  },
+
+  "skills": {
+    "_levels": "Endgame levels per Whelps (Oct 20, 2026) — same as the targets in cleric.json.",
+    "specializations": {
+      "Condemnation": ["+12% single target", "Crit reset (12)", "Multi-Hit (16)"],
+      "Bolt": ["+30% Skill Speed", "+20% single target", "Guaranteed crit (16)"],
+      "Divine Aura": ["Attacking speed", "+3s duration", "-10s cooldown"],
+      "Earth's Retribution": ["Discharge chance", "Multi-Hit", "-7s Bolt cooldown on Discharge"],
+      "Light of Regeneration": ["+5% Incoming Heal", "Tolerance (16)"],
+      "Radiant Recovery": ["-3s cooldown", "+5% HP (16)"],
+      "Healing Light": ["+2 uses", "+2% HP", "-2s (20)"],
+      "Judgment Thunder": ["-20% MP", "+12% single target"],
+      "Lightning Strike Scattershot": ["Multi-Hit", "-1s cooldowns (16)"],
+      "Debilitating Mark": ["-15% Defense", "20% stun"],
+      "Chain of Torment": ["20% knockdown", "Tolerance reduction"]
+    },
+    "notes": [
+      { "text": "Once Earth Punishment is 20 and Condemnation and Bolt are 16, take Judgment Thunder out of the boss macro — it eats Condemnation animations. Keep it for farming.", "source": "Whelps; aion2-guides.info", "confidence": "creator-opinion" },
+      { "text": "Earth Punishment 20 makes the buff last 20s instead of 10s. With about 34% cooldown reduction it never drops; Season 1 realistically reaches 10–11%.", "source": "creator notes", "confidence": "creator-opinion" }
+    ],
+    "source": "aion2-guides.info; Whelps", "confidence": "creator-opinion"
+  },
+
+  "stigmas": {
+    "priority": [
+      { "name": "Earth Punishment", "target": 20 },
+      { "name": "Prayer of Amplification", "target": 20, "note": "+15% Attack at 20" },
+      { "name": "Light of Protection", "target": 20, "when": "no Chanter" },
+      { "name": "Noble Aura", "target": 20, "when": "with Chanter" }
+    ],
+    "presets": {
+      "noChanter": ["Earth Punishment", "Prayer of Amplification", "Light of Protection", "Noble Aura"],
+      "withChanter": ["Earth Punishment", "Prayer of Amplification", "Noble Aura", ["Summon Resurrection", "Absolution"]],
+      "ludraKetu": ["Earth Punishment", "Prayer of Amplification", "Summon Resurrection", ["Benevolence", "Yustiel's Power"]]
+    },
+    "tips": [
+      "With a Chanter: mantras don't stack, so Light of Protection goes out.",
+      "Ask the Chanter to cast Power of the Storm first, otherwise it blocks Earth's Blessing.",
+      "Random groups: skip Summon Resurrection — players use stones, and its 2-minute cooldown is wasted."
+    ],
+    "source": "aion2-guides.info; creator notes", "confidence": "creator-opinion"
+  },
+
+  "ludra": {
+    "players": "10 (2 groups of 5)",
+    "facts": [
+      "Eternal Ludra enrages after 10 minutes.",
+      "At most 2 revives per boss fight — skill and Resurrection Spiritstone count together.",
+      "The Ketu group needs a healer with a revive; Soul Stones have healing priority."
+    ],
+    "recommend": "Keep a second preset “Ludra-Ketu” with Summon Resurrection, plus Benevolence or Yustiel's Power.",
+    "source": "creator notes", "confidence": "creator-opinion"
+  },
+
+  "daevanion": {
+    "priority": ["Orange Cooldown and Combat Speed nodes", "Attack and Critical Hit", "Blue skill nodes (actives to 12)", "Empyrean Lord's Grace / Earth's Grace", "Defensive nodes"],
+    "avoid": [
+      { "match": "Critical Damage Tolerance", "why": "useless in PvE" },
+      { "match": "Multi-Hit Resist", "why": "useless in PvE" },
+      { "match": "Max MP", "why": "MP +50 nodes — avoid" }
+    ],
+    "route": { "text": "Nezekan and Zikel: all four corners. Vaizel and Triniel: straight to the actives.", "by": "Lucia" },
+    "ariel": { "max": 60, "text": "PvE board: Krao Cave and Draupnir Hard (2,600), Ascension Trial Extreme (2,500)." },
+    "azphel": "PvP only — but its points count for item level.",
+    "source": "aion2-guides.info; Lucia (creator notes)", "confidence": "creator-opinion"
+  },
+
+  "titles": {
+    "factionNames": { "Asmodians": "Altgard", "Elyos": "Verteron" },
+    "slots": {
+      "Attack": [
+        { "name": "Unbound by Genus", "effect": "+4.5% PvE Damage, +34 Attack, +68 Crit", "unlock": "every Genus Insight wheel at 10", "confidence": "creator-opinion" },
+        { "name": "Guardian of {faction}", "effect": "+3% PvE Damage Boost, +210 Penetration", "unlock": "Monolith 20", "confidence": "confirmed" },
+        { "name": "Nice to Meet You", "effect": "+2.9% PvE Damage", "unlock": "50 Spacetime Rift uses", "confidence": "creator-opinion" }
+      ],
+      "Defense": [
+        { "name": "Saint of {faction}", "effect": "+300 Defense, +3% Damage Tolerance, +100 Block", "unlock": "Monolith 30", "confidence": "confirmed" }
+      ],
+      "Etc": [
+        { "name": "Empty Closet", "effect": "+3.5% Combat Speed, +3.5% Cooldown Reduction", "unlock": "700 skins", "confidence": "creator-opinion" },
+        { "name": "Through Hell and Back", "effect": "+3% Cooldown Reduction, +900 HP", "unlock": "Sealed dungeon “Ruins of the Ancient City of Roah”", "confidence": "confirmed" }
+      ]
+    },
+    "skins": { "goal": 700, "text": "Extract blue-and-below items; the wardrobe is shared with alts; check progress in the Achievements tab." },
+    "owned": "Every title you own gives a small permanent bonus.",
+    "source": "creator notes; effects marked confirmed match NCSOFT's API (equipStatList)", "confidence": "creator-opinion"
+  },
+
+  "wings": {
+    "boss": "Forest Spirit Wings — best boss wings, cheap.",
+    "bis": { "name": "Talisra Wings", "from": "Season shop, about 210,000–250,000 Oath Coin", "stats": "Attack 60, Defense 400, Accuracy 35, −4% Cooldown" },
+    "collect": "Collect every wing for the owned effects.",
+    "source": "aion2-guides.info; creator notes", "confidence": "creator-opinion"
+  },
+  "pets": { "text": "Every pet to level 3 (crystals for Genus Insight).", "source": "aion2-guides.info", "confidence": "creator-opinion" },
+  "genus": {
+    "picks": [
+      { "slots": "1, 5", "pick": "Attack Bonus (5: or Max Attack)" },
+      { "slots": "2, 8", "pick": "HP" },
+      { "slots": "3, 6, 9", "pick": "Accuracy (or Block if Accuracy is already high)" },
+      { "slots": "4", "pick": "the wheel's damage line" },
+      { "slots": "7", "pick": "Regeneration / Endurance" },
+      { "slots": "Special", "pick": "Double Chance" }
+    ],
+    "lockFrom": "Lock only from wheel level 9–10.",
+    "source": "Lucia (creator notes)", "confidence": "creator-opinion"
+  },
+
+  "stats": {
+    "targets": [
+      { "key": "accuracy", "name": "Accuracy", "min": 1000, "why": "Ludra entry check" },
+      { "key": "crit", "name": "Critical Hit", "min": 1000, "why": "Ludra entry check" },
+      { "key": "cdr", "name": "Cooldown Reduction %", "min": 10, "aim": 11, "why": "Season 1 realistic cap" },
+      { "key": "combatSpeed", "name": "Combat Speed %", "min": null, "why": "more is better" }
+    ],
+    "divine": [
+      { "type": "Destruction", "why": "damage" },
+      { "type": "Wisdom", "why": "Double Chance" },
+      { "type": "Illusion", "why": "Cooldown Reduction" },
+      { "type": "Time", "why": "Combat Speed" },
+      { "type": "Freedom", "why": "Accuracy — if you're short" },
+      { "type": "Death", "why": "Critical Hit" }
+    ],
+    "accuracySources": [
+      "Genus Insight slots 3, 6 and 9",
+      "Freedom [Vaizel] divine stat",
+      "Manastone Accuracy lines",
+      "Soul binding Precision (guard, necklace, earrings)",
+      "Food (Dark Dragon's Beef Wellington +100 Accuracy)"
+    ],
+    "source": "creator notes", "confidence": "creator-opinion"
+  },
+
+  "consumables": {
+    "items": [
+      { "id": "battleScroll", "name": "Battle Enhancement Scroll", "effect": "+10% Damage Boost and Tolerance, 300s", "from": "Achievements, shops, attendance, Twitch drop (10 from Nov 4)" },
+      { "id": "powerShard", "name": "Superior Power Shard", "effect": "+10% damage (really ~8.9%, weapon part only)", "from": "Toggle on the quickslot" },
+      { "id": "courage", "name": "Courage Scroll", "effect": "Combat Speed +15% (Superior) / +20% (top)", "from": "Alchemy, shops" },
+      { "id": "critScroll", "name": "Critical Boost Scroll", "effect": "Crit +100 / +150", "from": "Alchemy" },
+      { "id": "food", "name": "Dark Dragon's Beef Wellington", "effect": "+25 Attack, +250 Defense, +100 Accuracy, +10% Status Resist", "from": "Cooking" },
+      { "id": "serum", "name": "Superior Life Serum", "effect": "10% HP at once", "from": "Shops" },
+      { "id": "spiritstone", "name": "Resurrection Spiritstone", "effect": "Revive (counts toward the 2-revive cap)", "from": "Wind Breeze Merchant, Twitch drop" }
+    ],
+    "note": "Activate before the pull.",
+    "source": "creator notes", "confidence": "creator-opinion"
+  },
+
+  "macro": {
+    "lines": [
+      "Two presets: without and with a Chanter.",
+      "Macro: Prayer line → debuff line, 10 ms each, on RMB; hold Earth's Retribution on LMB.",
+      "Always full-charge Bolt, and open with it.",
+      "Lightning Strike Scattershot only during stagger without a Condemnation proc.",
+      "Keep heals out of the macro (lowers damage) — except Light of Regeneration.",
+      "Target mode saves mana."
+    ],
+    "source": "aion2-guides.info; creator notes", "confidence": "creator-opinion"
+  }
+}
