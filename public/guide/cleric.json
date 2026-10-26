@@ -299,7 +299,11 @@
       "Compass": "Vigor or Magic (Death) — Divine Aura",
       "Bell": "Magic (Destruction) — Empyrean Lord's Grace",
       "Mirror": "Vigor (Illusion) — Earth's Grace"
-    }
+    },
+    "arcanaSkills": [
+      "Empyrean Lord's Grace",
+      "Earth's Grace"
+    ]
   },
   "stats": [
     {
@@ -486,5 +490,6 @@
       "https://mein-mmo.de/en/aion-2-equipment-guide-how-to-quickly-obtain-the-best-gear-in-pve,1586095/",
       "https://gamingpromax.com/aion-2-endgame-guide/"
     ]
-  }
+  },
+  "daevanionNote": "Guide priority: orange Cooldown and Combat Speed nodes first, then Attack and Critical, then the blue +1 skill nodes. Azphel is PvP only."
 }

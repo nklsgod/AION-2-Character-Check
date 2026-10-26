@@ -1,0 +1,409 @@
+{
+  "class": "Gladiator",
+  "source": "https://aion2-guides.info/en/gladiator/",
+  "sourceUpdated": "2026-10-21",
+  "skillCap": 20,
+  "stigmaSlots": 4,
+  "modes": {
+    "pve": {
+      "label": "PvE",
+      "skills": [
+        {
+          "name": "Overhead Slam",
+          "target": 20,
+          "note": "Your #1 damage source; with Rage Burst and Lunge Stance it's effectively always up. 16 removes the cooldown, 20 adds the guaranteed crit."
+        },
+        {
+          "name": "Rending Blow",
+          "target": 20,
+          "note": "Second-biggest damage and your mana engine. Mobile pick at 8, +50 MP on crit at 16, +12% single target at 20."
+        },
+        {
+          "name": "Ruinous Blow",
+          "target": 16,
+          "note": "Big nuke that grants Prepare for Battle (+20% PvE damage, 20s)."
+        },
+        {
+          "name": "Sword Aura Rampage",
+          "target": 16,
+          "note": "Only hits Staggered targets; at 16 every hit takes 1s off all cooldowns, stigmas included."
+        },
+        {
+          "name": "Leaping Slam",
+          "target": 12,
+          "note": "Main gap-closer; 3s of Prepare for Battle before Ruinous Blow extends it."
+        },
+        {
+          "name": "Rush Strike",
+          "target": 12,
+          "note": "Dodge into a gap-close. Take the Stamina pick over -10s cooldown."
+        },
+        {
+          "name": "Mocking Blade",
+          "target": 12,
+          "note": "Emergency heal: 15% HP absorbed from bosses."
+        },
+        {
+          "name": "Ankle Slice",
+          "target": 12,
+          "note": "Backup closer. Skip the Ankle Smash chain."
+        },
+        {
+          "name": "Crushing Wave",
+          "target": 12,
+          "note": "Too slow for bosses; AoE and self-heal on trash."
+        },
+        {
+          "name": "Keen Strike",
+          "target": 12,
+          "note": "Basic attack: +20% MP and -1s Ruinous Blow cooldown per hit. Stop holding it once Overhead Slam and Rending Blow are 16."
+        },
+        {
+          "name": "Aerial Snare",
+          "target": 12,
+          "note": "Optional, bosses only (aLuckyRO): +100% damage to CC-immune targets and the Forced Fall chain. Give it its own key."
+        },
+        {
+          "name": "Defiance",
+          "target": 16,
+          "note": "CC break, only if you have points to spare."
+        }
+      ],
+      "stigmas": [
+        {
+          "name": "Lunge Stance",
+          "target": 20,
+          "note": "Level 20 cuts all cooldowns on crits. First stigma to max."
+        },
+        {
+          "name": "Focused Block",
+          "target": 5,
+          "note": "Guaranteed parry; every block triggers Experienced Counterstrike's party buff. Two uses in a row at 5."
+        },
+        {
+          "name": "Rage Burst",
+          "target": 5,
+          "note": "Triggers Overhead Slam for 10s, +10% PvE Damage Boost, -10% boss Attack; -15s cooldown at 5."
+        },
+        {
+          "name": "Zikel's Blessing",
+          "target": 10,
+          "note": "Default 4th slot: +20% Attack, +10% PvE Damage Boost at 10."
+        }
+      ]
+    },
+    "pve_party": {
+      "label": "PvE, organized party",
+      "inherit": "pve",
+      "stigmas": [
+        {
+          "name": "Lunge Stance",
+          "target": 20,
+          "note": "First stigma to max."
+        },
+        {
+          "name": "Focused Block",
+          "target": 5,
+          "note": "Blocking is buffing."
+        },
+        {
+          "name": "Rage Burst",
+          "target": 5,
+          "note": "Keeps Overhead Slam up."
+        },
+        {
+          "name": "Lifestealing Blade",
+          "target": 20,
+          "note": "Replaces Zikel's Blessing: Predation on the party. Only worth it at 20. Blade Toss (-30% boss Defense) is the semi-tank alternative."
+        }
+      ]
+    }
+  },
+  "passives": [
+    {
+      "name": "Attack Preparation",
+      "priority": 1,
+      "note": "Flat PvE Damage Boost, Defense and Accuracy. No conditions."
+    },
+    {
+      "name": "Experienced Counterstrike",
+      "priority": 1,
+      "note": "Front damage at all times, plus a 20s party PvE Damage Boost on every block."
+    },
+    {
+      "name": "Murderous Burst",
+      "priority": 2,
+      "note": "Every 5 hits: AoE burst + crit damage."
+    },
+    {
+      "name": "Impact Hit",
+      "priority": 2,
+      "note": "More Impact and Double chance."
+    },
+    {
+      "name": "Destructive Impulse",
+      "priority": 3,
+      "note": "Bonus damage on Staggered targets; after the main passives."
+    },
+    {
+      "name": "Blood Absorption",
+      "priority": 3,
+      "note": "Needs no investment."
+    },
+    {
+      "name": "Protection Armor",
+      "priority": 3,
+      "note": "Trap: reroll gear and cards that roll it."
+    }
+  ],
+  "gear": {
+    "goodLines": [
+      "Critical",
+      "Damage Boost",
+      "Weapon Damage Boost",
+      "Combat Speed",
+      "Might",
+      "Precision",
+      "Accuracy",
+      "Attack",
+      "Double",
+      "Move Speed"
+    ],
+    "badLinesPvE": [
+      "Resist",
+      "Evasion",
+      "Defense",
+      "Tolerance",
+      "Protection Armor"
+    ],
+    "slotRules": [
+      {
+        "match": [
+          "Weapon",
+          "Greatsword",
+          "Main"
+        ],
+        "want": [
+          "Weapon Damage Boost",
+          "Combat Speed",
+          "Damage Boost",
+          "Might"
+        ]
+      },
+      {
+        "match": [
+          "Guard",
+          "Off"
+        ],
+        "want": [
+          "Weapon Damage Boost",
+          "Combat Speed",
+          "Damage Boost",
+          "Might"
+        ]
+      },
+      {
+        "match": [
+          "Glove",
+          "Hand"
+        ],
+        "want": [
+          "Combat Speed"
+        ]
+      },
+      {
+        "match": [
+          "Boot",
+          "Shoe",
+          "Feet"
+        ],
+        "want": [
+          "Move Speed",
+          "Movement Speed"
+        ]
+      },
+      {
+        "match": [
+          "Ring",
+          "Earring",
+          "Necklace",
+          "Bracelet",
+          "Belt"
+        ],
+        "want": [
+          "Combat Speed",
+          "Might",
+          "Precision"
+        ]
+      }
+    ],
+    "ringSkills": [
+      "Overhead Slam",
+      "Rending Blow",
+      "Ruinous Blow"
+    ],
+    "arcanaSkills": [
+      "Attack Preparation",
+      "Experienced Counterstrike",
+      "Murderous Burst",
+      "Impact Hit",
+      "Identify Weakness"
+    ],
+    "minEnchantWeapon": 10,
+    "arcana": {
+      "Parchment": "Vigor — Overhead Slam, Ruinous Blow",
+      "Compass": "Vigor (Freedom for Accuracy) — Rending Blow",
+      "Chalice": "Vigor — whatever is still short of 20",
+      "Set": "4-piece Primal Vigor; 2-piece Magic Armor only if MP runs dry"
+    }
+  },
+  "stats": [
+    {
+      "match": [
+        "Accuracy"
+      ],
+      "min": 1000,
+      "note": "Ludra raid wants at least 1,000 Accuracy."
+    },
+    {
+      "match": [
+        "Critical Hit",
+        "Crit"
+      ],
+      "min": 1000,
+      "note": "Ludra raid wants at least 1,000 Critical Hit."
+    }
+  ],
+  "daevanionNote": "Guide priority: blue nodes for Overhead Slam, Rending Blow and Ruinous Blow first, then the orange nodes, then stats. Azphel is PvP only.",
+  "ludra": {
+    "name": "Abyssal Forge: Ludra",
+    "itemLevel": 2800,
+    "note": "10-player Sanctuary raid, four level-75 bosses. Entry needs level 45 and item level 2,800; groups usually also ask for a combat-power number.",
+    "warning": "The raid was temporarily removed after Early Access and returns on November 4, 2026.",
+    "returnDate": "2026-11-04",
+    "checks": [
+      {
+        "type": "itemLevel",
+        "label": "Item level 2,800"
+      },
+      {
+        "type": "stat",
+        "match": [
+          "Accuracy"
+        ],
+        "min": 1000,
+        "label": "Accuracy 1,000"
+      },
+      {
+        "type": "stat",
+        "match": [
+          "Critical Hit",
+          "Crit"
+        ],
+        "min": 1000,
+        "label": "Critical Hit 1,000"
+      },
+      {
+        "type": "skill",
+        "name": "Overhead Slam",
+        "min": 16,
+        "label": "Overhead Slam 16+ (no cooldown)"
+      },
+      {
+        "type": "skill",
+        "name": "Rending Blow",
+        "min": 16,
+        "label": "Rending Blow 16 (MP on crit)"
+      },
+      {
+        "type": "skill",
+        "name": "Lunge Stance",
+        "min": 20,
+        "label": "Lunge Stance 20"
+      },
+      {
+        "type": "weapon",
+        "min": 10,
+        "label": "Weapon at least +10"
+      }
+    ],
+    "phases": [
+      {
+        "from": 0,
+        "to": 1000,
+        "title": "Finish the level phase",
+        "do": [
+          "Main story to 45; item level 1,000 is needed to finish the story (Abyss visit).",
+          "Side quests, sealed dungeons (map '?'), strongholds and the 5 daily quests.",
+          "Weapon to about +10; amulet +10 and morph it blue."
+        ]
+      },
+      {
+        "from": 1000,
+        "to": 1400,
+        "title": "Permanent upgrades first",
+        "do": [
+          "Belt: stronghold scrolls to +10, then craft it up to legendary — it never gets replaced.",
+          "Revelation Amulet: feathers from the world and the Abyss at the monolith, same idea.",
+          "Regional quests for accessories, runes and titles; clash runes only to +1.",
+          "Daevanion: sealed dungeons and regional quests give the crystals; Krao Cave and Draupnir open at 700.",
+          "Shugo Festival, rifts, daily dungeons."
+        ]
+      },
+      {
+        "from": 1400,
+        "to": 1600,
+        "title": "Farm Vakron Sky Island / Urugugu Canyon",
+        "do": [
+          "Conquest tier with item-level-70 Unique gear — take the chest piece last to skip the grind for the final slot.",
+          "Never skip Nightmare entries and the Ascension Trial each reset (normal difficulty from 1,500).",
+          "If a few points are missing: enhance the bracelets, they stay with you a long time."
+        ]
+      },
+      {
+        "from": 1600,
+        "to": 2100,
+        "title": "Transcendence and the first Arcana set",
+        "do": [
+          "Transcendence Stage 1 (Deus Research Base, Shattered Arkanis): plain Arcana cards are worth 20 item level each, green ones 40.",
+          "Fill the remaining Abyss feathers at the monolith; buy Daevanion crystals from the Nightmare and Shugo shops.",
+          "Level the cards to 10; Overhead Slam and Ruinous Blow on the Parchment first."
+        ]
+      },
+      {
+        "from": 2100,
+        "to": 2500,
+        "title": "Fire Temple / Ferocious Horn Den",
+        "do": [
+          "Conquest tier with item-level-86 gear; the Fire Temple weapons are the interesting part.",
+          "Transcendence Stage 2 for blue Arcana cards, then unique Arcana crafting.",
+          "Re-roll bad random lines (Evasion, resists) into Might, Combat Speed, Precision; fill every manastone slot."
+        ]
+      },
+      {
+        "from": 2500,
+        "to": 2800,
+        "title": "Last stretch",
+        "do": [
+          "Ascension Trial Extreme (2,500) and the Hard modes of Krao Cave and Draupnir (2,600) — the Ariel board fragments drop there.",
+          "Enhance every slot evenly: the cheapest item level is usually the lowest piece, not the weapon.",
+          "Season shop: Talisra Wings (about 250,000 points); titles Guardian of Baran or Artguard; pets to 3 and Genus Insight rolls."
+        ]
+      },
+      {
+        "from": 2800,
+        "to": 99999,
+        "title": "Raid-ready",
+        "do": [
+          "Ludra weapons (item level 102, max +15) drop from Eternal Ludra; the Unique armor and accessories have 4 manastone slots.",
+          "Keep a second stigma preset with Lifestealing Blade 20 for organized parties."
+        ]
+      }
+    ],
+    "sources": [
+      "https://aion2-guides.info/en/gladiator/",
+      "https://mein-mmo.de/en/aion-2-equipment-guide-how-to-quickly-obtain-the-best-gear-in-pve,1586095/",
+      "https://gamingpromax.com/aion-2-endgame-guide/"
+    ]
+  }
+}

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Cleric Check — compare your AION 2 character with the guide</title>
+<title>Class Check — compare your AION 2 character with the guide</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -133,8 +133,8 @@
 <body>
 <main>
   <header>
-    <h1>Cleric Check</h1>
-    <p>Type your character name. Your skills, stigmas, passives, gear lines and stats are read from NCSOFT's character page and set against the Cleric build on <a href="https://aion2-guides.info/en/cleric/" target="_blank" rel="noopener">aion2-guides.info</a>.</p>
+    <h1 id="title">Class Check</h1>
+    <p>Type your character name. Your skills, stigmas, passives, gear lines and stats are read from NCSOFT's character page and set against your class's build on <a href="https://aion2-guides.info/en/" target="_blank" rel="noopener">aion2-guides.info</a> (Cleric and Gladiator so far).</p>
     <form id="form">
       <input id="name" placeholder="Character name" required autocomplete="off">
       <select id="region"></select>
@@ -160,7 +160,7 @@
     <section id="stats"></section>
     <section id="extras"></section>
     <section id="daevanion"></section>
-    <footer>Build data: aion2-guides.info (Cleric, Global Season 1, updated <span id="guideDate"></span>). Character data: NCSOFT's official character lookup, read through the local proxy. Unofficial fan tool, not affiliated with NCSOFT.</footer>
+    <footer>Build data: <a id="guideSrc" href="https://aion2-guides.info/en/">aion2-guides.info</a> (<span id="guideClass"></span>, Global Season 1, updated <span id="guideDate"></span>). Character data: NCSOFT's official character lookup, read through the local proxy. Unofficial fan tool, not affiliated with NCSOFT.</footer>
   </div>
 </main>
 
@@ -187,13 +187,21 @@ const api = async (path, params) => {
 };
 
 let guide, char, equip, items = {}, ctx = {}, mode = "pve";
+const GUIDES = ["cleric", "gladiator"], guides = {};
+async function useGuide(className) {
+  const key = GUIDES.find(k => norm(k) === norm(className)) || "cleric";
+  guide = guides[key] ||= await api(`/guide/${key}.json`, {});
+  if (!guide.modes[mode]) mode = Object.keys(guide.modes)[0];
+  $("#title").textContent = guide.class + " Check";
+  $("#guideClass").textContent = guide.class;
+  $("#guideDate").textContent = guide.sourceUpdated;
+  $("#guideSrc").href = guide.source;
+}
 
 // ---------- setup ----------
 (async () => {
   const regions = await api("/api/regions", {});
   $("#region").innerHTML = Object.entries(regions).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join("");
-  guide = await api("/guide/cleric.json", {});
-  $("#guideDate").textContent = guide.sourceUpdated;
   const p = new URLSearchParams(location.search);
   if (p.get("name")) { $("#name").value = p.get("name"); if (p.get("region")) $("#region").value = p.get("region"); search(); }
 })();
@@ -233,6 +241,7 @@ async function load(row, region) {
   $("#candidates").innerHTML = ""; say("Reading " + esc(row.name) + "…");
   try {
     [char, equip] = await Promise.all([api("/api/character", ctx), api("/api/equipment", ctx)]);
+    await useGuide(char.profile?.className);
   } catch (e) { return say("Could not read the character: " + esc(e.message), true); }
   items = {};
   say("");
@@ -255,7 +264,7 @@ const findSkill = name => skillList().find(s => same(s.name, name));
 function render() {
   const p = char.profile || {};
   const stat = n => findStat(char.stat?.statList || [], n);
-  const notCleric = p.className && !same(p.className, "Cleric");
+  const noGuide = p.className && !same(p.className, guide.class);
   $("#report").style.display = "block";
 
   $("#mode").innerHTML = Object.keys(guide.modes).map(k =>
@@ -266,7 +275,7 @@ function render() {
     ${p.profileImage ? `<img src="${esc(p.profileImage)}" alt="">` : ""}
     <div><h2>${esc(p.characterName)}</h2>
       <div class="sub">Lv ${p.characterLevel} ${esc(p.className)} · ${esc(p.serverName)}${p.regionName ? " · " + esc(p.regionName) : ""}${p.titleName ? " · “" + esc(p.titleName) + "”" : ""}</div>
-      ${notCleric ? `<div class="notice">This is a ${esc(p.className)}, but the guide is for Clerics — the comparison below will mostly show misses.</div>` : ""}
+      ${noGuide ? `<div class="notice">There's no ${esc(p.className)} guide here yet, so this is compared with the ${esc(guide.class)} build — expect mostly misses.</div>` : ""}
     </div>
     <div class="nums">
       <div><b>${(p.combatPower || 0).toLocaleString()}</b><span>combat power</span></div>
@@ -374,7 +383,7 @@ function renderGear() {
       const subs = it.subStats || [];
       let soul = subs.map(lineTag).join("");
       soul += (it.subSkills || []).map(k => {
-        const wanted = isRing || e.slotPos >= 41 ? guide.gear.ringSkills.concat(["Empyrean Lord's Grace", "Earth's Grace"]) : [];
+        const wanted = isRing || e.slotPos >= 41 ? guide.gear.ringSkills.concat(guide.gear.arcanaSkills || []) : [];
         const good = wanted.some(w => same(w, k.name));
         return `<span class="tag ${good ? "skill" : ""}">${esc(k.name)} +${k.level}</span>`;
       }).join("");
@@ -396,12 +405,13 @@ function renderGear() {
       <div>${it ? lines : `<div class="lines">${lines}</div>`}${lowWeapon ? `<div class="lines">${lowWeapon}</div>` : ""}${want}</div></li>`;
   }).join("");
   const w = equip?.petwing?.wing;
-  const wingState = !w ? "" : guide.wings.good.some(g => same(w.name, g)) ? "ok" : guide.wings.avoid.some(a => same(w.name, a)) ? "bad" : "";
+  const wings = guide.wings;
+  const wingState = !w || !wings ? "" : wings.good.some(g => same(w.name, g)) ? "ok" : wings.avoid.some(a => same(w.name, a)) ? "bad" : "";
   $("#gear").innerHTML = `<h3>Gear <small>${list.length} pieces</small></h3>
     <p class="lead">Soul binding lines and engraved manastones per piece. Green lines are the ones the guide asks for; red lines are defensive or resist lines it tells you to skip in PvE. Gold tags are active-skill lines on rings and arcana.</p>
     <ul class="gear">${html}
       ${w ? `<li><div><div class="slot">Wings</div><div class="item grade-${esc(w.grade)}">${esc(w.name)}${w.enchantLevel ? `<span class="ench">+${w.enchantLevel}</span>` : ""}</div></div>
-        <div><div class="lines"><span class="tag ${wingState}">${wingState === "ok" ? "guide pick" : wingState === "bad" ? "guide says: not these" : "any wing but Dark Veil works"}</span></div><div class="slot">${esc(guide.wings.note)}</div></div></li>` : ""}
+        <div><div class="lines"><span class="tag ${wingState}">${wingState === "ok" ? "guide pick" : wingState === "bad" ? "guide says: not these" : wings ? "any wing but Dark Veil works" : "the guide has no wing pick"}</span></div>${wings ? `<div class="slot">${esc(wings.note)}</div>` : ""}</div></li>` : ""}
     </ul>`;
 }
 async function loadItems() {
@@ -430,23 +440,24 @@ function renderStats(stat) {
       `type: ${s.type ?? "(none)"} · name: ${s.name ?? "(none)"} · value: ${s.value}`).join("\n"))}</pre></details>`;
 }
 function renderExtras() {
-  const t = guide.titles;
+  const t = guide.titles || {};
   const owned = char.title?.titleList || [];
   const row = (label, names) => {
+    if (!names?.length) return "";
     const have = names.filter(n => owned.some(o => same(o.name, n)));
     return `<div class="row"><div class="name">${label}</div><div class="lines">${names.map(n => `<span class="tag ${have.includes(n) ? "ok" : ""}">${esc(n)}</span>`).join("")}</div><div class="lvl ${have.length ? "ok" : "warn"}">${have.length}<span> / ${names.length}</span></div></div>`;
   };
   const pet = equip?.petwing?.pet;
   const arcana = Object.entries(guide.gear.arcana).map(([k, v]) => `<span class="tag">${k}: ${esc(v)}</span>`).join("");
   $("#extras").innerHTML = `<h3>Titles, pet, arcana</h3>
-    <p class="lead">Titles the guide names (${char.title?.ownedCount ?? "?"} of ${char.title?.totalCount ?? "?"} owned in total). Equipped now: “${esc(char.profile?.titleName || "none")}”.</p>
+    <p class="lead">${guide.titles ? "Titles the guide names" : "The guide names no titles for this class"} (${char.title?.ownedCount ?? "?"} of ${char.title?.totalCount ?? "?"} owned in total). Equipped now: “${esc(char.profile?.titleName || "none")}”.</p>
     ${row("Attack title", t.attack)}${row("Defense title", t.defense)}${row("Cooldown title", t.other)}
     <div class="row"><div class="name">Pet</div><div class="lines"><span class="tag">${pet ? esc(pet.name) + " · Lv " + pet.level : "none equipped"}</span></div><div class="lvl ${pet && pet.level >= 3 ? "ok" : "warn"}">${pet ? pet.level : 0}<span> / 3</span></div><p class="note">Get every pet to level 3 early for Genus Insight crystals.</p></div>
     <div class="row"><div class="name">Arcana plan<small>what to roll for</small></div><div class="lines">${arcana}</div></div>`;
 }
 function renderBoards() {
   const boards = char.daevanion?.boardList || [];
-  $("#daevanion").innerHTML = `<h3>Daevanion boards</h3><p class="lead">Guide priority: orange Cooldown and Combat Speed nodes first, then Attack and Critical, then the blue +1 skill nodes. Azphel is PvP only.</p>
+  $("#daevanion").innerHTML = `<h3>Daevanion boards</h3><p class="lead">${esc(guide.daevanionNote || "")}</p>
     <div class="boards">${boards.map(b => `<div class="board"><b>${esc(b.name)}</b> <small>${b.open ? (b.openNodeCount + "/" + b.totalNodeCount) : "locked"}</small><div class="fill"><i style="width:${b.openPercent || 0}%"></i></div></div>`).join("")}</div>`;
 }
 </script>

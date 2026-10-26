@@ -57,8 +57,9 @@ proxy, served either by `server.js` (local Express) or by the Netlify Function. 
 per second and caches every answer for 10 minutes.
 
 * `lib/aion.js` – the proxy logic shared by both entry points.
-* `public/guide/cleric.json` – the build targets, transcribed from the guide. Edit this
-  to change targets or add another class.
+* `public/guide/cleric.json`, `public/guide/gladiator.json` – the build targets, transcribed
+  from the guides. The page picks the file from the character's class. To add a class, copy
+  one of them and add its name to `GUIDES` in `index.html`.
 * `public/index.html` – the whole frontend (HTML, CSS, JS in one file).
 * `public/guide/mock-character.json` – sample API answers for `npm run mock`.
 
