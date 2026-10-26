@@ -153,6 +153,24 @@
   .actions li::before { content: "•"; margin-right: 6px; }
   .actions .red::before { color: var(--bad); } .actions .yellow::before { color: var(--warn); } .actions .green::before { color: var(--ok); } .actions .grey { color: var(--muted); }
   ol.todo small { display: block; color: var(--muted); font-size: 15px; margin-top: 2px; }
+  .calc { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .calc label { display: grid; gap: 3px; font-size: 14px; color: var(--muted); }
+  .calc input { padding: 8px 10px; }
+  .calc label.check { grid-template-columns: auto 1fr; align-items: center; gap: 8px; color: var(--text); }
+  .levers { display: flex; flex-wrap: wrap; gap: 14px; margin: 6px 0 10px; font-size: 15px; }
+  .levers label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+  .wf { width: 100%; height: auto; display: block; margin: 8px 0; }
+  .wf text { fill: var(--muted); font-family: var(--body); font-size: 12px; }
+  .wf .val { fill: var(--text); font-weight: 600; }
+  .summary { font-size: 18px; margin: 4px 0 16px; }
+  .summary b { color: var(--gold); font-family: var(--display); font-size: 26px; }
+  .rank { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .rank th { text-align: left; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--line); padding: 6px 8px 6px 0; }
+  .rank td { border-top: 1px dashed var(--line); padding: 7px 8px 7px 0; vertical-align: top; }
+  .rank td small { display: block; color: var(--muted); }
+  .rank .num { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .rank tr.off td { opacity: .5; }
+  .tablewrap { overflow-x: auto; }
   footer { color: var(--muted); font-size: 14px; padding-top: 28px; }
   @media (prefers-reduced-motion: no-preference) { .bar i { transition: background .3s; } }
 </style>
@@ -180,6 +198,7 @@
     <div class="mode" id="mode" role="group" aria-label="Build to compare with"></div>
     <div class="profile" id="profile"></div>
     <section id="todo"></section>
+    <section id="plan"></section>
     <section id="ludra"></section>
     <section id="skills"></section>
     <section id="stigmas"></section>
@@ -195,6 +214,7 @@
 <script type="module">
 import { norm, same, sameTitle, findStat, ilvlBreakdown, boardPoints } from "./js/core.js";
 import { diagnoseItem, cardLight, findings, skillLineSources } from "./js/doctor.js";
+import { LEVERS, upgrades, rank, plan } from "./js/calc.js";
 // ---------- helpers ----------
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -328,7 +348,7 @@ function render() {
   renderLevels($("#stigmas"), "Stigmas", build.stigmas, guide.skillCap, `${guide.stigmaSlots} slots in Season 1.${guide.stigmaNote ? " " + esc(guide.stigmaNote) : ""} Greyed rows are stigmas you have equipped that the preset doesn't use.`, true);
   renderLevels($("#passives"), "Passives", guide.passives.filter(x => x.priority < 3).map(x => ({ ...x, target: 10 })), 10, "Level these before any other passive; there is no hard cap in the guide, 10 is used as the first milestone.");
   statOf = stat;
-  renderTodo(); renderLudra(stat); renderGear(); renderStats(stat); renderExtras(); renderBoards();
+  renderTodo(); renderPlan(); renderLudra(stat); renderGear(); renderStats(stat); renderExtras(); renderBoards();
 }
 
 function renderLevels(el, title, wanted, cap, lead, showExtras) {
@@ -496,12 +516,12 @@ async function loadItems() {
 async function loadItem(e) {
   try { items[e.slotPos] = await api("/api/item", { ...ctx, id: e.id, enchantLevel: e.enchantLevel || 0, slotPos: e.slotPos }); }
   catch (err) { items[e.slotPos] = { failed: true, error: err.message }; } // "not delivered" ≠ "no lines"
-  renderGear(); renderTodo(); renderBreakdown();
+  renderGear(); renderTodo(); renderBreakdown(); updatePlan();
 }
 async function loadBoards() {
   for (const b of char.daevanion?.boardList || []) {
     try { boards[b.id] = await api("/api/daevanion", { ...ctx, boardId: b.id }); } catch { /* reported as missing */ }
-    renderBreakdown();
+    renderBreakdown(); updatePlan();
   }
 }
 
@@ -558,6 +578,94 @@ function renderTodo() {
     <p class="lead">Checked from this character's gear, cards, boards and stigmas, biggest impact first.${waiting ? ` ${waiting} piece${waiting > 1 ? "s are" : " is"} still loading — the list fills in.` : ""}</p>
     <ol class="todo">${f.slice(0, 6).map(li).join("") || "<li><b>Nothing urgent found</b><small>Follow the roadmap below.</small></li>"}</ol>
     ${f.length > 6 ? `<details class="raw"><summary>${f.length - 6} more findings</summary><ol class="todo" start="7">${f.slice(6).map(li).join("")}</ol></details>` : ""}`;
+}
+
+
+// ---------- Upgrade ranking + "path to 2,800" calculator ----------
+const CALC_FIELDS = [
+  ["target", "Target item level", "number", 2800], ["targetDate", "Target date", "date", "2026-11-04"],
+  ["kinah", "Kinah", "number"], ["odyle", "Odyle now", "number"], ["ap", "Abyss Points", "number"],
+  ["trainingExp", "Training Arcana EXP", "number"], ["crystals", "Mysterious Crystals", "number"], ["shards", "Stigma Shards", "number"],
+  ["pityFireTemple", "Fire Temple pity (claims)", "number"], ["pityHornDen", "Horn Den pity (claims)", "number"],
+  ["transcendenceRuns", "Transcendence runs planned", "number", 10],
+  ["membership", "Odyle membership", "checkbox"], ["event", "Event: double Odyle (Oct 28 – Nov 10)", "checkbox", true],
+];
+const LEVER_NAMES = { stones: "Manastones", arcana: "Arcana", gear: "Gear swaps", daevanion: "Daevanion", enhance: "Enhancement" };
+function calcInputs() {
+  const saved = loadEdits("calcInputs");
+  const inp = {};
+  for (const [k, , type, def] of CALC_FIELDS) {
+    const v = saved[k] ?? def;
+    inp[k] = type === "checkbox" ? !!v : v === "" || v == null ? null : type === "number" ? +v : v;
+  }
+  inp.levers = saved.levers || LEVERS;
+  return inp;
+}
+function renderPlan() {
+  if (!char || !model) return;
+  const inp = calcInputs();
+  const field = ([k, label, type]) => type === "checkbox"
+    ? `<label class="check"><input type="checkbox" data-k="${k}" ${inp[k] ? "checked" : ""}>${esc(label)}</label>`
+    : `<label>${esc(label)}<input type="${type}" data-k="${k}" value="${inp[k] ?? ""}" placeholder="${type === "number" ? "not entered" : ""}"></label>`;
+  $("#plan").innerHTML = `<h3>Path to ${(inp.target || 2800).toLocaleString()} <small>calculator and upgrade ranking</small></h3>
+    <p class="lead">Every upgrade this character can still make, priced and ranked by item level per effort. Enter what you have — empty fields count as unlimited. Saved in this browser for this character.</p>
+    <div class="calc">${CALC_FIELDS.map(field).join("")}</div>
+    <div class="levers">${LEVERS.map(l => `<label><input type="checkbox" data-lever="${l}" ${inp.levers.includes(l) ? "checked" : ""}>${LEVER_NAMES[l]}</label>`).join("")}</div>
+    <div id="planOut"></div>`;
+  $("#plan").querySelectorAll("input").forEach(i => i.onchange = () => {
+    const e = loadEdits("calcInputs");
+    if (i.dataset.lever) e.levers = [...$("#plan").querySelectorAll("input[data-lever]")].filter(x => x.checked).map(x => x.dataset.lever);
+    else e[i.dataset.k] = i.type === "checkbox" ? i.checked : i.value;
+    saveEdits(e, "calcInputs"); updatePlan();
+  });
+  updatePlan();
+}
+function updatePlan() {
+  const out = $("#planOut");
+  if (!out || !model) return;
+  const inp = calcInputs();
+  const ilvl = statOf("ItemLevel")?.value ?? 0, target = inp.target || guide.ludra.itemLevel;
+  const list = upgrades(model, { diags: diagnoses(), ilvl, inputs: inp, boards, boardList: char.daevanion?.boardList || [] });
+  const p = plan(model, list, inp, inp.levers);
+  const got = ilvl + p.total.exp, gap = Math.max(0, target - got);
+  const unlimited = ["kinah", "ap", "trainingExp"].filter(k => inp[k] == null).map(k => CALC_FIELDS.find(f => f[0] === k)[1]);
+  const waiting = (equip?.equipment?.equipmentList || []).some(e => !items[e.slotPos]);
+  const taken = new Set(p.taken.map(u => u.id));
+  const fmt = n => n >= 1e6 ? r1(n / 1e6) + "M" : n >= 1e3 ? Math.round(n / 1e3) + "k" : String(n);
+  const cost = u => [u.cost.kinah && fmt(u.cost.kinah) + " Kinah", u.cubes && `${u.cubes} cubes (${u.cubes * model.gear.drops.odylePerCube} Odyle)`, u.cost.ap && fmt(u.cost.ap) + " AP",
+    u.cost.trainingExp && fmt(u.cost.trainingExp) + " EXP", u.cost.runs && u.cost.runs + " runs", u.cost.shop && "shop currencies"].filter(Boolean).join(" + ") || "—";
+  const ranked = rank(list);
+  const row = u => `<tr class="${u.known ? "" : "off"}"><td>${esc(u.label)}<small>${esc(u.detail || "")}</small></td><td>${LEVER_NAMES[u.lever]}</td>
+    <td class="num">+${u.gain.exp}<small>${u.gain.min}–${u.gain.max}</small></td><td>${esc(cost(u))}</td><td>${u.random ? "yes" : "no"}</td><td>${esc(u.time)}</td><td>${taken.has(u.id) ? "✓" : u.known ? "" : "not priced"}</td></tr>`;
+  const head = `<tr><th>Upgrade</th><th>Lever</th><th>Item level</th><th>Cost</th><th>Random</th><th>When</th><th>In plan</th></tr>`;
+  out.innerHTML = `${waterfall(ilvl, target, p.byLever)}
+    <p class="summary">With your resources: <b>${Math.round(got).toLocaleString()}</b> expected (${Math.round(ilvl + p.total.min).toLocaleString()}–${Math.round(ilvl + p.total.max).toLocaleString()}). ${gap ? `Gap to ${target.toLocaleString()}: <b>${Math.round(gap)}</b>` : `Reaches ${target.toLocaleString()} ✓`}</p>
+    <p class="note">Odyle until ${esc(inp.targetDate)}: ${p.odyle.total.toLocaleString()} (${p.odyle.regen} regen${p.odyle.bought ? `, ${p.odyle.bought} bought, ${p.odyle.crafted} crafted` : ""}) = ${p.odyle.cubes} cubes over ${p.odyle.days} days.${unlimited.length ? ` Not entered, counted as unlimited: ${unlimited.join(", ")}.` : ""}${waiting ? " Gear is still loading." : ""} Random upgrades count with their expected value; the band shows worst and best case.</p>
+    <div class="tablewrap"><table class="rank">${head}${ranked.slice(0, 20).map(row).join("")}</table></div>
+    ${ranked.length > 20 ? `<details class="raw"><summary>${ranked.length - 20} more upgrades</summary><div class="tablewrap"><table class="rank">${head}${ranked.slice(20).map(row).join("")}</table></div></details>` : ""}
+    <p class="note">Prices, odds and drop rates are in <a href="/guide/ilvl-model.json" target="_blank">ilvl-model.json</a>, each with its source and how sure it is.</p>`;
+}
+const r1 = x => Math.round(x * 10) / 10;
+// Waterfall: current item level, one floating bar per lever (expected) with a min–max whisker, the result, and the target line.
+function waterfall(start, target, by) {
+  const steps = LEVERS.map(l => ({ l, ...by[l] })).filter(s => s.max > 0);
+  const end = start + steps.reduce((n, s) => n + s.exp, 0);
+  const hi = Math.max(target, start + steps.reduce((n, s) => n + s.max, 0)) + 20, lo = Math.max(0, start - 60);
+  const W = 640, H = 230, top = 16, bottom = 40, n = steps.length + 2, bw = (W - 60) / n;
+  const y = v => top + (H - top - bottom) * (1 - (v - lo) / (hi - lo));
+  let acc = start, bars = "";
+  const bar = (i, a, b, cls, label, val, whisk) => {
+    const x = 50 + i * bw + bw * .15, w = bw * .7;
+    bars += `<rect x="${x}" y="${y(Math.max(a, b))}" width="${w}" height="${Math.max(1, Math.abs(y(a) - y(b)))}" rx="2" fill="${cls}"/>`;
+    if (whisk) bars += `<line x1="${x + w / 2}" x2="${x + w / 2}" y1="${y(whisk[0])}" y2="${y(whisk[1])}" stroke="var(--text)" stroke-width="1.5"/><line x1="${x + w * .3}" x2="${x + w * .7}" y1="${y(whisk[1])}" y2="${y(whisk[1])}" stroke="var(--text)"/><line x1="${x + w * .3}" x2="${x + w * .7}" y1="${y(whisk[0])}" y2="${y(whisk[0])}" stroke="var(--text)"/>`;
+    bars += `<text class="val" x="${x + w / 2}" y="${y(Math.max(a, b)) - 5}" text-anchor="middle">${val}</text><text x="${x + w / 2}" y="${H - bottom + 16}" text-anchor="middle">${label}</text>`;
+  };
+  bar(0, lo, start, "var(--line)", "now", Math.round(start));
+  steps.forEach((s, i) => { bar(i + 1, acc, acc + s.exp, "var(--gold)", LEVER_NAMES[s.l], "+" + Math.round(s.exp), [acc + s.min, acc + s.max]); acc += s.exp; });
+  bar(n - 1, lo, end, end >= target ? "var(--ok)" : "var(--warn)", "expected", Math.round(end));
+  const ty = y(target);
+  return `<svg class="wf" viewBox="0 0 ${W} ${H}" role="img" aria-label="Item level waterfall from ${Math.round(start)} to ${Math.round(end)}, target ${target}">
+    <line x1="40" x2="${W - 6}" y1="${ty}" y2="${ty}" stroke="var(--bad)" stroke-dasharray="5 4"/><text x="${W - 6}" y="${ty - 5}" text-anchor="end">target ${target.toLocaleString()}</text>${bars}</svg>`;
 }
 
 // ---------- stats, titles, boards ----------

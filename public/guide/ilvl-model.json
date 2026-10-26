@@ -51,6 +51,33 @@
       },
       "confidence": "inferred",
       "source": "user notes (Superior odds taken over from Abyssal stones); Fubgun: Intermediate 15% for blue"
+    },
+    "types": {
+      "Lesser": {
+        "odds": {
+          "Common": 0.7,
+          "Rare": 0.3
+        },
+        "kinah": 5000
+      },
+      "Intermediate": {
+        "odds": {
+          "Common": 0.5,
+          "Rare": 0.35,
+          "Legend": 0.15
+        },
+        "kinah": 35000
+      },
+      "Superior": {
+        "odds": {
+          "Rare": 0.5,
+          "Legend": 0.35,
+          "Unique": 0.15
+        },
+        "kinah": 1000000
+      },
+      "confidence": "inferred",
+      "source": "expected values from user notes (Lesser 1.3, Intermediate 1.65, Superior 2.65) solved for odds with Fubgun's 15% blue on Intermediate; prices: Fubgun (Intermediate ~35k, Superior ~1M market); Lesser price unknown (placeholder)"
     }
   },
   "arcana": {
@@ -80,6 +107,72 @@
       "text": "Transmute Unique: 5 Mysterious Crystals + 2M Kina, pick 1 skill, 7-day cooldown",
       "confidence": "inferred",
       "source": "user notes"
+    },
+    "exp": {
+      "Unique": [
+        3000,
+        6000,
+        12000,
+        24000,
+        48000
+      ],
+      "Legend": [
+        1200,
+        2400,
+        4800,
+        9600
+      ],
+      "training": {
+        "Lesser": 200,
+        "Intermediate": 600,
+        "Superior": 1500,
+        "Ultimate": 3000,
+        "Exalted": 5000
+      },
+      "confidence": "inferred",
+      "source": "user notes; JOHNPAL: +4→+5 48k"
+    },
+    "drops": {
+      "stage3": {
+        "bosses": [
+          0.04,
+          0.04,
+          0.12
+        ],
+        "cardTypes": {
+          "Deus Research Base": [
+            "Compass",
+            "Bell"
+          ],
+          "Shattered Arkanis": [
+            "Parchment",
+            "Mirror"
+          ]
+        },
+        "note": "Unique Chalice only from stage 4"
+      },
+      "stage4": {
+        "bosses": [
+          0.06,
+          0.06,
+          0.06
+        ],
+        "fromIlvl": 2500,
+        "cardTypes": {
+          "Deus Research Base": [
+            "Compass",
+            "Bell",
+            "Chalice"
+          ],
+          "Shattered Arkanis": [
+            "Parchment",
+            "Mirror",
+            "Chalice"
+          ]
+        }
+      },
+      "confidence": "inferred",
+      "source": "user notes (stage 3), Fubgun (stage 4: 6% per boss, 3 bosses); card type assumed evenly split"
     }
   },
   "daevanion": {
@@ -126,6 +219,11 @@
       "from": "Krao Cave / Draupnir Hard (2,600), Ascension Trial Extreme (2,500)",
       "confidence": "inferred",
       "source": "user notes, aion2-guides.info"
+    },
+    "baseCap": {
+      "points": 416,
+      "confidence": "inferred",
+      "source": "Fubgun / JOHNPAL: 416 before Ariel (Nezekan, Zikel, Vaizel, Triniel)"
     }
   },
   "notCounted": [
@@ -228,6 +326,87 @@
       "Necklace": "Necklace",
       "Earring": "Earrings",
       "Ring": "Ring"
+    },
+    "drops": {
+      "perItemPerCube": 0.02,
+      "pityClaims": 28,
+      "odylePerCube": 40,
+      "guard": {
+        "vouchers": 3,
+        "kinah": 2000000
+      },
+      "confidence": "inferred",
+      "source": "user notes; JOHNPAL (guard 3 vouchers + 2M, ~84 runs)"
     }
+  },
+  "enhance": {
+    "attempts": {
+      "10": {
+        "chance": 0.65,
+        "kinah": 303000,
+        "stones": 7800
+      },
+      "11": {
+        "chance": 0.5,
+        "kinah": 455000
+      },
+      "12": {
+        "chance": 0.35,
+        "kinah": 724000
+      }
+    },
+    "pityPerFail": 0.05,
+    "losesLevel": false,
+    "note": "from +N to +N+1 on a Unique item-level-86 piece; +13 and up unknown",
+    "confidence": "inferred",
+    "source": "user notes"
+  },
+  "amplification": {
+    "needs": 15,
+    "perLevel": 5,
+    "levels": {
+      "1": {
+        "chance": 0.66,
+        "ampStones": 6,
+        "kinah": 600000
+      },
+      "2": {
+        "chance": null,
+        "ampStones": 9,
+        "kinah": 900000
+      }
+    },
+    "confidence": "inferred",
+    "source": "Fubgun (Amp 1 66%, 6 stones, ~600k; Amp 2 9 stones, ~900k)"
+  },
+  "odyle": {
+    "regenPer3h": 15,
+    "membership": {
+      "cap": 840,
+      "buyPerWeek": 20,
+      "buyKinahEach": 100000,
+      "craftPerWeek": 20
+    },
+    "capWithout": null,
+    "event": {
+      "from": "2026-10-28",
+      "to": "2026-11-10",
+      "factor": 2,
+      "what": "double Odyle mail"
+    },
+    "confidence": "inferred",
+    "source": "user notes; cap without membership unknown, event treated as double regen"
+  },
+  "effort": {
+    "_about": "How costs are weighed against each other for the ranking (1 effort unit each). Adjust to taste.",
+    "kinah": 1000000,
+    "odyle": 400,
+    "ap": 100000,
+    "crystals": 5,
+    "trainingExp": 10000,
+    "runs": 5,
+    "shop": 1,
+    "confidence": "unknown",
+    "source": "tool default"
   }
 }

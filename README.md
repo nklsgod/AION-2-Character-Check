@@ -19,6 +19,15 @@ Try the UI without the live API (fake character):
 npm run mock       # Windows PowerShell: $env:MOCK=1; node server.js
 ```
 
+## Tests
+
+```bash
+npm test
+```
+
+`test/fixtures/nkls.json` is a real character read from the API (item level 2,540). The model has to
+rebuild that number from its parts (gear, enhancement, manastones, Arcana, Daevanion) within ±10.
+
 ## Deploy on Netlify (serverless, free)
 
 The page is static and the proxy is one Netlify Function (`netlify/functions/api.mjs`),
@@ -60,7 +69,12 @@ per second and caches every answer for 10 minutes.
 * `public/guide/cleric.json`, `public/guide/gladiator.json` – the build targets, transcribed
   from the guides. The page picks the file from the character's class. To add a class, copy
   one of them and add its name to `GUIDES` in `index.html`.
-* `public/index.html` – the whole frontend (HTML, CSS, JS in one file).
+* `public/index.html` – the page (HTML, CSS and the UI code).
+* `public/js/core.js`, `doctor.js`, `calc.js` – item-level model, Gear Doctor rules and the
+  upgrade calculator as plain ES modules (no DOM), shared by the page and the tests.
+* `public/guide/ilvl-model.json` – every number the model uses (stone and card values, Daevanion
+  node costs, prices, drop rates, Odyle), each with its source and `confidence`
+  (confirmed / inferred / unknown). Edit this when a value turns out wrong.
 * `public/guide/mock-character.json` – sample API answers for `npm run mock`.
 
 ## Caveats
