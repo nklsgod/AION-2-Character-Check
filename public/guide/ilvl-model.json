@@ -1,30 +1,233 @@
 {
   "_about": "How profile item level is built from its parts. Every value has a source and a confidence: confirmed = checked against the game's own item level (nkls, 2,540, Oct 26 2026: model 2,534, 6 unexplained), inferred = from guides or a reasonable guess, unknown = placeholder. NCSOFT's API grades are Common / Rare / Legend / Unique (Legend is what guides call Epic / blue).",
   "item": {
-    "base": { "field": "item.level", "confidence": "confirmed", "source": "API /api/character/equipment/item `level` (86, 70, 65 …) — sums to the game value" },
-    "enchant": { "perLevel": 1, "confidence": "confirmed", "source": "reconciliation; Fubgun / JOHNPAL: +1 per enhancement level" },
-    "amplification": { "perLevel": 5, "confidence": "inferred", "source": "JOHNPAL TV, Fubgun (“every +1 Amp = +5 ilvl”); not yet seen in API data (exceedLevel 0)" }
+    "base": {
+      "field": "item.level",
+      "confidence": "confirmed",
+      "source": "API /api/character/equipment/item `level` (86, 70, 65 …) — sums to the game value"
+    },
+    "enchant": {
+      "perLevel": 1,
+      "confidence": "confirmed",
+      "source": "reconciliation; Fubgun / JOHNPAL: +1 per enhancement level"
+    },
+    "amplification": {
+      "perLevel": 5,
+      "confidence": "inferred",
+      "source": "JOHNPAL TV, Fubgun (“every +1 Amp = +5 ilvl”); not yet seen in API data (exceedLevel 0)"
+    }
   },
   "stone": {
-    "byGrade": { "Common": 1, "Rare": 2, "Legend": 3, "Unique": 4 },
+    "byGrade": {
+      "Common": 1,
+      "Rare": 2,
+      "Legend": 3,
+      "Unique": 4
+    },
     "confidence": "confirmed",
     "source": "API magicStoneStat[].grade + reconciliation; matches Fubgun (white 1, green 2, blue 3) and JOHNPAL (gold 4)",
-    "socketsByItemGrade": { "Common": 1, "Rare": 2, "Legend": 3, "Unique": 4 },
+    "socketsByItemGrade": {
+      "Common": 1,
+      "Rare": 2,
+      "Legend": 3,
+      "Unique": 4
+    },
     "socketsConfidence": "inferred",
-    "socketsSource": "user notes; the API sends magicStoneSlotCount per item, which is used whenever present"
+    "socketsSource": "user notes; the API sends magicStoneSlotCount per item, which is used whenever present",
+    "rolls": {
+      "expectedPerRoll": {
+        "Lesser": 1.3,
+        "Intermediate": 1.65,
+        "Superior": 2.65
+      },
+      "superiorOdds": {
+        "Rare": 0.5,
+        "Legend": 0.35,
+        "Unique": 0.15
+      },
+      "rerollToLegend": {
+        "expectedIlvl": 3.3,
+        "rollsPerLine": 2
+      },
+      "confidence": "inferred",
+      "source": "user notes (Superior odds taken over from Abyssal stones); Fubgun: Intermediate 15% for blue"
+    }
   },
   "arcana": {
-    "byGrade": { "Common": 20, "Rare": 40, "Legend": 60, "Unique": 80 },
+    "byGrade": {
+      "Common": 20,
+      "Rare": 40,
+      "Legend": 60,
+      "Unique": 80
+    },
     "confidence": "confirmed",
     "source": "API item.level of Arcana cards is 60 (Legend) / 80 (Unique); 20/40 from JOHNPAL TV (inferred)",
-    "maxLevel": { "Common": 2, "Rare": 3, "Legend": 4, "Unique": 5 },
-    "maxLevelSource": "API maxEnchantLevel (Legend 4, Unique 5 confirmed; Common/Rare from user notes)"
+    "maxLevel": {
+      "Common": 2,
+      "Rare": 3,
+      "Legend": 4,
+      "Unique": 5
+    },
+    "maxLevelSource": "API maxEnchantLevel (Legend 4, Unique 5 confirmed; Common/Rare from user notes)",
+    "sources": {
+      "Compass": "Transcendence: Deus Research Base",
+      "Bell": "Transcendence: Deus Research Base",
+      "Parchment": "Transcendence: Shattered Arkanis",
+      "Mirror": "Transcendence: Shattered Arkanis",
+      "Chalice": "Transcendence: either dungeon (Unique Chalice from Stage 4 only)"
+    },
+    "transmute": {
+      "text": "Transmute Unique: 5 Mysterious Crystals + 2M Kina, pick 1 skill, 7-day cooldown",
+      "confidence": "inferred",
+      "source": "user notes"
+    }
   },
   "daevanion": {
-    "nodeCost": { "Common": 1, "Rare": 2, "Legend": 3, "Unique": 4 },
+    "nodeCost": {
+      "Common": 1,
+      "Rare": 2,
+      "Legend": 3,
+      "Unique": 4
+    },
     "perPoint": 1,
     "confidence": "confirmed",
-    "source": "API /api/character/daevanion/detail node grades (github.com/nuriland/aion2-api); aion2-guides.info: grey 1, green 2, blue 3, orange 4; sums to the game value"
+    "source": "API /api/character/daevanion/detail node grades (github.com/nuriland/aion2-api); aion2-guides.info: grey 1, green 2, blue 3, orange 4; sums to the game value",
+    "azphelShop": {
+      "crystals": [
+        20,
+        30,
+        30,
+        30
+      ],
+      "apEach": [
+        10000,
+        20000,
+        40000,
+        80000
+      ],
+      "confidence": "inferred",
+      "source": "user notes (Azphel crystal shop tiers)"
+    },
+    "nightmareShop": {
+      "crystals": 50,
+      "cost": "300 fragments each",
+      "confidence": "inferred",
+      "source": "user notes"
+    },
+    "shugoShop": {
+      "crystalsPerMonth": 15,
+      "cost": "50 Centuryroot each",
+      "confidence": "inferred",
+      "source": "user notes"
+    },
+    "ariel": {
+      "fragmentsPerCrystal": 100,
+      "maxPerDungeon": 30,
+      "from": "Krao Cave / Draupnir Hard (2,600), Ascension Trial Extreme (2,500)",
+      "confidence": "inferred",
+      "source": "user notes, aion2-guides.info"
+    }
   },
-  "notCounted": ["titles", "wings", "pets", "stigmas", "potential", "theostones"]
+  "notCounted": [
+    "titles",
+    "wings",
+    "pets",
+    "stigmas",
+    "potential",
+    "theostones"
+  ],
+  "gear": {
+    "_about": "Rules for keep / replace. Slots are matched against slotPosName from the API.",
+    "tiers": [
+      54,
+      62,
+      70,
+      86,
+      102
+    ],
+    "keeperBase": 86,
+    "keep": [
+      {
+        "match": [
+          "Belt",
+          "Amulet"
+        ],
+        "why": "never replaced — upgraded in place (stronghold scrolls, crafting)"
+      },
+      {
+        "match": [
+          "Rune"
+        ],
+        "why": "Clash runes: only worth +1 for item level"
+      },
+      {
+        "match": [
+          "Bracelet"
+        ],
+        "why": "bracelet upgrades come with Ludra"
+      }
+    ],
+    "crafted": [
+      {
+        "match": "Splendent Star Dragon Lord Ring",
+        "keepUntil": "Splendent White/Dark Dragon Lord Ring (86, crafted)",
+        "why": "crafted ring with 5 lines"
+      }
+    ],
+    "sources": [
+      {
+        "name": "Fire Temple",
+        "slots": [
+          "MainHand",
+          "Main Weapon",
+          "Necklace",
+          "Earring",
+          "Ring"
+        ],
+        "drops": "Enraged Kromede",
+        "pityClaims": 28
+      },
+      {
+        "name": "Ferocious Horn Den",
+        "slots": [
+          "SubHand",
+          "Off-hand",
+          "Helmet",
+          "Helm",
+          "Shoulder",
+          "Torso",
+          "Pants",
+          "Gloves",
+          "Boots",
+          "Cape"
+        ],
+        "drops": "Nuakum",
+        "pityClaims": 28,
+        "note": {
+          "SubHand": "Nuakum Guard: 3 vouchers + 2M Kina",
+          "Off-hand": "Nuakum Guard: 3 vouchers + 2M Kina"
+        }
+      }
+    ],
+    "sourcesConfidence": "inferred",
+    "sourcesSource": "user notes; JOHNPAL TV / Fubgun (Horn Den armor & guard, Fire Temple weapon & jewellery)",
+    "maxUsefulEnchant": 11,
+    "pieceNames": {
+      "MainHand": "weapon",
+      "Main Weapon": "weapon",
+      "SubHand": "Guard",
+      "Off-hand": "Guard",
+      "Helmet": "Helm",
+      "Helm": "Helm",
+      "Shoulder": "Pauldrons",
+      "Torso": "Breastplate",
+      "Pants": "Greaves",
+      "Gloves": "Gloves",
+      "Boots": "Boots",
+      "Cape": "Cloak",
+      "Necklace": "Necklace",
+      "Earring": "Earrings",
+      "Ring": "Ring"
+    }
+  }
 }

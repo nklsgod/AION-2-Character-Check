@@ -140,7 +140,19 @@
   ol.todo li { counter-increment: todo; display: grid; grid-template-columns: 40px 1fr; gap: 0 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
   ol.todo li::before { content: counter(todo); grid-row: span 2; font-family: var(--display); font-size: 34px; font-weight: 600; line-height: 1; color: var(--gold); }
   ol.todo b { font-weight: 600; }
-  ol.todo small { color: var(--muted); font-size: 15px; }
+  ol.todo .tag { margin-left: 6px; }
+  .tag.g-Common { border-color: #8a8f9c; color: #b9bdc7; } .tag.g-Rare { border-color: #6fb387; color: #8fd0a6; }
+  .tag.g-Legend { border-color: #5aa6e8; color: #8cc4f5; } .tag.g-Unique { border-color: var(--gold); color: var(--gold); }
+  .chip { display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: .04em; padding: 1px 8px; border-radius: 4px; margin-top: 4px; }
+  .chip.keeper { background: rgba(111,179,135,.18); color: var(--ok); } .chip.replace { background: rgba(209,101,90,.18); color: var(--bad); }
+  .light { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+  .light.red { background: var(--bad); } .light.yellow { background: var(--warn); } .light.green { background: var(--ok); } .light.grey { background: var(--line); }
+  .gear .sum { color: var(--muted); font-size: 14px; }
+  .actions { list-style: none; margin: 6px 0 0; padding: 0; font-size: 15px; display: grid; gap: 3px; }
+  .actions li { display: block; padding: 0; border: 0; }
+  .actions li::before { content: "•"; margin-right: 6px; }
+  .actions .red::before { color: var(--bad); } .actions .yellow::before { color: var(--warn); } .actions .green::before { color: var(--ok); } .actions .grey { color: var(--muted); }
+  ol.todo small { display: block; color: var(--muted); font-size: 15px; margin-top: 2px; }
   footer { color: var(--muted); font-size: 14px; padding-top: 28px; }
   @media (prefers-reduced-motion: no-preference) { .bar i { transition: background .3s; } }
 </style>
@@ -181,7 +193,8 @@
 </main>
 
 <script type="module">
-import { norm, same, sameTitle, findStat, ilvlBreakdown } from "./js/core.js";
+import { norm, same, sameTitle, findStat, ilvlBreakdown, boardPoints } from "./js/core.js";
+import { diagnoseItem, cardLight, findings, skillLineSources } from "./js/doctor.js";
 // ---------- helpers ----------
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -346,7 +359,7 @@ function renderLevels(el, title, wanted, cap, lead, showExtras) {
   if (showExtras) {
     const stig = skillList().filter(isStigma);
     const n = Object.keys(loadEdits()).length;
-    raw = `<p class="note">Levels shown are from the preset NCSOFT's site exposes; other presets may differ. If a level is out of date, type the real one into its box — it's saved in this browser.${n ? ` ${n} edited · <button type="button" class="link" id="resetEdits">reset to NCSOFT's levels</button>` : ""}</p>
+    raw = `<p class="note"><b>Levels from the one preset NCSOFT's site exposes</b> — your other presets may differ. If a level is out of date, type the real one into its box — it's saved in this browser.${n ? ` ${n} edited · <button type="button" class="link" id="resetEdits">reset to NCSOFT's levels</button>` : ""}</p>
       <details class="raw"><summary>Raw stigma rows from the API (${stig.length})</summary><pre>${esc(stig.map(s =>
         `${s.name} · id ${s.id} · category ${s.category} · level ${s.skillLevel} · equip ${s.equip} · acquired ${s.acquired}`).join("\n"))}</pre></details>`;
   }
@@ -445,23 +458,28 @@ function renderGear() {
         let tags = "";
         for (let i = 0; i < slots; i++) {
           const m = stones.find(x => x.slotPos === i);
-          tags += m ? lineTag(m) : `<span class="tag empty">empty</span>`;
+          tags += m ? `<span class="tag g-${esc(m.grade)}" title="${esc(m.grade)}: +${model.stone.byGrade[m.grade] ?? "?"} item level">${esc(m.name)} ${esc(m.value || "")} · ${model.stone.byGrade[m.grade] ?? "?"}</span>` : `<span class="tag empty">empty</span>`;
         }
-        lines += `<div class="group"><small>Manastones (${stones.length}/${slots} filled)</small><div class="lines">${tags}</div></div>`;
+        const sum = stones.reduce((n, m) => n + (model.stone.byGrade[m.grade] ?? 0), 0);
+        lines += `<div class="group"><small>Manastones (${stones.length}/${slots} filled) · +${sum} item level of ${slots * 4}</small><div class="lines">${tags}</div></div>`;
       }
     }
     const want = rule ? `<div class="slot">guide wants: ${rule.want.join(", ")}${isRing ? " + active-skill lines" : ""}</div>` : "";
     const ench = e.enchantLevel ? `<span class="ench">+${e.enchantLevel}${e.exceedLevel ? " ★" + e.exceedLevel : ""}</span>` : "";
     const lowWeapon = isWeapon && e.enchantLevel < guide.gear.minEnchantWeapon ? `<span class="tag bad">below +${guide.gear.minEnchantWeapon}</span>` : "";
-    return `<li><div><div class="slot">${esc(e.slotPosName)}</div><div class="item grade-${esc(e.grade)}">${esc(e.name)}${ench}</div></div>
-      <div>${it && !it.failed ? lines : `<div class="lines">${lines}</div>`}${lowWeapon ? `<div class="lines">${lowWeapon}</div>` : ""}${want}</div></li>`;
+    const d = model && diagnoseItem(model, e, it);
+    const head = d ? `<div class="sum">base ${d.parts.base} · +${d.parts.enchant} enh${d.parts.amp ? ` · +${d.parts.amp} amp` : ""} · +${d.parts.stones} stones = <b>${d.parts.total}</b></div>
+        <span class="chip ${d.status}" title="${esc(d.why)}">${d.status === "keeper" ? "KEEPER" : "REPLACE"}</span> <small class="sum">${esc(d.why)}</small>` : "";
+    const acts = d?.actions.length ? `<ul class="actions">${d.actions.map(a => `<li class="${a.level}">${esc(a.text)}</li>`).join("")}</ul>` : "";
+    return `<li><div><div class="slot"><span class="light ${cardLight(d)}"></span>${esc(e.slotPosName)}</div><div class="item grade-${esc(e.grade)}">${esc(e.name)}${ench}</div>${head}</div>
+      <div>${it && !it.failed ? lines : `<div class="lines">${lines}</div>`}${lowWeapon ? `<div class="lines">${lowWeapon}</div>` : ""}${want}${acts}</div></li>`;
   }).join("");
   const w = equip?.petwing?.wing;
   const wings = guide.wings;
   const wingState = !w || !wings ? "" : wings.good.some(g => same(w.name, g)) ? "ok" : wings.avoid.some(a => same(w.name, a)) ? "bad"
     : (wings.situational || []).some(a => same(w.name, a)) ? "situational" : "";
   $("#gear").innerHTML = `<h3>Gear <small>${list.length} pieces</small></h3>
-    <p class="lead">Soul binding lines and engraved manastones per piece. Green lines are the ones the guide asks for; red lines are defensive or resist lines it tells you to skip in PvE. Gold tags are active-skill lines on rings and arcana.</p>
+    <p class="lead">Each piece: its item level parts, KEEPER (stays until Ludra) or REPLACE, and what to do with it. Manastones are colored by grade (grey 1, green 2, blue 3, gold 4 item level). Soul binding lines and engraved manastones per piece. Green lines are the ones the guide asks for; red lines are defensive or resist lines it tells you to skip in PvE. Gold tags are active-skill lines on rings and arcana.</p>
     <ul class="gear">${html}
       ${w ? `<li><div><div class="slot">Wings</div><div class="item grade-${esc(w.grade)}">${esc(w.name)}${w.enchantLevel ? `<span class="ench">+${w.enchantLevel}</span>` : ""}</div></div>
         <div><div class="lines"><span class="tag ${wingState}">${wingState === "ok" ? "guide pick" : wingState === "bad" ? "guide says: not these" : wingState === "situational" ? "non-boss content only" : wings ? "not a guide pick" : "the guide has no wing pick"}</span></div>${wings ? `<div class="slot">${esc(wings.note)}</div>` : ""}</div></li>` : ""}
@@ -505,76 +523,41 @@ function renderBreakdown() {
   el.innerHTML = `<small>Where ${r.api?.toLocaleString() ?? "your item level"} comes from — model ${r.total.toLocaleString()}</small><div class="lines">${parts}${rest}</div>`;
 }
 
-// ---------- top 5 toward 2,800 ----------
-// Each rule looks at this character and returns { score, title, why } or nothing; the five highest scores are shown.
-const STONE_ILVL = { Common: 1, Rare: 2, Legend: 3, Epic: 3, Unique: 4 };
-function todoList() {
-  const ilvl = statOf("ItemLevel")?.value ?? 0;
-  const list = equip?.equipment?.equipmentList || [];
-  const loaded = list.length > 0 && list.every(e => items[e.slotPos]);
-  const tier = e => items[e.slotPos]?.level ?? 0;
-  const main = list.filter(e => e.slotPos < 41 && !/belt|amulet|bracelet|rune/i.test(e.slotPosName));
-  const named = arr => arr.map(e => e.slotPosName).join(", ");
-  const isWeapon = e => slotRule(e.slotPosName, e.name)?.match.includes("Weapon");
-  const isGuard = e => /sub|off|guard/i.test(e.slotPosName);
-  const out = [];
-  const add = (score, title, why) => out.push({ score, title, why });
-
-  if (ilvl >= 2800) add(100, "You're at Ludra Normal — next stop 3,000 for Hard", "Same plan with more Kina: Amp +2/+3 on more pieces. Superior manastones go into item-level-102 gear only.");
-  if (loaded) {
-    if (ilvl < 2100) {
-      const low = main.filter(e => tier(e) < 70);
-      const have = main.length - low.length, missing = Math.max(0, 14 - main.length);
-      if (have < 12) add(95, `Get ${12 - have} more main slots to item level 70 (${have}/12)`,
-        `${low.length ? "Under 70 now: " + named(low) + ". " : ""}${missing ? missing + " main slot" + (missing > 1 ? "s are" : " is") + " empty. " : ""}Vakron always drops usable gear; Gartua on Immortal Island twice a day.`);
-    } else {
-      const low = main.filter(e => tier(e) < 86);
-      if (low.length) {
-        const g = low.find(isGuard), w = low.find(isWeapon);
-        add(92, `Replace ${low.length} piece${low.length > 1 ? "s" : ""} under item level 86`, `${named(low)}. Horn Den first, then Fire Temple.${g ? " Guard: save 3 Horn Den pity vouchers for it." : ""}${w ? " Weapon: craft it if you craft one thing." : ""}`);
-      }
-    }
-    const cards = list.filter(e => e.slotPos >= 41);
-    const notGold = cards.filter(e => tier(e) < 80);
-    if (cards.length < 5) add(90, `Fill all 5 Arcana slots (${cards.length}/5)`, "Even a grey card is +20 item level. Transcendence 1 at 1,600, 2 at 1,900.");
-    else if (notGold.length && ilvl >= 2500) add(88, `Farm Transcendence 4 for gold cards (${5 - notGold.length}/5 gold)`, `Not gold yet: ${notGold.map(e => items[e.slotPos]?.categoryName || e.slotPosName).join(", ")}. Each gold card is 80 item level; 6% per boss.`);
-    else if (notGold.length && ilvl >= 2200 && notGold.some(e => tier(e) < 60)) add(60, "1–2 Transcendence 3 runs for blue cards", "Only to fill weak slots or cross 2,500 — save the energy for Transcendence 4.");
-    if (ilvl >= 2300) {
-      for (const [e, score] of [[list.find(isWeapon), 87], [list.find(isGuard), 86]]) {
-        if (!e || tier(e) < 86 || (e.enchantLevel >= 15 && e.exceedLevel >= 2)) continue;
-        add(score, `${e.slotPosName} to +15 Amp 2 (now +${e.enchantLevel}${e.exceedLevel ? " Amp " + e.exceedLevel : ""})`,
-          "Each Amp level is +5 item level and +1% Damage Boost. One piece at +15 Amp 2 beats several pieces at +15.");
-      }
-    }
-    const empty = list.reduce((n, e) => n + Math.max(0, (items[e.slotPos]?.magicStoneSlotCount || 0) - (items[e.slotPos]?.magicStoneStat || []).length), 0);
-    if (empty) add(80, `Fill ${empty} empty manastone slot${empty > 1 ? "s" : ""}`, "Every stone is +1 to +4 item level, cheaper than anything else on this list.");
-    const weak = main.filter(e => tier(e) >= 86 && (items[e.slotPos]?.magicStoneStat || []).reduce((n, m) => n + (STONE_ILVL[m.grade] || 1), 0) < 7);
-    if (ilvl >= 2100 && weak.length) add(55, `Better manastones on ${weak.length} item-level-86 piece${weak.length > 1 ? "s" : ""}`, `${named(weak)}. Intermediate stones (about 35k Kina): 1 blue, 1–2 green, 1–2 white is +7–8 per piece. Don't chase more — no pity.`);
-  }
-  const build = buildFor(mode);
-  const stig = build.stigmas.map(w => ({ w, l: levelOf(w.name).lvl })).filter(x => x.l < x.w.target);
-  if (stig.length) add(70, `Stigma Shards: ${stig[0].w.name} ${stig[0].l} → ${stig[0].w.target}`, `Stigmas are the biggest source of real damage.${stig.length > 1 ? ` Also short: ${stig.slice(1).map(x => `${x.w.name} ${x.l}/${x.w.target}`).join(", ")}.` : ""} Nightmare and Shugo shops; Abyss Points from supply requests, sieges and corridors.`);
-  const core = build.skills.slice(0, 3).map(w => ({ w, s: findSkill(w.name) })).filter(x => (x.s?.skillLevel || 0) < x.w.target);
-  if (core.length) add(50, `Skill lines: ${core.map(x => `${x.w.name} ${x.s?.skillLevel || 0}/${x.w.target}`).join(", ")}`, "From Arcana cards and ring lines. 16 opens the bottom specialization row, 20 the third slot. Roll the ring last.");
-  for (const r of guide.stats) {
-    const v = r.match.map(statOf).find(Boolean)?.value;
-    const aim = r.target || r.min;
-    if (v != null && v < aim) add(v < r.min ? 45 : 25, `${r.match[0]} ${v} → ${aim.toLocaleString()}`, "Ludra bosses parry and resist crits; the training dummy doesn't. Manastones and soul-binding lines.");
-  }
-  if (ilvl >= 2600 && !(char.daevanion?.boardList || []).some(b => same(b.name, "Ariel") && b.open)) add(40, "Ariel board: Krao Cave and Draupnir Hard", "Up to +60 item level. Lowest priority for damage (Fubgun) — run it when you need the raw item level.");
-  const pet = equip?.petwing?.pet;
-  if (!pet || pet.level < 3) add(30, "Pet to level 3", "Genus Insight crystals; pet stats count for every character on the server.");
-  return out.sort((a, b) => b.score - a.score).slice(0, 5);
-}
+// ---------- Gear Doctor: findings sorted by impact ----------
+const diagnoses = () => (equip?.equipment?.equipmentList || []).map(e => diagnoseItem(model, e, items[e.slotPos])).filter(Boolean);
 function renderTodo() {
-  if (!char) return;
+  if (!char || !model) return;
   const ilvl = statOf("ItemLevel")?.value ?? 0;
   const list = equip?.equipment?.equipmentList || [];
-  const waiting = list.some(e => !items[e.slotPos]);
-  const todo = todoList();
-  $("#todo").innerHTML = `<h3>Top 5 right now <small>toward ${ilvl >= 2800 ? "3,000" : "2,800"} item level</small></h3>
-    <p class="lead">Picked from this character's gear, cards and stigmas.${waiting ? " Gear is still loading — the list fills in as pieces arrive." : ""}</p>
-    <ol class="todo">${todo.map(t => `<li><b>${esc(t.title)}</b><small>${esc(t.why)}</small></li>`).join("") || "<li><b>Nothing urgent found</b><small>Follow the roadmap below.</small></li>"}</ol>`;
+  const waiting = list.filter(e => !items[e.slotPos]).length;
+  const build = buildFor(mode);
+  const diags = diagnoses();
+  const main = build.skills[0];
+  const az = (char.daevanion?.boardList || []).find(b => same(b.name, "Azphel"));
+  const f = findings(model, {
+    diags, ilvl, target: guide.ludra.itemLevel,
+    stigmas: build.stigmas.filter(w => w.target >= 20).slice(0, 2).map(w => ({ name: w.name, lvl: levelOf(w.name).lvl, target: w.target })),
+    mainSkill: main && { name: main.name, lvl: findSkill(main.name)?.skillLevel || 0, target: main.target, sources: skillLineSources(list, items, main.name) },
+    stats: guide.stats.map(r => ({ name: r.match[0], value: r.match.map(statOf).find(Boolean)?.value ?? null, min: r.min })),
+    azphel: az && boards[az.id] && { points: boardPoints(model, boards[az.id]), shopMax: model.daevanion.azphelShop.crystals.reduce((a, b) => a + b, 0) },
+  });
+  // A few rules that aren't about single items
+  const isW = e => slotRule(e.slotPosName, e.name)?.match.includes("Weapon"), isG = e => /sub|off|guard/i.test(e.slotPosName);
+  if (ilvl >= 2300) for (const e of [list.find(isW), list.find(isG)]) {
+    const it = e && items[e.slotPos];
+    if (!it || it.failed || it.level < model.gear.keeperBase || (e.enchantLevel >= 15 && e.exceedLevel >= 2)) continue;
+    const gain = Math.max(0, 15 - e.enchantLevel) + Math.max(0, 2 - e.exceedLevel) * model.item.amplification.perLevel;
+    f.push({ impact: 9, title: `${e.slotPosName} to +15 Amp 2 (now +${e.enchantLevel}${e.exceedLevel ? " Amp " + e.exceedLevel : ""})`, why: "Each Amp level on weapon and guard is +5 item level and +1% Damage Boost; one piece at +15 Amp 2 beats several at +15.", action: "Enhance to +15, then Amp 1 (66%, 6 Amp Stones, ~600k) and Amp 2 (9 stones, ~900k).", gain: `+${gain} item level` });
+  }
+  if (ilvl >= 2600 && !(char.daevanion?.boardList || []).some(b => same(b.name, "Ariel"))) f.push({ impact: 4, title: "Ariel board locked", why: "Up to +60 item level; low damage value (Fubgun).", action: `${model.daevanion.ariel.from}: ${model.daevanion.ariel.fragmentsPerCrystal} fragments = 1 crystal, max ${model.daevanion.ariel.maxPerDungeon} per dungeon.`, gain: "up to +60 item level" });
+  const pet = equip?.petwing?.pet;
+  if (!pet || pet.level < 3) f.push({ impact: 1, title: "Pet to level 3", why: "Genus Insight crystals; pet stats apply to every character on the server.", action: "Level your pets.", gain: "stats" });
+  f.sort((a, b) => b.impact - a.impact);
+  const li = x => `<li><div><b>${esc(x.title)}</b> <span class="tag ok">${esc(x.gain)}</span><small>${esc(x.why)} <b>Do:</b> ${esc(x.action)}</small></div></li>`;
+  $("#todo").innerHTML = `<h3>Gear Doctor <small>${ilvl.toLocaleString()} → ${guide.ludra.itemLevel.toLocaleString()} item level</small></h3>
+    <p class="lead">Checked from this character's gear, cards, boards and stigmas, biggest impact first.${waiting ? ` ${waiting} piece${waiting > 1 ? "s are" : " is"} still loading — the list fills in.` : ""}</p>
+    <ol class="todo">${f.slice(0, 6).map(li).join("") || "<li><b>Nothing urgent found</b><small>Follow the roadmap below.</small></li>"}</ol>
+    ${f.length > 6 ? `<details class="raw"><summary>${f.length - 6} more findings</summary><ol class="todo" start="7">${f.slice(6).map(li).join("")}</ol></details>` : ""}`;
 }
 
 // ---------- stats, titles, boards ----------
