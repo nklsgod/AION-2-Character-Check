@@ -501,7 +501,8 @@
           "value": "+12",
           "grade": "Unique"
         }
-      ]
+      ],
+      "level": 70
     },
     "2": {
       "name": "Spiritforged Guard",
@@ -515,7 +516,8 @@
           "value": "+90"
         }
       ],
-      "subSkills": []
+      "subSkills": [],
+      "level": 70
     },
     "3": {
       "name": "Pilgrim Helm",
@@ -540,7 +542,8 @@
           "value": "+7",
           "grade": "Rare"
         }
-      ]
+      ],
+      "level": 70
     },
     "5": {
       "name": "Pilgrim Gloves",
@@ -552,7 +555,8 @@
       ],
       "subSkills": [],
       "magicStoneSlotCount": 2,
-      "magicStoneStat": []
+      "magicStoneStat": [],
+      "level": 65
     },
     "6": {
       "name": "Pilgrim Boots",
@@ -562,7 +566,8 @@
           "value": "+55"
         }
       ],
-      "subSkills": []
+      "subSkills": [],
+      "level": 70
     },
     "11": {
       "name": "Crafted Ring of Light",
@@ -585,7 +590,8 @@
           "name": "Salvation",
           "level": 1
         }
-      ]
+      ],
+      "level": 70
     },
     "41": {
       "name": "Chalice of Vigor",
@@ -595,7 +601,8 @@
           "name": "Condemnation",
           "level": 2
         }
-      ]
+      ],
+      "level": 60
     }
   },
   "others": {
@@ -892,7 +899,8 @@
               "value": "+14",
               "grade": "Rare"
             }
-          ]
+          ],
+          "level": 86
         },
         "11": {
           "name": "Crafted Ring of Fury",
@@ -911,7 +919,8 @@
               "name": "Mocking Blade",
               "level": 1
             }
-          ]
+          ],
+          "level": 70
         }
       }
     }

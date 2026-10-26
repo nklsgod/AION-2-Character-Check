@@ -11,12 +11,12 @@
         {
           "name": "Condemnation",
           "target": 20,
-          "note": "About half of your damage. Picks: +12% single target, crit reset (12), Multi-Hit (16)."
+          "note": "About half of your damage. Picks: +12% single target, crit reset (12), Multi-Hit (16). Endless Condemnation procs would need 33% cooldown reduction; Season 1 tops out around 10–11%."
         },
         {
           "name": "Bolt",
           "target": 18,
-          "note": "Strongest hit. +30% Skill Speed, +20% single target, guaranteed crit at 16."
+          "note": "Strongest hit. +30% Skill Speed, +20% single target, guaranteed crit at 16. Open every fight with a full-charge Bolt and full-charge it off cooldown."
         },
         {
           "name": "Divine Aura",
@@ -46,17 +46,17 @@
         {
           "name": "Judgment Thunder",
           "target": 13,
-          "note": "-20% MP, +12% single target. Leaves the macro once Earth Punishment is 20."
+          "note": "-20% MP, +12% single target. Take it off the boss bar once Earth Punishment is 20 and Condemnation and Bolt are 16+: it steals Condemnation's animation time, drains MP and cuts auto-attacks (which proc Discharge and Bolt cooldown). Then trim the extra Condemnation lines from the macro. Keep it for mobs or a manual cast in Chain of Torment's 6–7s downtime."
         },
         {
           "name": "Lightning Strike Scattershot",
           "target": 13,
-          "note": "Only during stagger; Multi-Hit, -1s cooldowns at 16."
+          "note": "Only during stagger, and only when Condemnation isn't proccing; Multi-Hit, -1s cooldowns at 16."
         },
         {
           "name": "Debilitating Mark",
           "target": 13,
-          "note": "-15% Defense, 20% stun."
+          "note": "-15% Defense, 20% stun. Keep it for party utility."
         },
         {
           "name": "Chain of Torment",
@@ -115,6 +115,12 @@
           "name": "Summon Resurrection",
           "target": 5,
           "note": "Replaces Light of Protection (doesn't stack with the Chanter's mantra). Absolution 15+ is the alternative."
+        }
+      ],
+      "skillOverrides": [
+        {
+          "name": "Debilitating Mark",
+          "note": "Not needed with a Chanter: their Earth Promise overrides the Mark debuff."
         }
       ]
     },
@@ -294,15 +300,21 @@
     ],
     "minEnchantWeapon": 10,
     "arcana": {
-      "Chalice": "Vigor (Time) — Condemnation",
-      "Parchment": "Any — Condemnation",
-      "Compass": "Vigor or Magic (Death) — Divine Aura",
-      "Bell": "Magic (Destruction) — Empyrean Lord's Grace",
-      "Mirror": "Vigor (Illusion) — Earth's Grace"
+      "Chalice": "Vigor (Time) — Condemnation, ideally with a second target: Divine Aura, Bolt, Radiant Recovery or Earth's Retribution",
+      "Parchment": "Vigor or Magic — Condemnation; keep and level every Parchment that has it",
+      "Compass": "Vigor or Magic (Death, for Crit) — Divine Aura: +4 reaches 20 with a +2 ring, +2 reaches 16",
+      "Bell": "Magic (Destruction, for Attack) — Empyrean Lord's Grace, aim for +3",
+      "Mirror": "Vigor (Illusion, for cooldown) — Earth's Grace (Healing Enhancement is fine)"
     },
     "arcanaSkills": [
       "Empyrean Lord's Grace",
       "Earth's Grace"
+    ],
+    "arcanaNotes": [
+      "2-piece Vigor (Chalice + Mirror) is enough. The 4-piece with Compass and Parchment is optional: single skill rolls matter far more than the set bonus.",
+      "Level 20 needs +6 from cards and ring together: e.g. +2 Parchment, +2 Chalice, +2 ring, or +4 on one card and +2 ring. If your Chalice has Condemnation plus a second target skill, look for a Parchment with the same pair to take both to 20.",
+      "Don't roll skills on the ring until your cards can actually reach 20. Soul-bind weapon, guard, armor and the other accessories first; the ring comes last.",
+      "Don't transmute a Chalice for two fixed skills (15 Mysterious Crystals and 5M Kina) — level cards with that instead."
     ]
   },
   "stats": [
@@ -327,10 +339,11 @@
       "Forest Spirit",
       "Talisra"
     ],
-    "avoid": [
+    "avoid": [],
+    "situational": [
       "Dark Veil"
     ],
-    "note": "Start with Forest Spirit wings; Talisra Wings from the season shop are best in slot."
+    "note": "Forest Spirit for bosses (cheapest, best boss damage), Dark Veil for non-boss content, Talisra from the season shop is best in slot. Collect every wing for the owned effects."
   },
   "titles": {
     "attack": [
@@ -344,6 +357,10 @@
     "other": [
       "Through Hell and Back",
       "Empty Closet"
+    ],
+    "notes": [
+      "Attack: Guardian of Baran or Artguard until Unbound by Genus (best in slot, needs every Genus board at 10). Defense: Saint. Cooldown: Through Hell and Back until Empty Closet (best in slot, Combat Speed and cooldown).",
+      "Empty Closet needs 700 skins: extract all blue-and-below gear on your main and alts (closet progress is shared) and combine the skins in the wardrobe. Track progress in the Achievements tab, not the wardrobe counter."
     ]
   },
   "daevanion": [
@@ -567,5 +584,6 @@
     ],
     "credits": "aion2-guides.info, mein-mmo.de, gamingpromax.com, JOHNPAL TV (“The Path to 2800+ Gear Score”) and Fubgun (“How to Reach 2800 ilvl”)"
   },
-  "daevanionNote": "Guide priority: orange Cooldown and Combat Speed nodes first, then Attack and Critical, then the blue +1 skill nodes. Azphel is PvP only."
+  "daevanionNote": "Guide priority: orange Cooldown and Combat Speed nodes first, then Attack and Critical, then the blue +1 skill nodes. Azphel is PvP only.",
+  "stigmaNote": "Earth Punishment to 20 first, Prayer of Amplification second, then Light of Protection (no Chanter) or Noble Aura (with Chanter)."
 }

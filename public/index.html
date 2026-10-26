@@ -135,6 +135,11 @@
   .tips details { border-top: 1px dashed var(--line); padding: 10px 0; }
   .tips summary { cursor: pointer; font-family: var(--display); font-size: 22px; font-weight: 600; }
   .tips ul { margin: 6px 0 0; padding-left: 20px; }
+  ol.todo { margin: 0 0 16px; padding: 0; list-style: none; counter-reset: todo; display: grid; gap: 10px; }
+  ol.todo li { counter-increment: todo; display: grid; grid-template-columns: 40px 1fr; gap: 0 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+  ol.todo li::before { content: counter(todo); grid-row: span 2; font-family: var(--display); font-size: 34px; font-weight: 600; line-height: 1; color: var(--gold); }
+  ol.todo b { font-weight: 600; }
+  ol.todo small { color: var(--muted); font-size: 15px; }
   footer { color: var(--muted); font-size: 14px; padding-top: 28px; }
   @media (prefers-reduced-motion: no-preference) { .bar i { transition: background .3s; } }
 </style>
@@ -161,6 +166,7 @@
   <div id="report">
     <div class="mode" id="mode" role="group" aria-label="Build to compare with"></div>
     <div class="profile" id="profile"></div>
+    <section id="todo"></section>
     <section id="ludra"></section>
     <section id="skills"></section>
     <section id="stigmas"></section>
@@ -195,7 +201,7 @@ const api = async (path, params) => {
   return data;
 };
 
-let guide, char, equip, items = {}, ctx = {}, mode = "pve";
+let guide, char, equip, items = {}, ctx = {}, mode = "pve", statOf = () => undefined;
 const GUIDES = ["cleric", "gladiator"], guides = {};
 async function useGuide(className) {
   const key = GUIDES.find(k => norm(k) === norm(className)) || "cleric";
@@ -312,9 +318,10 @@ function render() {
 
   const build = buildFor(mode);
   renderLevels($("#skills"), "Skills", build.skills, guide.skillCap, `Endgame levels for “${esc(build.label)}”. The outlined notch is the guide's target.`);
-  renderLevels($("#stigmas"), "Stigmas", build.stigmas, guide.skillCap, `${guide.stigmaSlots} slots in Season 1. Greyed rows are stigmas you have equipped that the preset doesn't use.`, true);
+  renderLevels($("#stigmas"), "Stigmas", build.stigmas, guide.skillCap, `${guide.stigmaSlots} slots in Season 1.${guide.stigmaNote ? " " + esc(guide.stigmaNote) : ""} Greyed rows are stigmas you have equipped that the preset doesn't use.`, true);
   renderLevels($("#passives"), "Passives", guide.passives.filter(x => x.priority < 3).map(x => ({ ...x, target: 10 })), 10, "Level these before any other passive; there is no hard cap in the guide, 10 is used as the first milestone.");
-  renderLudra(stat); renderGear(); renderStats(stat); renderExtras(); renderBoards();
+  statOf = stat;
+  renderTodo(); renderLudra(stat); renderGear(); renderStats(stat); renderExtras(); renderBoards();
 }
 
 function renderLevels(el, title, wanted, cap, lead, showExtras) {
@@ -453,12 +460,13 @@ function renderGear() {
   }).join("");
   const w = equip?.petwing?.wing;
   const wings = guide.wings;
-  const wingState = !w || !wings ? "" : wings.good.some(g => same(w.name, g)) ? "ok" : wings.avoid.some(a => same(w.name, a)) ? "bad" : "";
+  const wingState = !w || !wings ? "" : wings.good.some(g => same(w.name, g)) ? "ok" : wings.avoid.some(a => same(w.name, a)) ? "bad"
+    : (wings.situational || []).some(a => same(w.name, a)) ? "situational" : "";
   $("#gear").innerHTML = `<h3>Gear <small>${list.length} pieces</small></h3>
     <p class="lead">Soul binding lines and engraved manastones per piece. Green lines are the ones the guide asks for; red lines are defensive or resist lines it tells you to skip in PvE. Gold tags are active-skill lines on rings and arcana.</p>
     <ul class="gear">${html}
       ${w ? `<li><div><div class="slot">Wings</div><div class="item grade-${esc(w.grade)}">${esc(w.name)}${w.enchantLevel ? `<span class="ench">+${w.enchantLevel}</span>` : ""}</div></div>
-        <div><div class="lines"><span class="tag ${wingState}">${wingState === "ok" ? "guide pick" : wingState === "bad" ? "guide says: not these" : wings ? "any wing but Dark Veil works" : "the guide has no wing pick"}</span></div>${wings ? `<div class="slot">${esc(wings.note)}</div>` : ""}</div></li>` : ""}
+        <div><div class="lines"><span class="tag ${wingState}">${wingState === "ok" ? "guide pick" : wingState === "bad" ? "guide says: not these" : wingState === "situational" ? "non-boss content only" : wings ? "not a guide pick" : "the guide has no wing pick"}</span></div>${wings ? `<div class="slot">${esc(wings.note)}</div>` : ""}</div></li>` : ""}
     </ul>`;
 }
 async function loadItems() {
@@ -466,8 +474,79 @@ async function loadItems() {
   for (const e of list) {
     try { items[e.slotPos] = await api("/api/item", { ...ctx, id: e.id, enchantLevel: e.enchantLevel || 0, slotPos: e.slotPos }); }
     catch { items[e.slotPos] = { subStats: [], subSkills: [], magicStoneStat: [] }; }
-    renderGear();
+    renderGear(); renderTodo();
   }
+}
+
+// ---------- top 5 toward 2,800 ----------
+// Each rule looks at this character and returns { score, title, why } or nothing; the five highest scores are shown.
+const STONE_ILVL = { Common: 1, Rare: 2, Legend: 3, Epic: 3, Unique: 4 };
+function todoList() {
+  const ilvl = statOf("ItemLevel")?.value ?? 0;
+  const list = equip?.equipment?.equipmentList || [];
+  const loaded = list.length > 0 && list.every(e => items[e.slotPos]);
+  const tier = e => items[e.slotPos]?.level ?? 0;
+  const main = list.filter(e => e.slotPos < 41 && !/belt|amulet|bracelet|rune/i.test(e.slotPosName));
+  const named = arr => arr.map(e => e.slotPosName).join(", ");
+  const isWeapon = e => slotRule(e.slotPosName, e.name)?.match.includes("Weapon");
+  const isGuard = e => /sub|off|guard/i.test(e.slotPosName);
+  const out = [];
+  const add = (score, title, why) => out.push({ score, title, why });
+
+  if (ilvl >= 2800) add(100, "You're at Ludra Normal — next stop 3,000 for Hard", "Same plan with more Kina: Amp +2/+3 on more pieces. Superior manastones go into item-level-102 gear only.");
+  if (loaded) {
+    if (ilvl < 2100) {
+      const low = main.filter(e => tier(e) < 70);
+      const have = main.length - low.length, missing = Math.max(0, 14 - main.length);
+      if (have < 12) add(95, `Get ${12 - have} more main slots to item level 70 (${have}/12)`,
+        `${low.length ? "Under 70 now: " + named(low) + ". " : ""}${missing ? missing + " main slot" + (missing > 1 ? "s are" : " is") + " empty. " : ""}Vakron always drops usable gear; Gartua on Immortal Island twice a day.`);
+    } else {
+      const low = main.filter(e => tier(e) < 86);
+      if (low.length) {
+        const g = low.find(isGuard), w = low.find(isWeapon);
+        add(92, `Replace ${low.length} piece${low.length > 1 ? "s" : ""} under item level 86`, `${named(low)}. Horn Den first, then Fire Temple.${g ? " Guard: save 3 Horn Den pity vouchers for it." : ""}${w ? " Weapon: craft it if you craft one thing." : ""}`);
+      }
+    }
+    const cards = list.filter(e => e.slotPos >= 41);
+    const notGold = cards.filter(e => tier(e) < 80);
+    if (cards.length < 5) add(90, `Fill all 5 Arcana slots (${cards.length}/5)`, "Even a grey card is +20 item level. Transcendence 1 at 1,600, 2 at 1,900.");
+    else if (notGold.length && ilvl >= 2500) add(88, `Farm Transcendence 4 for gold cards (${5 - notGold.length}/5 gold)`, `Not gold yet: ${notGold.map(e => items[e.slotPos]?.categoryName || e.slotPosName).join(", ")}. Each gold card is 80 item level; 6% per boss.`);
+    else if (notGold.length && ilvl >= 2200 && notGold.some(e => tier(e) < 60)) add(60, "1–2 Transcendence 3 runs for blue cards", "Only to fill weak slots or cross 2,500 — save the energy for Transcendence 4.");
+    if (ilvl >= 2300) {
+      for (const [e, score] of [[list.find(isWeapon), 87], [list.find(isGuard), 86]]) {
+        if (!e || tier(e) < 86 || (e.enchantLevel >= 15 && e.exceedLevel >= 2)) continue;
+        add(score, `${e.slotPosName} to +15 Amp 2 (now +${e.enchantLevel}${e.exceedLevel ? " Amp " + e.exceedLevel : ""})`,
+          "Each Amp level is +5 item level and +1% Damage Boost. One piece at +15 Amp 2 beats several pieces at +15.");
+      }
+    }
+    const empty = list.reduce((n, e) => n + Math.max(0, (items[e.slotPos]?.magicStoneSlotCount || 0) - (items[e.slotPos]?.magicStoneStat || []).length), 0);
+    if (empty) add(80, `Fill ${empty} empty manastone slot${empty > 1 ? "s" : ""}`, "Every stone is +1 to +4 item level, cheaper than anything else on this list.");
+    const weak = main.filter(e => tier(e) >= 86 && (items[e.slotPos]?.magicStoneStat || []).reduce((n, m) => n + (STONE_ILVL[m.grade] || 1), 0) < 7);
+    if (ilvl >= 2100 && weak.length) add(55, `Better manastones on ${weak.length} item-level-86 piece${weak.length > 1 ? "s" : ""}`, `${named(weak)}. Intermediate stones (about 35k Kina): 1 blue, 1–2 green, 1–2 white is +7–8 per piece. Don't chase more — no pity.`);
+  }
+  const build = buildFor(mode);
+  const stig = build.stigmas.map(w => ({ w, l: levelOf(w.name).lvl })).filter(x => x.l < x.w.target);
+  if (stig.length) add(70, `Stigma Shards: ${stig[0].w.name} ${stig[0].l} → ${stig[0].w.target}`, `Stigmas are the biggest source of real damage.${stig.length > 1 ? ` Also short: ${stig.slice(1).map(x => `${x.w.name} ${x.l}/${x.w.target}`).join(", ")}.` : ""} Nightmare and Shugo shops; Abyss Points from supply requests, sieges and corridors.`);
+  const core = build.skills.slice(0, 3).map(w => ({ w, s: findSkill(w.name) })).filter(x => (x.s?.skillLevel || 0) < x.w.target);
+  if (core.length) add(50, `Skill lines: ${core.map(x => `${x.w.name} ${x.s?.skillLevel || 0}/${x.w.target}`).join(", ")}`, "From Arcana cards and ring lines. 16 opens the bottom specialization row, 20 the third slot. Roll the ring last.");
+  for (const r of guide.stats) {
+    const v = r.match.map(statOf).find(Boolean)?.value;
+    if (v != null && v < r.min) add(45, `${r.match[0]} ${v} → ${r.min.toLocaleString()}`, "Ludra bosses parry and resist crits; the training dummy doesn't. Manastones and soul-binding lines.");
+  }
+  if (ilvl >= 2600 && !(char.daevanion?.boardList || []).some(b => same(b.name, "Ariel") && b.open)) add(40, "Ariel board: Krao Cave and Draupnir Hard", "Up to +60 item level. Lowest priority for damage (Fubgun) — run it when you need the raw item level.");
+  const pet = equip?.petwing?.pet;
+  if (!pet || pet.level < 3) add(30, "Pet to level 3", "Genus Insight crystals; pet stats count for every character on the server.");
+  return out.sort((a, b) => b.score - a.score).slice(0, 5);
+}
+function renderTodo() {
+  if (!char) return;
+  const ilvl = statOf("ItemLevel")?.value ?? 0;
+  const list = equip?.equipment?.equipmentList || [];
+  const waiting = list.some(e => !items[e.slotPos]);
+  const todo = todoList();
+  $("#todo").innerHTML = `<h3>Top 5 right now <small>toward ${ilvl >= 2800 ? "3,000" : "2,800"} item level</small></h3>
+    <p class="lead">Picked from this character's gear, cards and stigmas.${waiting ? " Gear is still loading — the list fills in as pieces arrive." : ""}</p>
+    <ol class="todo">${todo.map(t => `<li><b>${esc(t.title)}</b><small>${esc(t.why)}</small></li>`).join("") || "<li><b>Nothing urgent found</b><small>Follow the roadmap below.</small></li>"}</ol>`;
 }
 
 // ---------- stats, titles, boards ----------
@@ -507,8 +586,9 @@ function renderExtras() {
   $("#extras").innerHTML = `<h3>Titles, pet, arcana</h3>
     <p class="lead">${guide.titles ? "Titles the guide names" : "The guide names no titles for this class"} (${char.title?.ownedCount ?? "?"} of ${char.title?.totalCount ?? "?"} owned in total). Equipped now: “${esc(char.profile?.titleName || "none")}”.</p>
     ${row("Attack title", t.attack)}${row("Defense title", t.defense)}${row("Cooldown title", t.other)}
+    ${(t.notes || []).map(n => `<p class="note">${esc(n)}</p>`).join("")}
     <div class="row"><div class="name">Pet</div><div class="lines"><span class="tag">${pet ? esc(pet.name) + " · Lv " + pet.level : "none equipped"}</span></div><div class="lvl ${pet && pet.level >= 3 ? "ok" : "warn"}">${pet ? pet.level : 0}<span> / 3</span></div><p class="note">Get every pet to level 3 early for Genus Insight crystals.</p></div>
-    <div class="row"><div class="name">Arcana plan<small>what to roll for</small></div><div class="lines">${arcana}</div></div>`;
+    <div class="row"><div class="name">Arcana plan<small>what to roll for</small></div><div class="lines">${arcana}</div>${(guide.gear.arcanaNotes || []).map(n => `<p class="note">${esc(n)}</p>`).join("")}</div>`;
 }
 function renderBoards() {
   const boards = char.daevanion?.boardList || [];
